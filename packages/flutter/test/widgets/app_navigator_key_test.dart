@@ -4,7 +4,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 Route<void> generateRoute(RouteSettings settings) => PageRouteBuilder<void>(
   settings: settings,
@@ -14,24 +13,19 @@ Route<void> generateRoute(RouteSettings settings) => PageRouteBuilder<void>(
 );
 
 void main() {
-  testWidgetsWithLeakTracking('WidgetsApp.navigatorKey', (WidgetTester tester) async {
+  testWidgets('WidgetsApp.navigatorKey', (WidgetTester tester) async {
     final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
-    await tester.pumpWidget(WidgetsApp(
-      navigatorKey: key,
-      color: const Color(0xFF112233),
-      onGenerateRoute: generateRoute,
-    ));
+    await tester.pumpWidget(
+      WidgetsApp(navigatorKey: key, color: const Color(0xFF112233), onGenerateRoute: generateRoute),
+    );
     expect(key.currentState, isA<NavigatorState>());
-    await tester.pumpWidget(WidgetsApp(
-      color: const Color(0xFF112233),
-      onGenerateRoute: generateRoute,
-    ));
+    await tester.pumpWidget(
+      WidgetsApp(color: const Color(0xFF112233), onGenerateRoute: generateRoute),
+    );
     expect(key.currentState, isNull);
-    await tester.pumpWidget(WidgetsApp(
-      navigatorKey: key,
-      color: const Color(0xFF112233),
-      onGenerateRoute: generateRoute,
-    ));
+    await tester.pumpWidget(
+      WidgetsApp(navigatorKey: key, color: const Color(0xFF112233), onGenerateRoute: generateRoute),
+    );
     expect(key.currentState, isA<NavigatorState>());
   });
 }

@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('AnimatedPadding.debugFillProperties', (WidgetTester tester) async {
+  testWidgets('AnimatedPadding.debugFillProperties', (WidgetTester tester) async {
     final AnimatedPadding padding = AnimatedPadding(
       padding: const EdgeInsets.all(7.0),
       curve: Curves.ease,
@@ -17,7 +16,9 @@ void main() {
     expect(padding, hasOneLineDescription);
   });
 
-  testWidgetsWithLeakTracking('AnimatedPadding padding visual-to-directional animation', (WidgetTester tester) async {
+  testWidgets('AnimatedPadding padding visual-to-directional animation', (
+    WidgetTester tester,
+  ) async {
     final Key target = UniqueKey();
 
     await tester.pumpWidget(
@@ -59,7 +60,9 @@ void main() {
     expect(tester.getTopRight(find.byKey(target)), const Offset(700.0, 0.0));
   });
 
-  testWidgetsWithLeakTracking('AnimatedPadding animated padding clamped to positive values', (WidgetTester tester) async {
+  testWidgets('AnimatedPadding animated padding clamped to positive values', (
+    WidgetTester tester,
+  ) async {
     final Key target = UniqueKey();
 
     await tester.pumpWidget(
@@ -97,5 +100,4 @@ void main() {
     expect(tester.getSize(find.byKey(target)), const Size(800.0, 600.0));
     expect(tester.getTopRight(find.byKey(target)), const Offset(800.0, 0.0));
   });
-
 }

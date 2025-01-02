@@ -7,6 +7,9 @@ import 'dart:collection';
 
 import 'package:meta/meta.dart';
 
+// TODO(ianh): We should remove AppContext's mechanism and replace it with
+// passing dependencies directly in constructors, methods, etc. See #47161.
+
 /// Generates an [AppContext] value.
 ///
 /// Generators are allowed to return `null`, in which case the context will
@@ -96,7 +99,8 @@ class AppContext {
       if (index >= 0) {
         // We're already in the process of trying to generate this type.
         throw ContextDependencyCycleException._(
-            UnmodifiableListView<Type>(_reentrantChecks!.sublist(index)));
+          UnmodifiableListView<Type>(_reentrantChecks!.sublist(index)),
+        );
       }
 
       _reentrantChecks!.add(type);

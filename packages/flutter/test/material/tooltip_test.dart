@@ -10,29 +10,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
+import '../widgets/feedback_tester.dart';
 import '../widgets/semantics_tester.dart';
-import 'feedback_tester.dart';
 
 const String tooltipText = 'TIP';
 
 Finder _findTooltipContainer(String tooltipText) {
-  return find.ancestor(
-    of: find.text(tooltipText),
-    matching: find.byType(Container),
-  );
+  return find.ancestor(of: find.text(tooltipText), matching: find.byType(Container));
 }
 
 void main() {
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - center', (WidgetTester tester) async {
+  testWidgets('Does tooltip end up in the right place - center', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Overlay(
+      MaterialApp(
+        home: Overlay(
           initialEntries: <OverlayEntry>[
             entry = OverlayEntry(
               builder: (BuildContext context) {
@@ -71,9 +71,7 @@ void main() {
      *                   *
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     final Offset tipInGlobal = tip.localToGlobal(tip.size.topCenter(Offset.zero));
     // The exact position of the left side depends on the font the test framework
     // happens to pick, so we don't test that.
@@ -81,15 +79,21 @@ void main() {
     expect(tipInGlobal.dy, 20.0);
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - center with padding outside overlay', (WidgetTester tester) async {
+  testWidgets('Does tooltip end up in the right place - center with padding outside overlay', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Padding(
+      MaterialApp(
+        home: Padding(
           padding: const EdgeInsets.all(20),
           child: Overlay(
             initialEntries: <OverlayEntry>[
@@ -133,9 +137,7 @@ void main() {
      *                      * } - 20.0 padding outside overlay
      ************************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     final Offset tipInGlobal = tip.localToGlobal(tip.size.topCenter(Offset.zero));
     // The exact position of the left side depends on the font the test framework
     // happens to pick, so we don't test that.
@@ -143,41 +145,45 @@ void main() {
     expect(tipInGlobal.dy, 40.0);
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - top left', (WidgetTester tester) async {
+  testWidgets('Material2 - Does tooltip end up in the right place - top left', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Theme(
-        data: ThemeData(useMaterial3: false),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
-            initialEntries: <OverlayEntry>[
-              entry = OverlayEntry(
-                builder: (BuildContext context) {
-                  return Stack(
-                    children: <Widget>[
-                      Positioned(
-                        left: 0.0,
-                        top: 0.0,
-                        child: Tooltip(
-                          key: tooltipKey,
-                          message: tooltipText,
-                          height: 20.0,
-                          padding: const EdgeInsets.all(5.0),
-                          verticalOffset: 20.0,
-                          preferBelow: false,
-                          child: const SizedBox.shrink(),
-                        ),
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 0.0,
+                      top: 0.0,
+                      child: Tooltip(
+                        key: tooltipKey,
+                        message: tooltipText,
+                        height: 20.0,
+                        padding: const EdgeInsets.all(5.0),
+                        verticalOffset: 20.0,
+                        preferBelow: false,
+                        child: const SizedBox.shrink(),
                       ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -193,22 +199,84 @@ void main() {
      *                   *
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(24.0)); // 14.0 height + 5.0 padding * 2 (top, bottom)
     expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)), equals(const Offset(10.0, 20.0)));
-  });
+  }, skip: kIsWeb && !isSkiaWeb); // https://github.com/flutter/flutter/issues/99933
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - center prefer above fits', (WidgetTester tester) async {
+  testWidgets('Material3 - Does tooltip end up in the right place - top left', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Overlay(
+      MaterialApp(
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 0.0,
+                      top: 0.0,
+                      child: Tooltip(
+                        key: tooltipKey,
+                        message: tooltipText,
+                        height: 20.0,
+                        padding: const EdgeInsets.all(5.0),
+                        verticalOffset: 20.0,
+                        preferBelow: false,
+                        child: const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    /********************* 800x600 screen
+     *o                  * y=0
+     *|                  * }- 20.0 vertical offset, of which 10.0 is in the screen edge margin
+     *+----+             * \- (5.0 padding in height)
+     *|    |             * |- 20 height
+     *+----+             * /- (5.0 padding in height)
+     *                   *
+     *********************/
+
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(30.0)); // 20.0 height + 5.0 padding * 2 (top, bottom)
+    expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)), equals(const Offset(10.0, 20.0)));
+  }, skip: kIsWeb && !isSkiaWeb); // https://github.com/flutter/flutter/issues/99933
+
+  testWidgets('Does tooltip end up in the right place - center prefer above fits', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    late final OverlayEntry entry;
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Overlay(
           initialEntries: <OverlayEntry>[
             entry = OverlayEntry(
               builder: (BuildContext context) {
@@ -248,23 +316,27 @@ void main() {
      *                   *
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(100.0));
     expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(100.0));
     expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(200.0));
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - center prefer above does not fit', (WidgetTester tester) async {
+  testWidgets('Does tooltip end up in the right place - center prefer above does not fit', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Overlay(
+      MaterialApp(
+        home: Overlay(
           initialEntries: <OverlayEntry>[
             entry = OverlayEntry(
               builder: (BuildContext context) {
@@ -315,23 +387,27 @@ void main() {
      *                   * }- 10.0 margin
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(190.0));
     expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(399.0));
     expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(589.0));
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - center prefer below fits', (WidgetTester tester) async {
+  testWidgets('Does tooltip end up in the right place - center prefer below fits', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Overlay(
+      MaterialApp(
+        home: Overlay(
           initialEntries: <OverlayEntry>[
             entry = OverlayEntry(
               builder: (BuildContext context) {
@@ -370,25 +446,89 @@ void main() {
      *                   * }- 10.0 margin
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(190.0));
     expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(400.0));
     expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(590.0));
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - way off to the right', (WidgetTester tester) async {
+  testWidgets('Material2 - Does tooltip end up in the right place - way off to the right', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Theme(
-        data: ThemeData(useMaterial3: false),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 1600.0,
+                      top: 300.0,
+                      child: Tooltip(
+                        key: tooltipKey,
+                        message: tooltipText,
+                        height: 10.0,
+                        padding: EdgeInsets.zero,
+                        verticalOffset: 10.0,
+                        preferBelow: true,
+                        child: const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    /********************* 800x600 screen
+     *                   *
+     *                   *
+     *                   * y=300.0;   target -->   o
+     *              ___| * }-10.0 vertical offset
+     *             |___| * }-10.0 height
+     *                   *
+     *                   * }-10.0 margin
+     *********************/
+
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(14.0));
+    expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(310.0));
+    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dx, equals(790.0));
+    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(324.0));
+  });
+
+  testWidgets(
+    'Material3 - Does tooltip end up in the right place - way off to the right',
+    (WidgetTester tester) async {
+      final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+      late final OverlayEntry entry;
+      addTearDown(
+        () =>
+            entry
+              ..remove()
+              ..dispose(),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Overlay(
             initialEntries: <OverlayEntry>[
               entry = OverlayEntry(
                 builder: (BuildContext context) {
@@ -414,12 +554,11 @@ void main() {
             ],
           ),
         ),
-      ),
-    );
-    tooltipKey.currentState?.ensureTooltipVisible();
-    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+      );
+      tooltipKey.currentState?.ensureTooltipVisible();
+      await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-    /********************* 800x600 screen
+      /********************* 800x600 screen
      *                   *
      *                   *
      *                   * y=300.0;   target -->   o
@@ -429,50 +568,54 @@ void main() {
      *                   * }-10.0 margin
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
-    expect(tip.size.height, equals(14.0));
-    expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(310.0));
-    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dx, equals(790.0));
-    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(324.0));
-  });
+      final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+      expect(tip.size.height, equals(20.0));
+      expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(310.0));
+      expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dx, equals(790.0));
+      expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(330.0));
+    },
+    skip: kIsWeb && !isSkiaWeb, // https://github.com/flutter/flutter/issues/99933
+  );
 
-  testWidgetsWithLeakTracking('Does tooltip end up in the right place - near the edge', (WidgetTester tester) async {
+  testWidgets('Material2 - Does tooltip end up in the right place - near the edge', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Theme(
-        data: ThemeData(useMaterial3: false),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
-            initialEntries: <OverlayEntry>[
-              entry = OverlayEntry(
-                builder: (BuildContext context) {
-                  return Stack(
-                    children: <Widget>[
-                      Positioned(
-                        left: 780.0,
-                        top: 300.0,
-                        child: Tooltip(
-                          key: tooltipKey,
-                          message: tooltipText,
-                          height: 10.0,
-                          padding: EdgeInsets.zero,
-                          verticalOffset: 10.0,
-                          preferBelow: true,
-                          child: const SizedBox.shrink(),
-                        ),
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 780.0,
+                      top: 300.0,
+                      child: Tooltip(
+                        key: tooltipKey,
+                        message: tooltipText,
+                        height: 10.0,
+                        padding: EdgeInsets.zero,
+                        verticalOffset: 10.0,
+                        preferBelow: true,
+                        child: const SizedBox.shrink(),
                       ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -489,34 +632,92 @@ void main() {
      *                   * }-10.0 margin
      *********************/
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(14.0));
     expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(310.0));
     expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dx, equals(790.0));
     expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(324.0));
   });
 
-  testWidgetsWithLeakTracking('Tooltip should be fully visible when MediaQuery.viewInsets > 0', (WidgetTester tester) async {
+  testWidgets('Material3 - Does tooltip end up in the right place - near the edge', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    late final OverlayEntry entry;
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Stack(
+                  children: <Widget>[
+                    Positioned(
+                      left: 780.0,
+                      top: 300.0,
+                      child: Tooltip(
+                        key: tooltipKey,
+                        message: tooltipText,
+                        height: 10.0,
+                        padding: EdgeInsets.zero,
+                        verticalOffset: 10.0,
+                        preferBelow: true,
+                        child: const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    /********************* 800x600 screen
+     *                   *
+     *                   *
+     *                o  * y=300.0
+     *              __|  * }-10.0 vertical offset
+     *             |___| * }-10.0 height
+     *                   *
+     *                   * }-10.0 margin
+     *********************/
+
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(20.0));
+    expect(tip.localToGlobal(tip.size.topLeft(Offset.zero)).dy, equals(310.0));
+    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dx, equals(790.0));
+    expect(tip.localToGlobal(tip.size.bottomRight(Offset.zero)).dy, equals(330.0));
+  }, skip: kIsWeb && !isSkiaWeb); // https://github.com/flutter/flutter/issues/99933
+
+  testWidgets('Tooltip should be fully visible when MediaQuery.viewInsets > 0', (
+    WidgetTester tester,
+  ) async {
     // Regression test for https://github.com/flutter/flutter/issues/23666
     Widget materialAppWithViewInsets(double viewInsetsHeight) {
       final Widget scaffold = Scaffold(
         body: const TextField(),
         floatingActionButton: FloatingActionButton(
           tooltip: tooltipText,
-          onPressed: () { /* do nothing */ },
+          onPressed: () {
+            /* do nothing */
+          },
           child: const Icon(Icons.add),
         ),
       );
       return MediaQuery(
-        data: MediaQueryData(
-          viewInsets: EdgeInsets.only(bottom: viewInsetsHeight),
-        ),
-        child: MaterialApp(
-          useInheritedMediaQuery: true,
-          home: scaffold,
-        ),
+        data: MediaQueryData(viewInsets: EdgeInsets.only(bottom: viewInsetsHeight)),
+        child: MaterialApp(useInheritedMediaQuery: true, home: scaffold),
       );
     }
 
@@ -553,16 +754,20 @@ void main() {
     expect(tooltipTopRight.dy, lessThan(fabTopRight.dy));
   });
 
-  testWidgetsWithLeakTracking('Custom tooltip margin', (WidgetTester tester) async {
+  testWidgets('Custom tooltip margin', (WidgetTester tester) async {
     const double customMarginValue = 10.0;
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Overlay(
+      MaterialApp(
+        home: Overlay(
           initialEntries: <OverlayEntry>[
             entry = OverlayEntry(
               builder: (BuildContext context) {
@@ -582,49 +787,39 @@ void main() {
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-    final Offset topLeftTipInGlobal = tester.getTopLeft(
-      _findTooltipContainer(tooltipText),
-    );
+    final Offset topLeftTipInGlobal = tester.getTopLeft(_findTooltipContainer(tooltipText));
     final Offset topLeftTooltipContentInGlobal = tester.getTopLeft(find.text(tooltipText));
     expect(topLeftTooltipContentInGlobal.dx, topLeftTipInGlobal.dx + customMarginValue);
     expect(topLeftTooltipContentInGlobal.dy, topLeftTipInGlobal.dy + customMarginValue);
 
-    final Offset topRightTipInGlobal = tester.getTopRight(
-      _findTooltipContainer(tooltipText),
-    );
+    final Offset topRightTipInGlobal = tester.getTopRight(_findTooltipContainer(tooltipText));
     final Offset topRightTooltipContentInGlobal = tester.getTopRight(find.text(tooltipText));
     expect(topRightTooltipContentInGlobal.dx, topRightTipInGlobal.dx - customMarginValue);
     expect(topRightTooltipContentInGlobal.dy, topRightTipInGlobal.dy + customMarginValue);
 
-    final Offset bottomLeftTipInGlobal = tester.getBottomLeft(
-      _findTooltipContainer(tooltipText),
-    );
+    final Offset bottomLeftTipInGlobal = tester.getBottomLeft(_findTooltipContainer(tooltipText));
     final Offset bottomLeftTooltipContentInGlobal = tester.getBottomLeft(find.text(tooltipText));
     expect(bottomLeftTooltipContentInGlobal.dx, bottomLeftTipInGlobal.dx + customMarginValue);
     expect(bottomLeftTooltipContentInGlobal.dy, bottomLeftTipInGlobal.dy - customMarginValue);
 
-    final Offset bottomRightTipInGlobal = tester.getBottomRight(
-      _findTooltipContainer(tooltipText),
-    );
+    final Offset bottomRightTipInGlobal = tester.getBottomRight(_findTooltipContainer(tooltipText));
     final Offset bottomRightTooltipContentInGlobal = tester.getBottomRight(find.text(tooltipText));
     expect(bottomRightTooltipContentInGlobal.dx, bottomRightTipInGlobal.dx - customMarginValue);
     expect(bottomRightTooltipContentInGlobal.dy, bottomRightTipInGlobal.dy - customMarginValue);
   });
 
-  testWidgetsWithLeakTracking('Default tooltip message textStyle - light', (WidgetTester tester) async {
+  testWidgets('Material2 - Default tooltip message textStyle - light', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
-    await tester.pumpWidget(MaterialApp(
-      theme: ThemeData(useMaterial3: false),
-      home: Tooltip(
-        key: tooltipKey,
-        message: tooltipText,
-        child: Container(
-          width: 100.0,
-          height: 100.0,
-          color: Colors.green[500],
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Tooltip(
+          key: tooltipKey,
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
         ),
       ),
-    ));
+    );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
@@ -632,26 +827,48 @@ void main() {
     expect(textStyle.color, Colors.white);
     expect(textStyle.fontFamily, 'Roboto');
     expect(textStyle.decoration, TextDecoration.none);
-    expect(textStyle.debugLabel, '((englishLike bodyMedium 2014).merge(blackMountainView bodyMedium)).copyWith');
+    expect(
+      textStyle.debugLabel,
+      '((englishLike bodyMedium 2014).merge(blackMountainView bodyMedium)).copyWith',
+    );
   });
 
-  testWidgetsWithLeakTracking('Default tooltip message textStyle - dark', (WidgetTester tester) async {
+  testWidgets('Material3 - Default tooltip message textStyle - light', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
-    await tester.pumpWidget(MaterialApp(
-      theme: ThemeData(
-        useMaterial3: false,
-        brightness: Brightness.dark,
-      ),
-      home: Tooltip(
-        key: tooltipKey,
-        message: tooltipText,
-        child: Container(
-          width: 100.0,
-          height: 100.0,
-          color: Colors.green[500],
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Tooltip(
+          key: tooltipKey,
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
         ),
       ),
-    ));
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    final TextStyle textStyle = tester.widget<Text>(find.text(tooltipText)).style!;
+    expect(textStyle.color, Colors.white);
+    expect(textStyle.fontFamily, 'Roboto');
+    expect(textStyle.decoration, TextDecoration.none);
+    expect(
+      textStyle.debugLabel,
+      '((englishLike bodyMedium 2021).merge((blackMountainView bodyMedium).apply)).copyWith',
+    );
+  });
+
+  testWidgets('Material2 - Default tooltip message textStyle - dark', (WidgetTester tester) async {
+    final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false, brightness: Brightness.dark),
+        home: Tooltip(
+          key: tooltipKey,
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
+        ),
+      ),
+    );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
@@ -659,26 +876,49 @@ void main() {
     expect(textStyle.color, Colors.black);
     expect(textStyle.fontFamily, 'Roboto');
     expect(textStyle.decoration, TextDecoration.none);
-    expect(textStyle.debugLabel, '((englishLike bodyMedium 2014).merge(whiteMountainView bodyMedium)).copyWith');
+    expect(
+      textStyle.debugLabel,
+      '((englishLike bodyMedium 2014).merge(whiteMountainView bodyMedium)).copyWith',
+    );
   });
 
-  testWidgetsWithLeakTracking('Custom tooltip message textStyle', (WidgetTester tester) async {
+  testWidgets('Material3 - Default tooltip message textStyle - dark', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
-    await tester.pumpWidget(MaterialApp(
-      home: Tooltip(
-        key: tooltipKey,
-        textStyle: const TextStyle(
-          color: Colors.orange,
-          decoration: TextDecoration.underline,
-        ),
-        message: tooltipText,
-        child: Container(
-          width: 100.0,
-          height: 100.0,
-          color: Colors.green[500],
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark),
+        home: Tooltip(
+          key: tooltipKey,
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
         ),
       ),
-    ));
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    final TextStyle textStyle = tester.widget<Text>(find.text(tooltipText)).style!;
+    expect(textStyle.color, Colors.black);
+    expect(textStyle.fontFamily, 'Roboto');
+    expect(textStyle.decoration, TextDecoration.none);
+    expect(
+      textStyle.debugLabel,
+      '((englishLike bodyMedium 2021).merge((whiteMountainView bodyMedium).apply)).copyWith',
+    );
+  });
+
+  testWidgets('Custom tooltip message textStyle', (WidgetTester tester) async {
+    final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Tooltip(
+          key: tooltipKey,
+          textStyle: const TextStyle(color: Colors.orange, decoration: TextDecoration.underline),
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
+        ),
+      ),
+    );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
@@ -688,7 +928,7 @@ void main() {
     expect(textStyle.decoration, TextDecoration.underline);
   });
 
-  testWidgetsWithLeakTracking('Custom tooltip message textAlign', (WidgetTester tester) async {
+  testWidgets('Custom tooltip message textAlign', (WidgetTester tester) async {
     Future<void> pumpTooltipWithTextAlign({TextAlign? textAlign}) async {
       final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
       await tester.pumpWidget(
@@ -697,11 +937,7 @@ void main() {
             key: tooltipKey,
             textAlign: textAlign,
             message: tooltipText,
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              color: Colors.green[500],
-            ),
+            child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
           ),
         ),
       );
@@ -723,7 +959,7 @@ void main() {
     expect(textAlign, TextAlign.end);
   });
 
-  testWidgetsWithLeakTracking('Tooltip overlay respects ambient Directionality', (WidgetTester tester) async {
+  testWidgets('Tooltip overlay respects ambient Directionality', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/40702.
     Widget buildApp(String text, TextDirection textDirection) {
       return MaterialApp(
@@ -732,11 +968,7 @@ void main() {
           child: Center(
             child: Tooltip(
               message: text,
-              child: Container(
-                width: 100.0,
-                height: 100.0,
-                color: Colors.green[500],
-              ),
+              child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
             ),
           ),
         ),
@@ -746,7 +978,9 @@ void main() {
     await tester.pumpWidget(buildApp(tooltipText, TextDirection.rtl));
     await tester.longPress(find.byType(Tooltip));
     expect(find.text(tooltipText), findsOneWidget);
-    RenderParagraph tooltipRenderParagraph = tester.renderObject<RenderParagraph>(find.text(tooltipText));
+    RenderParagraph tooltipRenderParagraph = tester.renderObject<RenderParagraph>(
+      find.text(tooltipText),
+    );
     expect(tooltipRenderParagraph.textDirection, TextDirection.rtl);
 
     await tester.pump(const Duration(seconds: 10));
@@ -760,31 +994,33 @@ void main() {
     expect(tooltipRenderParagraph.textDirection, TextDirection.ltr);
   });
 
-  testWidgetsWithLeakTracking('Tooltip overlay wrapped with a non-fallback DefaultTextStyle widget', (WidgetTester tester) async {
+  testWidgets('Tooltip overlay wrapped with a non-fallback DefaultTextStyle widget', (
+    WidgetTester tester,
+  ) async {
     // A Material widget is needed as an ancestor of the Text widget.
     // It is invalid to have text in a Material application that
     // does not have a Material ancestor.
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
-    await tester.pumpWidget(MaterialApp(
-      home: Tooltip(
-        key: tooltipKey,
-        message: tooltipText,
-        child: Container(
-          width: 100.0,
-          height: 100.0,
-          color: Colors.green[500],
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Tooltip(
+          key: tooltipKey,
+          message: tooltipText,
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
         ),
       ),
-    ));
+    );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-    final TextStyle textStyle = tester.widget<DefaultTextStyle>(
-      find.ancestor(
-        of: find.text(tooltipText),
-        matching: find.byType(DefaultTextStyle),
-      ).first,
-    ).style;
+    final TextStyle textStyle =
+        tester
+            .widget<DefaultTextStyle>(
+              find
+                  .ancestor(of: find.text(tooltipText), matching: find.byType(DefaultTextStyle))
+                  .first,
+            )
+            .style;
 
     // The default fallback text style results in a text with a
     // double underline of Color(0xffffff00).
@@ -793,29 +1029,33 @@ void main() {
     expect(textStyle.decorationStyle, isNot(TextDecorationStyle.double));
   });
 
-  testWidgetsWithLeakTracking('Does tooltip end up with the right default size, shape, and color', (WidgetTester tester) async {
+  testWidgets('Material2 - Does tooltip end up with the right default size, shape, and color', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Theme(
-        data: ThemeData(useMaterial3: false),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
-            initialEntries: <OverlayEntry>[
-              entry = OverlayEntry(
-                builder: (BuildContext context) {
-                  return Tooltip(
-                    key: tooltipKey,
-                    message: tooltipText,
-                    child: const SizedBox.shrink(),
-                  );
-                },
-              ),
-            ],
-          ),
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Tooltip(
+                  key: tooltipKey,
+                  message: tooltipText,
+                  child: const SizedBox.shrink(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -825,99 +1065,242 @@ void main() {
     final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(32.0));
     expect(tip.size.width, equals(74.0));
-    expect(tip, paints..rrect(
-      rrect: RRect.fromRectAndRadius(tip.paintBounds, const Radius.circular(4.0)),
-      color: const Color(0xe6616161),
-    ));
+    expect(
+      tip,
+      paints..rrect(
+        rrect: RRect.fromRectAndRadius(tip.paintBounds, const Radius.circular(4.0)),
+        color: const Color(0xe6616161),
+      ),
+    );
 
-    final Container tooltipContainer = tester.firstWidget<Container>(_findTooltipContainer(tooltipText));
+    final Container tooltipContainer = tester.firstWidget<Container>(
+      _findTooltipContainer(tooltipText),
+    );
     expect(tooltipContainer.padding, const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0));
   });
 
-  testWidgetsWithLeakTracking('Tooltip default size, shape, and color test for Desktop', (WidgetTester tester) async {
-    // Regressing test for https://github.com/flutter/flutter/issues/68601
+  testWidgets('Material3 - Does tooltip end up with the right default size, shape, and color', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    late final OverlayEntry entry;
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
+
     await tester.pumpWidget(
       MaterialApp(
-        theme: ThemeData(useMaterial3: false),
-        home: Tooltip(
-          key: tooltipKey,
-          message: tooltipText,
-          child: const SizedBox.shrink(),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Tooltip(
+                  key: tooltipKey,
+                  message: tooltipText,
+                  child: const SizedBox.shrink(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-    final RenderParagraph tooltipRenderParagraph = tester.renderObject<RenderParagraph>(find.text(tooltipText));
-    expect(tooltipRenderParagraph.textSize.height, equals(12.0));
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(32.0));
+    expect(tip.size.width, equals(74.75));
+    expect(
+      tip,
+      paints..rrect(
+        rrect: RRect.fromRectAndRadius(tip.paintBounds, const Radius.circular(4.0)),
+        color: const Color(0xe6616161),
+      ),
+    );
 
-    final RenderBox tooltipRenderBox = tester.renderObject(_findTooltipContainer(tooltipText));
-    expect(tooltipRenderBox.size.height, equals(24.0));
-    expect(tooltipRenderBox, paints..rrect(
-      rrect: RRect.fromRectAndRadius(tooltipRenderBox.paintBounds, const Radius.circular(4.0)),
-      color: const Color(0xe6616161),
-    ));
+    final Container tooltipContainer = tester.firstWidget<Container>(
+      _findTooltipContainer(tooltipText),
+    );
+    expect(tooltipContainer.padding, const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0));
+  });
 
-    final Container tooltipContainer = tester.firstWidget<Container>(_findTooltipContainer(tooltipText));
-    expect(tooltipContainer.padding, const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0));
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{TargetPlatform.macOS, TargetPlatform.linux, TargetPlatform.windows}));
+  testWidgets(
+    'Material2 - Tooltip default size, shape, and color test for Desktop',
+    (WidgetTester tester) async {
+      // Regressing test for https://github.com/flutter/flutter/issues/68601
+      final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(useMaterial3: false),
+          home: Tooltip(key: tooltipKey, message: tooltipText, child: const SizedBox.shrink()),
+        ),
+      );
+      tooltipKey.currentState?.ensureTooltipVisible();
+      await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-  testWidgetsWithLeakTracking('Can tooltip decoration be customized', (WidgetTester tester) async {
+      final RenderParagraph tooltipRenderParagraph = tester.renderObject<RenderParagraph>(
+        find.text(tooltipText),
+      );
+      expect(tooltipRenderParagraph.textSize.height, equals(12.0));
+
+      final RenderBox tooltipRenderBox = tester.renderObject(_findTooltipContainer(tooltipText));
+      expect(tooltipRenderBox.size.height, equals(24.0));
+      expect(
+        tooltipRenderBox,
+        paints..rrect(
+          rrect: RRect.fromRectAndRadius(tooltipRenderBox.paintBounds, const Radius.circular(4.0)),
+          color: const Color(0xe6616161),
+        ),
+      );
+
+      final Container tooltipContainer = tester.firstWidget<Container>(
+        _findTooltipContainer(tooltipText),
+      );
+      expect(tooltipContainer.padding, const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0));
+    },
+    variant: const TargetPlatformVariant(<TargetPlatform>{
+      TargetPlatform.macOS,
+      TargetPlatform.linux,
+      TargetPlatform.windows,
+    }),
+  );
+
+  testWidgets(
+    'Material3 - Tooltip default size, shape, and color test for Desktop',
+    (WidgetTester tester) async {
+      // Regressing test for https://github.com/flutter/flutter/issues/68601
+      final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Tooltip(key: tooltipKey, message: tooltipText, child: const SizedBox.shrink()),
+        ),
+      );
+      tooltipKey.currentState?.ensureTooltipVisible();
+      await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+      final RenderParagraph tooltipRenderParagraph = tester.renderObject<RenderParagraph>(
+        find.text(tooltipText),
+      );
+      expect(tooltipRenderParagraph.textSize.height, equals(17.0));
+
+      final RenderBox tooltipRenderBox = tester.renderObject(_findTooltipContainer(tooltipText));
+      expect(tooltipRenderBox.size.height, equals(25.0));
+      expect(
+        tooltipRenderBox,
+        paints..rrect(
+          rrect: RRect.fromRectAndRadius(tooltipRenderBox.paintBounds, const Radius.circular(4.0)),
+          color: const Color(0xe6616161),
+        ),
+      );
+
+      final Container tooltipContainer = tester.firstWidget<Container>(
+        _findTooltipContainer(tooltipText),
+      );
+      expect(tooltipContainer.padding, const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0));
+    },
+    variant: const TargetPlatformVariant(<TargetPlatform>{
+      TargetPlatform.macOS,
+      TargetPlatform.linux,
+      TargetPlatform.windows,
+    }),
+    skip: kIsWeb && !isSkiaWeb, // https://github.com/flutter/flutter/issues/99933
+  );
+
+  testWidgets('Material2 - Can tooltip decoration be customized', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     const Decoration customDecoration = ShapeDecoration(
       shape: StadiumBorder(),
       color: Color(0x80800000),
     );
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
-      Theme(
-        data: ThemeData(useMaterial3: false),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
-            initialEntries: <OverlayEntry>[
-              entry = OverlayEntry(
-                builder: (BuildContext context) {
-                  return Tooltip(
-                    key: tooltipKey,
-                    decoration: customDecoration,
-                    message: tooltipText,
-                    child: const SizedBox.shrink(),
-                  );
-                },
-              ),
-            ],
-          ),
+      MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Tooltip(
+                  key: tooltipKey,
+                  decoration: customDecoration,
+                  message: tooltipText,
+                  child: const SizedBox.shrink(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
     tooltipKey.currentState?.ensureTooltipVisible();
     await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
 
-    final RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(32.0));
     expect(tip.size.width, equals(74.0));
     expect(tip, paints..rrect(color: const Color(0x80800000)));
   });
 
-  testWidgetsWithLeakTracking('Tooltip stays after long press', (WidgetTester tester) async {
+  testWidgets('Material3 - Can tooltip decoration be customized', (WidgetTester tester) async {
+    final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+    const Decoration customDecoration = ShapeDecoration(
+      shape: StadiumBorder(),
+      color: Color(0x80800000),
+    );
+    late final OverlayEntry entry;
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Overlay(
+          initialEntries: <OverlayEntry>[
+            entry = OverlayEntry(
+              builder: (BuildContext context) {
+                return Tooltip(
+                  key: tooltipKey,
+                  decoration: customDecoration,
+                  message: tooltipText,
+                  child: const SizedBox.shrink(),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+    tooltipKey.currentState?.ensureTooltipVisible();
+    await tester.pump(const Duration(seconds: 2)); // faded in, show timer started (and at 0.0)
+
+    final RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(32.0));
+    expect(tip.size.width, equals(74.75));
+    expect(tip, paints..rrect(color: const Color(0x80800000)));
+  });
+
+  testWidgets('Tooltip stays after long press', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: Tooltip(
             triggerMode: TooltipTriggerMode.longPress,
             message: tooltipText,
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              color: Colors.green[500],
-            ),
+            child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
           ),
         ),
       ),
@@ -955,7 +1338,9 @@ void main() {
     await gesture.up();
   });
 
-  testWidgetsWithLeakTracking('Tooltip dismiss countdown begins on long press release', (WidgetTester tester) async {
+  testWidgets('Tooltip dismiss countdown begins on long press release', (
+    WidgetTester tester,
+  ) async {
     // Specs: https://github.com/flutter/flutter/issues/4182
     const Duration showDuration = Duration(seconds: 1);
     const Duration eternity = Duration(days: 9999);
@@ -981,7 +1366,9 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip is dismissed after a long press and showDuration expired', (WidgetTester tester) async {
+  testWidgets('Tooltip is dismissed after a long press and showDuration expired', (
+    WidgetTester tester,
+  ) async {
     const Duration showDuration = Duration(seconds: 3);
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.longPress, showDuration: showDuration);
 
@@ -1000,7 +1387,9 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip is dismissed after a tap and showDuration expired', (WidgetTester tester) async {
+  testWidgets('Tooltip is dismissed after a tap and showDuration expired', (
+    WidgetTester tester,
+  ) async {
     const Duration showDuration = Duration(seconds: 3);
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, showDuration: showDuration);
 
@@ -1016,38 +1405,77 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip is dismissed after a tap and showDuration expired when competing with a GestureDetector', (WidgetTester tester) async {
-    // Regression test for https://github.com/flutter/flutter/issues/98854
-    const Duration showDuration = Duration(seconds: 3);
-    await tester.pumpWidget(
-      MaterialApp(
-        home: GestureDetector(
-          onVerticalDragStart: (_) { /* Do nothing */ },
-          child: const Tooltip(
-            message: tooltipText,
-            triggerMode: TooltipTriggerMode.tap,
-            showDuration: showDuration,
-            child: SizedBox(width: 100.0, height: 100.0),
-          ),
-        ),
-      ),
-    );
+  testWidgets('Tooltip is dismissed after tap to dismiss immediately', (WidgetTester tester) async {
+    await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap);
+
     final Finder tooltip = find.byType(Tooltip);
     expect(find.text(tooltipText), findsNothing);
 
-    await tester.tap(tooltip);
-    // Wait for GestureArena disambiguation, delay is kPressTimeout to disambiguate
-    // between onTap and onVerticalDragStart
-    await tester.pump(kPressTimeout);
+    // Tap to trigger the tooltip.
+    await _testGestureTap(tester, tooltip);
     expect(find.text(tooltipText), findsOneWidget);
 
-    // Tooltip is dismissed after showDuration expired
-    await tester.pump(showDuration);
+    // Tap to dismiss the tooltip. Tooltip is dismissed immediately.
+    await _testGestureTap(tester, find.text(tooltipText));
     await tester.pump(const Duration(milliseconds: 10));
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Dispatch the mouse events before tip overlay detached', (WidgetTester tester) async {
+  testWidgets('Tooltip is not dismissed after tap if enableTapToDismiss is false', (
+    WidgetTester tester,
+  ) async {
+    await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, enableTapToDismiss: false);
+
+    final Finder tooltip = find.byType(Tooltip);
+    expect(find.text(tooltipText), findsNothing);
+
+    // Tap to trigger the tooltip.
+    await _testGestureTap(tester, tooltip);
+    expect(find.text(tooltipText), findsOneWidget);
+
+    // Tap the tooltip. Tooltip is not dismissed .
+    await _testGestureTap(tester, find.text(tooltipText));
+    await tester.pump(const Duration(milliseconds: 10));
+    expect(find.text(tooltipText), findsOneWidget);
+  });
+
+  testWidgets(
+    'Tooltip is dismissed after a tap and showDuration expired when competing with a GestureDetector',
+    (WidgetTester tester) async {
+      // Regression test for https://github.com/flutter/flutter/issues/98854
+      const Duration showDuration = Duration(seconds: 3);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: GestureDetector(
+            onVerticalDragStart: (_) {
+              /* Do nothing */
+            },
+            child: const Tooltip(
+              message: tooltipText,
+              triggerMode: TooltipTriggerMode.tap,
+              showDuration: showDuration,
+              child: SizedBox(width: 100.0, height: 100.0),
+            ),
+          ),
+        ),
+      );
+      final Finder tooltip = find.byType(Tooltip);
+      expect(find.text(tooltipText), findsNothing);
+
+      await tester.tap(tooltip);
+      // Wait for GestureArena disambiguation, delay is kPressTimeout to disambiguate
+      // between onTap and onVerticalDragStart
+      await tester.pump(kPressTimeout);
+      expect(find.text(tooltipText), findsOneWidget);
+
+      // Tooltip is dismissed after showDuration expired
+      await tester.pump(showDuration);
+      await tester.pump(const Duration(milliseconds: 10));
+      expect(find.text(tooltipText), findsNothing);
+    },
+  );
+
+  testWidgets('Dispatch the mouse events before tip overlay detached', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/96890
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -1065,10 +1493,7 @@ void main() {
           child: Tooltip(
             message: tooltipText,
             waitDuration: waitDuration,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -1082,31 +1507,21 @@ void main() {
     await tester.pump(waitDuration);
 
     // Remove the `Tooltip` widget.
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Center(
-          child: SizedBox.shrink(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: Center(child: SizedBox.shrink())));
 
     // The tooltip should be removed, including the overlay child.
     expect(find.text(tooltipText), findsNothing);
     expect(find.byTooltip(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Calling ensureTooltipVisible on an unmounted TooltipState returns false', (WidgetTester tester) async {
+  testWidgets('Calling ensureTooltipVisible on an unmounted TooltipState returns false', (
+    WidgetTester tester,
+  ) async {
     // Regression test for https://github.com/flutter/flutter/issues/95851
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
-          child: Tooltip(
-            message: tooltipText,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
-          ),
+          child: Tooltip(message: tooltipText, child: SizedBox(width: 100.0, height: 100.0)),
         ),
       ),
     );
@@ -1115,18 +1530,12 @@ void main() {
     expect(tooltipState.ensureTooltipVisible(), true);
 
     // Remove the tooltip.
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Center(
-          child: SizedBox.shrink(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: Center(child: SizedBox.shrink())));
 
     expect(tooltipState.ensureTooltipVisible(), false);
   });
 
-  testWidgetsWithLeakTracking('Tooltip shows/hides when hovered', (WidgetTester tester) async {
+  testWidgets('Tooltip shows/hides when hovered', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
@@ -1143,10 +1552,7 @@ void main() {
           child: Tooltip(
             message: tooltipText,
             waitDuration: waitDuration,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -1176,7 +1582,140 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip text is also hoverable', (WidgetTester tester) async {
+  // Regression test for https://github.com/flutter/flutter/issues/141644.
+  // This allows the user to quickly explore the UI via tooltips.
+  testWidgets('Tooltip shows without delay when the mouse moves from another tooltip', (
+    WidgetTester tester,
+  ) async {
+    const Duration waitDuration = Durations.extralong1;
+    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(() async {
+      return gesture.removePointer();
+    });
+    await gesture.addPointer();
+    await gesture.moveTo(const Offset(1.0, 1.0));
+    await tester.pump();
+    await gesture.moveTo(Offset.zero);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Column(
+          children: <Widget>[
+            Tooltip(
+              message: 'first tooltip',
+              waitDuration: waitDuration,
+              child: SizedBox(width: 100.0, height: 100.0),
+            ),
+            Tooltip(
+              message: 'last tooltip',
+              waitDuration: waitDuration,
+              child: SizedBox(width: 100.0, height: 100.0),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await gesture.moveTo(Offset.zero);
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.byType(Tooltip).first));
+    await tester.pump();
+    // Wait for the first tooltip to appear.
+    await tester.pump(waitDuration);
+    expect(find.text('first tooltip'), findsOneWidget);
+    expect(find.text('last tooltip'), findsNothing);
+
+    // Move to the second tooltip and expect it to show up immediately.
+    await gesture.moveTo(tester.getCenter(find.byType(Tooltip).last));
+    await tester.pump();
+    expect(find.text('first tooltip'), findsNothing);
+    expect(find.text('last tooltip'), findsOneWidget);
+  });
+
+  // Regression test for https://github.com/flutter/flutter/issues/142045.
+  testWidgets(
+    'Tooltip shows/hides when the mouse hovers, and then exits and re-enters in quick succession',
+    (WidgetTester tester) async {
+      const Duration waitDuration = Durations.extralong1;
+      final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(() async {
+        return gesture.removePointer();
+      });
+      await gesture.addPointer();
+      await gesture.moveTo(const Offset(1.0, 1.0));
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Center(
+            child: Tooltip(
+              message: tooltipText,
+              waitDuration: waitDuration,
+              exitDuration: waitDuration,
+              child: SizedBox(width: 100.0, height: 100.0),
+            ),
+          ),
+        ),
+      );
+
+      Future<void> mouseEnterAndWaitUntilVisible() async {
+        await gesture.moveTo(tester.getCenter(find.byType(Tooltip)));
+        await tester.pump();
+        await tester.pump(waitDuration);
+        await tester.pumpAndSettle();
+        expect(find.text(tooltipText), findsOne);
+      }
+
+      Future<void> mouseExit() async {
+        await gesture.moveTo(Offset.zero);
+        await tester.pump();
+      }
+
+      Future<void> performSequence(Iterable<Future<void> Function()> actions) async {
+        for (final Future<void> Function() action in actions) {
+          await action();
+        }
+      }
+
+      await performSequence(<Future<void> Function()>[mouseEnterAndWaitUntilVisible]);
+      expect(find.text(tooltipText), findsOne);
+
+      // Wait for reset.
+      await mouseExit();
+      await tester.pump(const Duration(hours: 1));
+      await tester.pumpAndSettle();
+      expect(find.text(tooltipText), findsNothing);
+
+      await performSequence(<Future<void> Function()>[
+        mouseEnterAndWaitUntilVisible,
+        mouseExit,
+        mouseEnterAndWaitUntilVisible,
+      ]);
+      expect(find.text(tooltipText), findsOne);
+
+      // Wait for reset.
+      await mouseExit();
+      await tester.pump(const Duration(hours: 1));
+      await tester.pumpAndSettle();
+      expect(find.text(tooltipText), findsNothing);
+
+      await performSequence(<Future<void> Function()>[
+        mouseEnterAndWaitUntilVisible,
+        mouseExit,
+        mouseEnterAndWaitUntilVisible,
+        mouseExit,
+        mouseEnterAndWaitUntilVisible,
+      ]);
+      expect(find.text(tooltipText), findsOne);
+
+      // Wait for reset.
+      await mouseExit();
+      await tester.pump(const Duration(hours: 1));
+      await tester.pumpAndSettle();
+      expect(find.text(tooltipText), findsNothing);
+    },
+  );
+
+  testWidgets('Tooltip text is also hoverable', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
@@ -1229,7 +1768,9 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip should not show more than one tooltip when hovered', (WidgetTester tester) async {
+  testWidgets('Tooltip should not show more than one tooltip when hovered', (
+    WidgetTester tester,
+  ) async {
     const Duration waitDuration = Duration(milliseconds: 500);
     final UniqueKey innerKey = UniqueKey();
     final UniqueKey outerKey = UniqueKey();
@@ -1245,11 +1786,7 @@ void main() {
               alignment: Alignment.centerRight,
               child: Tooltip(
                 message: 'Inner',
-                child: SizedBox(
-                  key: innerKey,
-                  width: 25,
-                  height: 100,
-                ),
+                child: SizedBox(key: innerKey, width: 25, height: 100),
               ),
             ),
           ),
@@ -1258,7 +1795,9 @@ void main() {
     );
 
     TestGesture? gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    addTearDown(() async { gesture?.removePointer(); });
+    addTearDown(() async {
+      gesture?.removePointer();
+    });
 
     // Both the inner and outer containers have tooltips associated with them, but only
     // the currently hovered one should appear, even though the pointer is inside both.
@@ -1293,7 +1832,7 @@ void main() {
     expect(find.text('Inner'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip can be dismissed by escape key', (WidgetTester tester) async {
+  testWidgets('Tooltip can be dismissed by escape key', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     TestGesture? gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
@@ -1338,7 +1877,7 @@ void main() {
     gesture = null;
   });
 
-  testWidgetsWithLeakTracking('Multiple Tooltips are dismissed by escape key', (WidgetTester tester) async {
+  testWidgets('Multiple Tooltips are dismissed by escape key', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     await tester.pumpWidget(
       const MaterialApp(
@@ -1379,7 +1918,7 @@ void main() {
     expect(find.text('message2'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not attempt to show after unmount', (WidgetTester tester) async {
+  testWidgets('Tooltip does not attempt to show after unmount', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/54096.
     const Duration waitDuration = Duration(seconds: 1);
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -1397,10 +1936,7 @@ void main() {
           child: Tooltip(
             message: tooltipText,
             waitDuration: waitDuration,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -1413,23 +1949,22 @@ void main() {
     await tester.pump();
 
     // Pump another random widget to unmount the Tooltip widget.
-    await tester.pumpWidget(
-        const MaterialApp(
-          home: Center(
-            child: SizedBox(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: Center(child: SizedBox())));
 
     // If the issue regresses, an exception will be thrown while we are waiting.
     await tester.pump(waitDuration);
   });
 
-  testWidgetsWithLeakTracking('Does tooltip contribute semantics', (WidgetTester tester) async {
+  testWidgets('Does tooltip contribute semantics', (WidgetTester tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
       Directionality(
@@ -1460,11 +1995,7 @@ void main() {
 
     final TestSemantics expected = TestSemantics.root(
       children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          tooltip: 'TIP',
-          textDirection: TextDirection.ltr,
-        ),
+        TestSemantics.rootChild(id: 1, tooltip: 'TIP', textDirection: TextDirection.ltr),
       ],
     );
 
@@ -1480,11 +2011,16 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgetsWithLeakTracking('Tooltip semantics does not merge into child', (WidgetTester tester) async {
+  testWidgets('Tooltip semantics does not merge into child', (WidgetTester tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     late final OverlayEntry entry;
-    addTearDown(() => entry..remove()..dispose());
+    addTearDown(
+      () =>
+          entry
+            ..remove()
+            ..dispose(),
+    );
 
     await tester.pumpWidget(
       Directionality(
@@ -1519,7 +2055,9 @@ void main() {
     // Make sure the fade in animation has started and the tooltip isn't transparent.
     await tester.pump(const Duration(seconds: 2));
 
-    expect(semantics, hasSemantics(
+    expect(
+      semantics,
+      hasSemantics(
         TestSemantics.root(
           children: <TestSemantics>[
             TestSemantics(
@@ -1528,7 +2066,11 @@ void main() {
                   flags: <SemanticsFlag>[SemanticsFlag.hasImplicitScrolling],
                   children: <TestSemantics>[
                     TestSemantics(label: 'before'),
-                    TestSemantics(label: 'child', tooltip: 'B', children: <TestSemantics>[TestSemantics(label: 'B')]),
+                    TestSemantics(
+                      label: 'child',
+                      tooltip: 'B',
+                      children: <TestSemantics>[TestSemantics(label: 'B')],
+                    ),
                     TestSemantics(label: 'after'),
                   ],
                 ),
@@ -1539,17 +2081,18 @@ void main() {
         ignoreId: true,
         ignoreRect: true,
         ignoreTransform: true,
-    ));
+      ),
+    );
 
     semantics.dispose();
   });
 
-  testWidgetsWithLeakTracking('Tooltip text scales with textScaleFactor', (WidgetTester tester) async {
-    Widget buildApp(String text, { required double textScaleFactor }) {
-      return Theme(
-        data: ThemeData(useMaterial3: false),
-        child: MediaQuery(
-          data: MediaQueryData(textScaleFactor: textScaleFactor),
+  testWidgets('Material2 - Tooltip text scales with textScaler', (WidgetTester tester) async {
+    Widget buildApp(String text, {required TextScaler textScaler}) {
+      return MaterialApp(
+        theme: ThemeData(useMaterial3: false),
+        home: MediaQuery(
+          data: MediaQueryData(textScaler: textScaler),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Navigator(
@@ -1559,11 +2102,7 @@ void main() {
                     return Center(
                       child: Tooltip(
                         message: text,
-                        child: Container(
-                          width: 100.0,
-                          height: 100.0,
-                          color: Colors.green[500],
-                        ),
+                        child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
                       ),
                     );
                   },
@@ -1575,26 +2114,62 @@ void main() {
       );
     }
 
-    await tester.pumpWidget(buildApp(tooltipText, textScaleFactor: 1.0));
+    await tester.pumpWidget(buildApp(tooltipText, textScaler: TextScaler.noScaling));
     await tester.longPress(find.byType(Tooltip));
     expect(find.text(tooltipText), findsOneWidget);
     expect(tester.getSize(find.text(tooltipText)), equals(const Size(42.0, 14.0)));
-    RenderBox tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(32.0));
 
-    await tester.pumpWidget(buildApp(tooltipText, textScaleFactor: 4.0));
+    await tester.pumpWidget(buildApp(tooltipText, textScaler: const TextScaler.linear(4.0)));
     await tester.longPress(find.byType(Tooltip));
     expect(find.text(tooltipText), findsOneWidget);
     expect(tester.getSize(find.text(tooltipText)), equals(const Size(168.0, 56.0)));
-    tip = tester.renderObject(
-      _findTooltipContainer(tooltipText),
-    );
+    tip = tester.renderObject(_findTooltipContainer(tooltipText));
     expect(tip.size.height, equals(64.0));
   });
 
-  testWidgetsWithLeakTracking('Tooltip text displays with richMessage', (WidgetTester tester) async {
+  testWidgets('Material3 - Tooltip text scales with textScaleFactor', (WidgetTester tester) async {
+    Widget buildApp(String text, {required TextScaler textScaler}) {
+      return MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(textScaler: textScaler),
+          child: Navigator(
+            onGenerateRoute: (RouteSettings settings) {
+              return MaterialPageRoute<void>(
+                builder: (BuildContext context) {
+                  return Center(
+                    child: Tooltip(
+                      message: text,
+                      child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(buildApp(tooltipText, textScaler: TextScaler.noScaling));
+    await tester.longPress(find.byType(Tooltip));
+    expect(find.text(tooltipText), findsOneWidget);
+    expect(tester.getSize(find.text(tooltipText)).width, equals(42.75));
+    expect(tester.getSize(find.text(tooltipText)).height, equals(20.0));
+    RenderBox tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(32.0));
+
+    await tester.pumpWidget(buildApp(tooltipText, textScaler: const TextScaler.linear(4.0)));
+    await tester.longPress(find.byType(Tooltip));
+    expect(find.text(tooltipText), findsOneWidget);
+    expect(tester.getSize(find.text(tooltipText)).width, equals(168.75));
+    expect(tester.getSize(find.text(tooltipText)).height, equals(80.0));
+    tip = tester.renderObject(_findTooltipContainer(tooltipText));
+    expect(tip.size.height, equals(88.0));
+  }, skip: kIsWeb && !isSkiaWeb); // https://github.com/flutter/flutter/issues/99933
+
+  testWidgets('Tooltip text displays with richMessage', (WidgetTester tester) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     const String textSpan1Text = 'I am a rich tooltip message. ';
     const String textSpan2Text = 'I am another span of a rich tooltip message';
@@ -1604,17 +2179,9 @@ void main() {
           key: tooltipKey,
           richMessage: const TextSpan(
             text: textSpan1Text,
-            children: <InlineSpan>[
-              TextSpan(
-                text: textSpan2Text,
-              ),
-            ],
+            children: <InlineSpan>[TextSpan(text: textSpan2Text)],
           ),
-          child: Container(
-            width: 100.0,
-            height: 100.0,
-            color: Colors.green[500],
-          ),
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
         ),
       ),
     );
@@ -1625,44 +2192,31 @@ void main() {
     expect(richText.text.toPlainText(), equals('$textSpan1Text$textSpan2Text'));
   });
 
-  testWidgetsWithLeakTracking('Tooltip throws assertion error when both message and richMessage are specified', (WidgetTester tester) async {
-    expect(
-      () {
-        MaterialApp(
-          home: Tooltip(
-            message: 'I am a tooltip message.',
-            richMessage: const TextSpan(
-              text: 'I am a rich tooltip.',
-              children: <InlineSpan>[
-                TextSpan(
-                  text: 'I am another span of a rich tooltip.',
-                ),
-              ],
-            ),
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              color: Colors.green[500],
-            ),
+  testWidgets('Tooltip throws assertion error when both message and richMessage are specified', (
+    WidgetTester tester,
+  ) async {
+    expect(() {
+      MaterialApp(
+        home: Tooltip(
+          message: 'I am a tooltip message.',
+          richMessage: const TextSpan(
+            text: 'I am a rich tooltip.',
+            children: <InlineSpan>[TextSpan(text: 'I am another span of a rich tooltip.')],
           ),
-        );
-      },
-      throwsA(const TypeMatcher<AssertionError>()),
-    );
+          child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
+        ),
+      );
+    }, throwsA(const TypeMatcher<AssertionError>()));
   });
 
-  testWidgetsWithLeakTracking('Haptic feedback', (WidgetTester tester) async {
+  testWidgets('Haptic feedback', (WidgetTester tester) async {
     final FeedbackTester feedback = FeedbackTester();
     await tester.pumpWidget(
       MaterialApp(
         home: Center(
           child: Tooltip(
             message: 'Foo',
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              color: Colors.green[500],
-            ),
+            child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
           ),
         ),
       ),
@@ -1675,33 +2229,31 @@ void main() {
     feedback.dispose();
   });
 
-  testWidgetsWithLeakTracking('Semantics included', (WidgetTester tester) async {
+  testWidgets('Semantics included', (WidgetTester tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Center(
-          child: Tooltip(
-            message: 'Foo',
-            child: Text('Bar'),
-          ),
-        ),
-      ),
+      const MaterialApp(home: Center(child: Tooltip(message: 'Foo', child: Text('Bar')))),
     );
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
+    expect(
+      semantics,
+      hasSemantics(
+        TestSemantics.root(
           children: <TestSemantics>[
-            TestSemantics(
+            TestSemantics.rootChild(
               children: <TestSemantics>[
                 TestSemantics(
-                  flags: <SemanticsFlag>[SemanticsFlag.scopesRoute],
                   children: <TestSemantics>[
                     TestSemantics(
-                      tooltip: 'Foo',
-                      label: 'Bar',
-                      textDirection: TextDirection.ltr,
+                      flags: <SemanticsFlag>[SemanticsFlag.scopesRoute],
+                      children: <TestSemantics>[
+                        TestSemantics(
+                          tooltip: 'Foo',
+                          label: 'Bar',
+                          textDirection: TextDirection.ltr,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1709,39 +2261,40 @@ void main() {
             ),
           ],
         ),
-      ],
-    ), ignoreRect: true, ignoreId: true, ignoreTransform: true));
+        ignoreRect: true,
+        ignoreId: true,
+        ignoreTransform: true,
+      ),
+    );
 
     semantics.dispose();
   });
 
-  testWidgetsWithLeakTracking('Semantics excluded', (WidgetTester tester) async {
+  testWidgets('Semantics excluded', (WidgetTester tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
 
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
-          child: Tooltip(
-            message: 'Foo',
-            excludeFromSemantics: true,
-            child: Text('Bar'),
-          ),
+          child: Tooltip(message: 'Foo', excludeFromSemantics: true, child: Text('Bar')),
         ),
       ),
     );
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
+    expect(
+      semantics,
+      hasSemantics(
+        TestSemantics.root(
           children: <TestSemantics>[
-            TestSemantics(
+            TestSemantics.rootChild(
               children: <TestSemantics>[
                 TestSemantics(
-                  flags: <SemanticsFlag>[SemanticsFlag.scopesRoute],
                   children: <TestSemantics>[
                     TestSemantics(
-                      label: 'Bar',
-                      textDirection: TextDirection.ltr,
+                      flags: <SemanticsFlag>[SemanticsFlag.scopesRoute],
+                      children: <TestSemantics>[
+                        TestSemantics(label: 'Bar', textDirection: TextDirection.ltr),
+                      ],
                     ),
                   ],
                 ),
@@ -1749,17 +2302,23 @@ void main() {
             ),
           ],
         ),
-      ],
-    ), ignoreRect: true, ignoreId: true, ignoreTransform: true));
+        ignoreRect: true,
+        ignoreId: true,
+        ignoreTransform: true,
+      ),
+    );
 
     semantics.dispose();
   });
 
-  testWidgetsWithLeakTracking('has semantic events', (WidgetTester tester) async {
+  testWidgets('has semantic events', (WidgetTester tester) async {
     final List<dynamic> semanticEvents = <dynamic>[];
-    tester.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(SystemChannels.accessibility, (dynamic message) async {
-      semanticEvents.add(message);
-    });
+    tester.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(
+      SystemChannels.accessibility,
+      (dynamic message) async {
+        semanticEvents.add(message);
+      },
+    );
     final SemanticsTester semantics = SemanticsTester(tester);
 
     await tester.pumpWidget(
@@ -1767,11 +2326,7 @@ void main() {
         home: Center(
           child: Tooltip(
             message: 'Foo',
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              color: Colors.green[500],
-            ),
+            child: Container(width: 100.0, height: 100.0, color: Colors.green[500]),
           ),
         ),
       ),
@@ -1780,58 +2335,58 @@ void main() {
     await tester.longPress(find.byType(Tooltip));
     final RenderObject object = tester.firstRenderObject(find.byType(Tooltip));
 
-    expect(semanticEvents, unorderedEquals(<dynamic>[
-      <String, dynamic>{
-        'type': 'longPress',
-        'nodeId': _findDebugSemantics(object).id,
-        'data': <String, dynamic>{},
-      },
-      <String, dynamic>{
-        'type': 'tooltip',
-        'data': <String, dynamic>{
-          'message': 'Foo',
+    expect(
+      semanticEvents,
+      unorderedEquals(<dynamic>[
+        <String, dynamic>{
+          'type': 'longPress',
+          'nodeId': _findDebugSemantics(object).id,
+          'data': <String, dynamic>{},
         },
-      },
-    ]));
+        <String, dynamic>{
+          'type': 'tooltip',
+          'data': <String, dynamic>{'message': 'Foo'},
+        },
+      ]),
+    );
     semantics.dispose();
-    tester.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(SystemChannels.accessibility, null);
+    tester.binding.defaultBinaryMessenger.setMockDecodedMessageHandler<dynamic>(
+      SystemChannels.accessibility,
+      null,
+    );
   });
-  testWidgetsWithLeakTracking('default Tooltip debugFillProperties', (WidgetTester tester) async {
+  testWidgets('default Tooltip debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
     const Tooltip(message: 'message').debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString()).toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
-    expect(description, <String>[
-      '"message"',
-    ]);
+    expect(description, <String>['"message"']);
   });
-  testWidgetsWithLeakTracking('default Tooltip debugFillProperties with richMessage', (WidgetTester tester) async {
+  testWidgets('default Tooltip debugFillProperties with richMessage', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
     const Tooltip(
       richMessage: TextSpan(
         text: 'This is a ',
-        children: <InlineSpan>[
-          TextSpan(
-            text: 'richMessage',
-          ),
-        ],
+        children: <InlineSpan>[TextSpan(text: 'richMessage')],
       ),
     ).debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-        .map((DiagnosticsNode node) => node.toString()).toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
-    expect(description, <String>[
-      '"This is a richMessage"',
-    ]);
+    expect(description, <String>['"This is a richMessage"']);
   });
-  testWidgetsWithLeakTracking('Tooltip implements debugFillProperties', (WidgetTester tester) async {
+  testWidgets('Tooltip implements debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
     // Not checking controller, inputFormatters, focusNode
@@ -1851,9 +2406,11 @@ void main() {
       enableFeedback: true,
     ).debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString()).toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[
       '"message"',
@@ -1870,7 +2427,7 @@ void main() {
     ]);
   });
 
-  testWidgetsWithLeakTracking('Tooltip triggers on tap when trigger mode is tap', (WidgetTester tester) async {
+  testWidgets('Tooltip triggers on tap when trigger mode is tap', (WidgetTester tester) async {
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap);
 
     final Finder tooltip = find.byType(Tooltip);
@@ -1880,7 +2437,9 @@ void main() {
     expect(find.text(tooltipText), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('Tooltip triggers on long press when mode is long press', (WidgetTester tester) async {
+  testWidgets('Tooltip triggers on long press when mode is long press', (
+    WidgetTester tester,
+  ) async {
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.longPress);
 
     final Finder tooltip = find.byType(Tooltip);
@@ -1893,7 +2452,9 @@ void main() {
     expect(find.text(tooltipText), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not trigger on tap when trigger mode is longPress', (WidgetTester tester) async {
+  testWidgets('Tooltip does not trigger on tap when trigger mode is longPress', (
+    WidgetTester tester,
+  ) async {
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.longPress);
 
     final Finder tooltip = find.byType(Tooltip);
@@ -1903,7 +2464,7 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not trigger when trigger mode is manual', (WidgetTester tester) async {
+  testWidgets('Tooltip does not trigger when trigger mode is manual', (WidgetTester tester) async {
     await setWidgetForTooltipMode(tester, TooltipTriggerMode.manual);
 
     final Finder tooltip = find.byType(Tooltip);
@@ -1916,7 +2477,7 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip onTriggered is called when Tooltip triggers', (WidgetTester tester) async {
+  testWidgets('Tooltip onTriggered is called when Tooltip triggers', (WidgetTester tester) async {
     bool onTriggeredCalled = false;
     void onTriggered() => onTriggeredCalled = true;
 
@@ -1932,7 +2493,9 @@ void main() {
     expect(onTriggeredCalled, true);
   });
 
-  testWidgetsWithLeakTracking('Tooltip onTriggered is not called when Tooltip is hovered', (WidgetTester tester) async {
+  testWidgets('Tooltip onTriggered is not called when Tooltip is hovered', (
+    WidgetTester tester,
+  ) async {
     bool onTriggeredCalled = false;
     void onTriggered() => onTriggeredCalled = true;
 
@@ -1948,10 +2511,7 @@ void main() {
             message: tooltipText,
             waitDuration: waitDuration,
             onTriggered: onTriggered,
-            child: const SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: const SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -1965,7 +2525,7 @@ void main() {
     expect(onTriggeredCalled, false);
   });
 
-  testWidgetsWithLeakTracking('dismissAllToolTips dismisses hovered tooltips', (WidgetTester tester) async {
+  testWidgets('dismissAllToolTips dismisses hovered tooltips', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await gesture.addPointer();
@@ -1977,10 +2537,7 @@ void main() {
           child: Tooltip(
             message: tooltipText,
             waitDuration: waitDuration,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -2001,7 +2558,7 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Hovered tooltips do not dismiss after showDuration', (WidgetTester tester) async {
+  testWidgets('Hovered tooltips do not dismiss after showDuration', (WidgetTester tester) async {
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await gesture.addPointer();
@@ -2014,10 +2571,7 @@ void main() {
             message: tooltipText,
             waitDuration: waitDuration,
             triggerMode: TooltipTriggerMode.longPress,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+            child: SizedBox(width: 100.0, height: 100.0),
           ),
         ),
       ),
@@ -2050,33 +2604,151 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip should not be shown with empty message (with child)', (WidgetTester tester) async {
+  testWidgets('Hovered tooltips with showDuration set do dismiss when hovering elsewhere', (
+    WidgetTester tester,
+  ) async {
+    const Duration waitDuration = Duration.zero;
+    const Duration showDuration = Duration(seconds: 1);
+
     await tester.pumpWidget(
       const MaterialApp(
-        home: Tooltip(
-          message: tooltipText,
-          child: Text(tooltipText),
+        home: Center(
+          child: Tooltip(
+            message: tooltipText,
+            waitDuration: waitDuration,
+            showDuration: showDuration,
+            triggerMode: TooltipTriggerMode.longPress,
+            child: SizedBox(width: 100.0, height: 100.0),
+          ),
         ),
       ),
+    );
+
+    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
+
+    await gesture.moveTo(Offset.zero);
+    // Set a duration equal to the default exit
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(tooltipText),
+      findsNothing,
+      reason: 'Tooltip should not wait for showDuration before it hides itself.',
+    );
+  });
+
+  testWidgets('Hovered tooltips hide after stopping the hover', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: SizedBox.square(
+            dimension: 10.0,
+            child: Tooltip(
+              message: tooltipText,
+              triggerMode: TooltipTriggerMode.longPress,
+              child: SizedBox.expand(),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
+
+    await gesture.moveTo(Offset.zero);
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(tooltipText),
+      findsNothing,
+      reason: 'Tooltip should be hidden when no longer hovered.',
+    );
+  });
+
+  testWidgets('Hovered tooltips hide after stopping the hover and exitDuration expires', (
+    WidgetTester tester,
+  ) async {
+    const Duration exitDuration = Duration(seconds: 1);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: SizedBox.square(
+            dimension: 10.0,
+            child: Tooltip(
+              message: tooltipText,
+              exitDuration: exitDuration,
+              triggerMode: TooltipTriggerMode.longPress,
+              child: SizedBox.expand(),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
+    await tester.pump(const Duration(seconds: 1));
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
+
+    await gesture.moveTo(Offset.zero);
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should wait until exitDuration expires before being hidden',
+    );
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(tooltipText),
+      findsNothing,
+      reason: 'Tooltip should be hidden when no longer hovered.',
+    );
+  });
+
+  testWidgets('Tooltip should not be shown with empty message (with child)', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: Tooltip(message: tooltipText, child: Text(tooltipText))),
     );
     expect(find.text(tooltipText), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('Tooltip should not be shown with empty message (without child)', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Tooltip(
-          message: tooltipText,
-        ),
-      ),
-    );
+  testWidgets('Tooltip should not be shown with empty message (without child)', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: Tooltip(message: tooltipText)));
     expect(find.text(tooltipText), findsNothing);
     if (tooltipText.isEmpty) {
       expect(find.byType(SizedBox), findsOneWidget);
     }
   });
 
-  testWidgetsWithLeakTracking('Tooltip trigger mode ignores mouse events', (WidgetTester tester) async {
+  testWidgets('Tooltip trigger mode ignores mouse events', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Tooltip(
@@ -2087,7 +2759,10 @@ void main() {
       ),
     );
 
-    final TestGesture mouseGesture = await tester.startGesture(tester.getCenter(find.byTooltip(tooltipText)), kind: PointerDeviceKind.mouse);
+    final TestGesture mouseGesture = await tester.startGesture(
+      tester.getCenter(find.byTooltip(tooltipText)),
+      kind: PointerDeviceKind.mouse,
+    );
     await tester.pump(kLongPressTimeout + kPressTimeout);
     await mouseGesture.up();
 
@@ -2095,7 +2770,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(tooltipText), findsNothing);
 
-    final TestGesture touchGesture = await tester.startGesture(tester.getCenter(find.byTooltip(tooltipText)));
+    final TestGesture touchGesture = await tester.startGesture(
+      tester.getCenter(find.byTooltip(tooltipText)),
+    );
     await tester.pump(kLongPressTimeout + kPressTimeout);
     await touchGesture.up();
 
@@ -2104,17 +2781,16 @@ void main() {
     expect(find.text(tooltipText), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not block other mouse regions', (WidgetTester tester) async {
+  testWidgets('Tooltip does not block other mouse regions', (WidgetTester tester) async {
     bool entered = false;
 
     await tester.pumpWidget(
       MaterialApp(
         home: MouseRegion(
-          onEnter: (PointerEnterEvent event) { entered = true; },
-          child: const Tooltip(
-            message: tooltipText,
-            child: SizedBox.expand(),
-          ),
+          onEnter: (PointerEnterEvent event) {
+            entered = true;
+          },
+          child: const Tooltip(message: tooltipText, child: SizedBox.expand()),
         ),
       ),
     );
@@ -2129,17 +2805,19 @@ void main() {
     expect(entered, isTrue);
   });
 
-  testWidgetsWithLeakTracking('Does not rebuild on mouse connect/disconnect', (WidgetTester tester) async {
+  testWidgets('Does not rebuild on mouse connect/disconnect', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/117627
     int buildCount = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: Tooltip(
           message: tooltipText,
-          child: Builder(builder: (BuildContext context) {
-            buildCount += 1;
-            return const SizedBox.expand();
-          }),
+          child: Builder(
+            builder: (BuildContext context) {
+              buildCount += 1;
+              return const SizedBox.expand();
+            },
+          ),
         ),
       ),
     );
@@ -2154,21 +2832,25 @@ void main() {
     expect(buildCount, 1);
   });
 
-  testWidgetsWithLeakTracking('Tooltip should not ignore users tap on richMessage', (WidgetTester tester) async {
+  testWidgets('Tooltip should not ignore users tap on richMessage', (WidgetTester tester) async {
     bool isTapped = false;
+    final TapGestureRecognizer recognizer = TapGestureRecognizer();
+    addTearDown(recognizer.dispose);
 
     await tester.pumpWidget(
       MaterialApp(
         home: Tooltip(
           richMessage: TextSpan(
             text: tooltipText,
-            recognizer: TapGestureRecognizer()..onTap = () {
-              isTapped = true;
-            }
+            recognizer:
+                recognizer
+                  ..onTap = () {
+                    isTapped = true;
+                  },
           ),
           showDuration: const Duration(seconds: 5),
           triggerMode: TooltipTriggerMode.tap,
-          child: const Icon(Icons.refresh)
+          child: const Icon(Icons.refresh),
         ),
       ),
     );
@@ -2184,7 +2866,9 @@ void main() {
     expect(isTapped, isTrue);
   });
 
-  testWidgetsWithLeakTracking('Hold mouse button down and hover over the Tooltip widget', (WidgetTester tester) async {
+  testWidgets('Hold mouse button down and hover over the Tooltip widget', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -2201,12 +2885,18 @@ void main() {
       ),
     );
 
-    final TestGesture mouseGesture = await tester.startGesture(Offset.zero, kind: PointerDeviceKind.mouse);
+    final TestGesture mouseGesture = await tester.startGesture(
+      Offset.zero,
+      kind: PointerDeviceKind.mouse,
+    );
     addTearDown(mouseGesture.removePointer);
     await mouseGesture.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
     await tester.pump(const Duration(seconds: 1));
     expect(
-      find.text(tooltipText), findsOneWidget, reason: 'Tooltip should be visible when hovered.');
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
 
     await mouseGesture.up();
     await tester.pump(const Duration(days: 10));
@@ -2223,11 +2913,11 @@ void main() {
     expect(
       find.text(tooltipText),
       findsNothing,
-      reason: 'Tooltip should be dismissed with no hovering mouse cursor.' ,
+      reason: 'Tooltip should be dismissed with no hovering mouse cursor.',
     );
   });
 
-  testWidgetsWithLeakTracking('Hovered text should dismiss when clicked outside', (WidgetTester tester) async {
+  testWidgets('Hovered text should dismiss when clicked outside', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -2250,7 +2940,11 @@ void main() {
     addTearDown(mouseGesture1.removePointer);
     await mouseGesture1.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
     await tester.pump(const Duration(seconds: 1));
-    expect(find.text(tooltipText), findsOneWidget, reason: 'Tooltip should be visible when hovered.');
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
 
     // Tapping on the Tooltip widget should dismiss the tooltip, since the
     // trigger mode is longPress.
@@ -2264,15 +2958,23 @@ void main() {
     addTearDown(mouseGesture2.removePointer);
     await mouseGesture2.moveTo(tester.getCenter(find.byTooltip(tooltipText)));
     await tester.pump(const Duration(seconds: 1));
-    expect(find.text(tooltipText), findsOneWidget, reason: 'Tooltip should be visible when hovered.');
+    expect(
+      find.text(tooltipText),
+      findsOneWidget,
+      reason: 'Tooltip should be visible when hovered.',
+    );
 
     await tester.tapAt(Offset.zero);
     await tester.pump();
     await tester.pumpAndSettle();
-    expect(find.text(tooltipText), findsNothing, reason: 'Tapping outside of the Tooltip widget should dismiss the tooltip.');
+    expect(
+      find.text(tooltipText),
+      findsNothing,
+      reason: 'Tapping outside of the Tooltip widget should dismiss the tooltip.',
+    );
   });
 
-  testWidgetsWithLeakTracking('Mouse tap and hover over the Tooltip widget', (WidgetTester tester) async {
+  testWidgets('Mouse tap and hover over the Tooltip widget', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/127575 .
     await tester.pumpWidget(
       const MaterialApp(
@@ -2343,7 +3045,9 @@ void main() {
     );
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not rebuild for fade in / fade out animation', (WidgetTester tester) async {
+  testWidgets('Tooltip does not rebuild for fade in / fade out animation', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -2376,7 +3080,9 @@ void main() {
     expect(element.dirty, isFalse);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not initialize animation controller in dispose process', (WidgetTester tester) async {
+  testWidgets('Tooltip does not initialize animation controller in dispose process', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Center(
@@ -2399,40 +3105,45 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not crash when showing the tooltip but the OverlayPortal is unmounted, during dispose', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: SelectionArea(
-          child: Center(
-            child: Tooltip(
-              message: tooltipText,
-              waitDuration: Duration(seconds: 1),
-              triggerMode: TooltipTriggerMode.longPress,
-              child: SizedBox.square(dimension: 50),
+  testWidgets(
+    'Tooltip does not crash when showing the tooltip but the OverlayPortal is unmounted, during dispose',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: SelectionArea(
+            child: Center(
+              child: Tooltip(
+                message: tooltipText,
+                waitDuration: Duration(seconds: 1),
+                triggerMode: TooltipTriggerMode.longPress,
+                child: SizedBox.square(dimension: 50),
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    final TooltipState tooltipState = tester.state(find.byType(Tooltip));
-    final TestGesture gesture = await tester.startGesture(tester.getCenter(find.byType(Tooltip)));
-    tooltipState.ensureTooltipVisible();
-    await tester.pumpWidget(const SizedBox());
-    expect(tester.takeException(), isNull);
+      final TooltipState tooltipState = tester.state(find.byType(Tooltip));
+      final TestGesture gesture = await tester.startGesture(tester.getCenter(find.byType(Tooltip)));
+      tooltipState.ensureTooltipVisible();
+      await tester.pumpWidget(const SizedBox());
+      expect(tester.takeException(), isNull);
 
-    // Finish gesture to release resources.
-    await gesture.up();
-    await tester.pumpAndSettle();
-  });
+      // Finish gesture to release resources.
+      await gesture.up();
+      await tester.pumpAndSettle();
+    },
+  );
 
-  testWidgetsWithLeakTracking('Tooltip is not selectable', (WidgetTester tester) async {
+  testWidgets('Tooltip is not selectable', (WidgetTester tester) async {
     const String tooltipText = 'AAAAAAAAAAAAAAAAAAAAAAA';
     String? selectedText;
     await tester.pumpWidget(
       MaterialApp(
         home: SelectionArea(
-          onSelectionChanged: (SelectedContent? content) { selectedText = content?.plainText; },
+          onSelectionChanged: (SelectedContent? content) {
+            selectedText = content?.plainText;
+          },
           child: const Center(
             child: Column(
               children: <Widget>[
@@ -2453,7 +3164,9 @@ void main() {
     final TooltipState tooltipState = tester.state(find.byType(Tooltip));
 
     final Rect textRect = tester.getRect(find.text('Select Me'));
-    final TestGesture gesture = await tester.startGesture(Alignment.centerLeft.alongSize(textRect.size) + textRect.topLeft);
+    final TestGesture gesture = await tester.startGesture(
+      Alignment.centerLeft.alongSize(textRect.size) + textRect.topLeft,
+    );
     // Drag from centerLeft to centerRight to select the text.
     await tester.pump(const Duration(seconds: 1));
     await gesture.moveTo(Alignment.centerRight.alongSize(textRect.size) + textRect.topLeft);
@@ -2467,12 +3180,48 @@ void main() {
 
     final Rect tooltipTextRect = tester.getRect(find.text(tooltipText));
     // Now drag from centerLeft to centerRight to select the tooltip text.
-    await gesture.moveTo(Alignment.centerLeft.alongSize(tooltipTextRect.size) + tooltipTextRect.topLeft);
+    await gesture.moveTo(
+      Alignment.centerLeft.alongSize(tooltipTextRect.size) + tooltipTextRect.topLeft,
+    );
     await tester.pump();
-    await gesture.moveTo(Alignment.centerRight.alongSize(tooltipTextRect.size) + tooltipTextRect.topLeft);
+    await gesture.moveTo(
+      Alignment.centerRight.alongSize(tooltipTextRect.size) + tooltipTextRect.topLeft,
+    );
     await tester.pump();
 
     expect(selectedText, isNot(contains('A')));
+  });
+
+  testWidgets('Tooltip mouse cursor behavior', (WidgetTester tester) async {
+    const SystemMouseCursor customCursor = SystemMouseCursors.grab;
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: Tooltip(
+            message: tooltipText,
+            mouseCursor: customCursor,
+            child: SizedBox.square(dimension: 50),
+          ),
+        ),
+      ),
+    );
+
+    final TestGesture gesture = await tester.createGesture(
+      kind: PointerDeviceKind.mouse,
+      pointer: 1,
+    );
+    await gesture.addPointer(location: const Offset(10, 10));
+    await tester.pump();
+    expect(
+      RendererBinding.instance.mouseTracker.debugDeviceActiveCursor(1),
+      SystemMouseCursors.basic,
+    );
+
+    final Offset chip = tester.getCenter(find.byType(Tooltip));
+    await gesture.moveTo(chip);
+    await tester.pump();
+    expect(RendererBinding.instance.mouseTracker.debugDeviceActiveCursor(1), customCursor);
   });
 }
 
@@ -2480,6 +3229,7 @@ Future<void> setWidgetForTooltipMode(
   WidgetTester tester,
   TooltipTriggerMode triggerMode, {
   Duration? showDuration,
+  bool? enableTapToDismiss,
   TooltipTriggeredCallback? onTriggered,
 }) async {
   await tester.pumpWidget(
@@ -2489,6 +3239,7 @@ Future<void> setWidgetForTooltipMode(
         triggerMode: triggerMode,
         onTriggered: onTriggered,
         showDuration: showDuration,
+        enableTapToDismiss: enableTapToDismiss ?? true,
         child: const SizedBox(width: 100.0, height: 100.0),
       ),
     ),
@@ -2509,8 +3260,5 @@ Future<void> _testGestureTap(WidgetTester tester, Finder tooltip) async {
 }
 
 SemanticsNode _findDebugSemantics(RenderObject object) {
-  if (object.debugSemantics != null) {
-    return object.debugSemantics!;
-  }
-  return _findDebugSemantics(object.parent!);
+  return object.debugSemantics ?? _findDebugSemantics(object.parent!);
 }

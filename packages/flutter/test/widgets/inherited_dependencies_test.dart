@@ -5,19 +5,24 @@
 import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('InheritedWidget dependencies show up in diagnostic properties', (WidgetTester tester) async {
+  testWidgets('InheritedWidget dependencies show up in diagnostic properties', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey key = GlobalKey();
-    await tester.pumpWidget(Directionality(
-      key: key,
-      textDirection: TextDirection.ltr,
-      child: Builder(builder: (BuildContext context) {
-        Directionality.of(context);
-        return const SizedBox();
-      }),
-    ));
+    await tester.pumpWidget(
+      Directionality(
+        key: key,
+        textDirection: TextDirection.ltr,
+        child: Builder(
+          builder: (BuildContext context) {
+            Directionality.of(context);
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
     final InheritedElement element = key.currentContext! as InheritedElement;
     expect(
       element.toStringDeep(minLevel: DiagnosticLevel.info),
@@ -28,14 +33,18 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(Directionality(
-      key: key,
-      textDirection: TextDirection.rtl,
-      child: Builder(builder: (BuildContext context) {
-        Directionality.of(context);
-        return const SizedBox();
-      }),
-    ));
+    await tester.pumpWidget(
+      Directionality(
+        key: key,
+        textDirection: TextDirection.rtl,
+        child: Builder(
+          builder: (BuildContext context) {
+            Directionality.of(context);
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
     expect(
       element.toStringDeep(minLevel: DiagnosticLevel.info),
       equalsIgnoringHashCodes(

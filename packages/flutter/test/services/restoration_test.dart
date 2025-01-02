@@ -13,7 +13,7 @@ import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 import 'restoration.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('$RestorationManager dispatches memory events', (WidgetTester tester) async {
+  testWidgets('$RestorationManager dispatches memory events', (WidgetTester tester) async {
     await expectLater(
       await memoryEvents(() => RestorationManager().dispose(), RestorationManager),
       areCreateAndDispose,
@@ -21,10 +21,12 @@ void main() {
   });
 
   group('RestorationManager', () {
-    testWidgetsWithLeakTracking('root bucket retrieval', (WidgetTester tester) async {
+    testWidgets('root bucket retrieval', (WidgetTester tester) async {
       final List<MethodCall> callsToEngine = <MethodCall>[];
       final Completer<Map<dynamic, dynamic>> result = Completer<Map<dynamic, dynamic>>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) {
         callsToEngine.add(call);
         return result.future;
       });
@@ -69,10 +71,12 @@ void main() {
       expect(synchronousBucket, same(rootBucket));
     });
 
-    testWidgetsWithLeakTracking('root bucket received from engine before retrieval', (WidgetTester tester) async {
+    testWidgets('root bucket received from engine before retrieval', (WidgetTester tester) async {
       SystemChannels.restoration.setMethodCallHandler(null);
       final List<MethodCall> callsToEngine = <MethodCall>[];
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) async {
         callsToEngine.add(call);
         return null;
       });
@@ -89,11 +93,15 @@ void main() {
       expect(callsToEngine, isEmpty);
     });
 
-    testWidgetsWithLeakTracking('root bucket received while engine retrieval is pending', (WidgetTester tester) async {
+    testWidgets('root bucket received while engine retrieval is pending', (
+      WidgetTester tester,
+    ) async {
       SystemChannels.restoration.setMethodCallHandler(null);
       final List<MethodCall> callsToEngine = <MethodCall>[];
       final Completer<Map<dynamic, dynamic>> result = Completer<Map<dynamic, dynamic>>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) {
         callsToEngine.add(call);
         return result.future;
       });
@@ -120,8 +128,12 @@ void main() {
       expect(rootBucket2!.contains('foo'), isFalse);
     });
 
-    testWidgetsWithLeakTracking('root bucket is properly replaced when new data is available', (WidgetTester tester) async {
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) async {
+    testWidgets('root bucket is properly replaced when new data is available', (
+      WidgetTester tester,
+    ) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) async {
         return _createEncodedRestorationData1();
       });
       final RestorationManager manager = RestorationManager();
@@ -162,17 +174,22 @@ void main() {
       expect(newChild.read<String>('bar'), 'Hello');
     });
 
-    testWidgetsWithLeakTracking('returns null as root bucket when restoration is disabled', (WidgetTester tester) async {
+    testWidgets('returns null as root bucket when restoration is disabled', (
+      WidgetTester tester,
+    ) async {
       final List<MethodCall> callsToEngine = <MethodCall>[];
       final Completer<Map<dynamic, dynamic>> result = Completer<Map<dynamic, dynamic>>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call)  {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) {
         callsToEngine.add(call);
         return result.future;
       });
       int listenerCount = 0;
-      final RestorationManager manager = RestorationManager()..addListener(() {
-        listenerCount++;
-      });
+      final RestorationManager manager =
+          RestorationManager()..addListener(() {
+            listenerCount++;
+          });
       addTearDown(manager.dispose);
       RestorationBucket? rootBucket;
       bool rootBucketResolved = false;
@@ -206,10 +223,12 @@ void main() {
       expect(rootBucket, isNull);
     });
 
-    testWidgetsWithLeakTracking('flushData', (WidgetTester tester) async {
+    testWidgets('flushData', (WidgetTester tester) async {
       final List<MethodCall> callsToEngine = <MethodCall>[];
       final Completer<Map<dynamic, dynamic>> result = Completer<Map<dynamic, dynamic>>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) {
         callsToEngine.add(call);
         return result.future;
       });
@@ -243,9 +262,11 @@ void main() {
       expect(callsToEngine, hasLength(1));
     });
 
-    testWidgetsWithLeakTracking('isReplacing', (WidgetTester tester) async {
+    testWidgets('isReplacing', (WidgetTester tester) async {
       final Completer<Map<dynamic, dynamic>> result = Completer<Map<dynamic, dynamic>>();
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (
+        MethodCall call,
+      ) {
         return result.future;
       });
 
@@ -308,15 +329,14 @@ void main() {
     expect(debugIsSerializableForRestoration(12.43), isTrue);
     expect(debugIsSerializableForRestoration('Hello World'), isTrue);
     expect(debugIsSerializableForRestoration(<int>[12, 13, 14]), isTrue);
-    expect(debugIsSerializableForRestoration(<String, int>{'v1' : 10, 'v2' : 23}), isTrue);
-    expect(debugIsSerializableForRestoration(<String, dynamic>{
-      'hello': <int>[12, 12, 12],
-      'world': <int, bool>{
-        1: true,
-        2: false,
-        4: true,
-      },
-    }), isTrue);
+    expect(debugIsSerializableForRestoration(<String, int>{'v1': 10, 'v2': 23}), isTrue);
+    expect(
+      debugIsSerializableForRestoration(<String, dynamic>{
+        'hello': <int>[12, 12, 12],
+        'world': <int, bool>{1: true, 2: false, 4: true},
+      }),
+      isTrue,
+    );
   });
 }
 
@@ -324,21 +344,16 @@ Future<void> _pushDataFromEngine(Map<dynamic, dynamic> data) async {
   await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
     'flutter/restoration',
     const StandardMethodCodec().encodeMethodCall(MethodCall('push', data)),
-    (_) { },
+    (_) {},
   );
 }
 
 Map<dynamic, dynamic> _createEncodedRestorationData1() {
   final Map<String, dynamic> data = <String, dynamic>{
-    valuesMapKey: <String, dynamic>{
-      'value1' : 10,
-      'value2' : 'Hello',
-    },
+    valuesMapKey: <String, dynamic>{'value1': 10, 'value2': 'Hello'},
     childrenMapKey: <String, dynamic>{
-      'child1' : <String, dynamic>{
-        valuesMapKey : <String, dynamic>{
-          'another value': 22,
-        },
+      'child1': <String, dynamic>{
+        valuesMapKey: <String, dynamic>{'another value': 22},
       },
     },
   };
@@ -347,14 +362,10 @@ Map<dynamic, dynamic> _createEncodedRestorationData1() {
 
 Map<dynamic, dynamic> _createEncodedRestorationData2() {
   final Map<String, dynamic> data = <String, dynamic>{
-    valuesMapKey: <String, dynamic>{
-      'foo' : 33,
-    },
+    valuesMapKey: <String, dynamic>{'foo': 33},
     childrenMapKey: <String, dynamic>{
-      'childFoo' : <String, dynamic>{
-        valuesMapKey : <String, dynamic>{
-          'bar': 'Hello',
-        },
+      'childFoo': <String, dynamic>{
+        valuesMapKey: <String, dynamic>{'bar': 'Hello'},
       },
     },
   };

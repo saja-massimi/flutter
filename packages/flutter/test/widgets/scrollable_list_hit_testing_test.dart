@@ -5,12 +5,11 @@
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 const List<int> items = <int>[0, 1, 2, 3, 4, 5];
 
 void main() {
-  testWidgetsWithLeakTracking('Tap item after scroll - horizontal', (WidgetTester tester) async {
+  testWidgets('Tap item after scroll - horizontal', (WidgetTester tester) async {
     final List<int> tapped = <int>[];
     await tester.pumpWidget(
       Directionality(
@@ -22,13 +21,16 @@ void main() {
               dragStartBehavior: DragStartBehavior.down,
               itemExtent: 290.0,
               scrollDirection: Axis.horizontal,
-              children: items.map<Widget>((int item) {
-                return GestureDetector(
-                  onTap: () { tapped.add(item); },
-                  dragStartBehavior: DragStartBehavior.down,
-                  child: Text('$item'),
-                );
-              }).toList(),
+              children:
+                  items.map<Widget>((int item) {
+                    return GestureDetector(
+                      onTap: () {
+                        tapped.add(item);
+                      },
+                      dragStartBehavior: DragStartBehavior.down,
+                      child: Text('$item'),
+                    );
+                  }).toList(),
             ),
           ),
         ),
@@ -52,7 +54,7 @@ void main() {
     expect(tapped, equals(<int>[2]));
   });
 
-  testWidgetsWithLeakTracking('Tap item after scroll - vertical', (WidgetTester tester) async {
+  testWidgets('Tap item after scroll - vertical', (WidgetTester tester) async {
     final List<int> tapped = <int>[];
     await tester.pumpWidget(
       Directionality(
@@ -63,13 +65,16 @@ void main() {
             child: ListView(
               dragStartBehavior: DragStartBehavior.down,
               itemExtent: 290.0,
-              children: items.map<Widget>((int item) {
-                return GestureDetector(
-                  onTap: () { tapped.add(item); },
-                  dragStartBehavior: DragStartBehavior.down,
-                  child: Text('$item'),
-                );
-              }).toList(),
+              children:
+                  items.map<Widget>((int item) {
+                    return GestureDetector(
+                      onTap: () {
+                        tapped.add(item);
+                      },
+                      dragStartBehavior: DragStartBehavior.down,
+                      child: Text('$item'),
+                    );
+                  }).toList(),
             ),
           ),
         ),
@@ -92,10 +97,13 @@ void main() {
     await tester.tap(find.text('1'));
     expect(tapped, equals(<int>[1]));
     await tester.tap(find.text('3'), warnIfMissed: false);
-    expect(tapped, equals(<int>[1])); // the center of the third item is off-screen so it shouldn't get hit
+    expect(
+      tapped,
+      equals(<int>[1]),
+    ); // the center of the third item is off-screen so it shouldn't get hit
   });
 
-  testWidgetsWithLeakTracking('Padding scroll anchor start', (WidgetTester tester) async {
+  testWidgets('Padding scroll anchor start', (WidgetTester tester) async {
     final List<int> tapped = <int>[];
 
     await tester.pumpWidget(
@@ -104,12 +112,15 @@ void main() {
         child: ListView(
           itemExtent: 290.0,
           padding: const EdgeInsets.fromLTRB(5.0, 20.0, 15.0, 10.0),
-          children: items.map<Widget>((int item) {
-            return GestureDetector(
-              onTap: () { tapped.add(item); },
-              child: Text('$item'),
-            );
-          }).toList(),
+          children:
+              items.map<Widget>((int item) {
+                return GestureDetector(
+                  onTap: () {
+                    tapped.add(item);
+                  },
+                  child: Text('$item'),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -127,7 +138,7 @@ void main() {
     expect(tapped, equals(<int>[0, 1, 1]));
   });
 
-  testWidgetsWithLeakTracking('Padding scroll anchor end', (WidgetTester tester) async {
+  testWidgets('Padding scroll anchor end', (WidgetTester tester) async {
     final List<int> tapped = <int>[];
 
     await tester.pumpWidget(
@@ -137,12 +148,15 @@ void main() {
           itemExtent: 290.0,
           reverse: true,
           padding: const EdgeInsets.fromLTRB(5.0, 20.0, 15.0, 10.0),
-          children: items.map<Widget>((int item) {
-            return GestureDetector(
-              onTap: () { tapped.add(item); },
-              child: Text('$item'),
-            );
-          }).toList(),
+          children:
+              items.map<Widget>((int item) {
+                return GestureDetector(
+                  onTap: () {
+                    tapped.add(item);
+                  },
+                  child: Text('$item'),
+                );
+              }).toList(),
         ),
       ),
     );
@@ -160,7 +174,7 @@ void main() {
     expect(tapped, equals(<int>[0, 1, 1]));
   });
 
-  testWidgetsWithLeakTracking('Tap immediately following clamped overscroll', (WidgetTester tester) async {
+  testWidgets('Tap immediately following clamped overscroll', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/5709
     final List<int> tapped = <int>[];
 
@@ -169,12 +183,15 @@ void main() {
         textDirection: TextDirection.ltr,
         child: ListView(
           itemExtent: 200.0,
-          children: items.map<Widget>((int item) {
-            return GestureDetector(
-              onTap: () { tapped.add(item); },
-              child: Text('$item'),
-            );
-          }).toList(),
+          children:
+              items.map<Widget>((int item) {
+                return GestureDetector(
+                  onTap: () {
+                    tapped.add(item);
+                  },
+                  child: Text('$item'),
+                );
+              }).toList(),
         ),
       ),
     );

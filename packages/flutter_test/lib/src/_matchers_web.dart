@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'matchers.dart';
+library;
+
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -60,10 +63,12 @@ class MatchesGoldenFile extends AsyncMatcher {
     final Size size = renderObject.paintBounds.size;
     final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.instance;
     final ui.FlutterView view = binding.platformDispatcher.implicitView!;
-    final RenderView renderView = binding.renderViews.firstWhere((RenderView r) => r.flutterView == view);
+    final RenderView renderView = binding.renderViews.firstWhere(
+      (RenderView r) => r.flutterView == view,
+    );
 
-    if (isCanvasKit) {
-      // In CanvasKit, use Layer.toImage to generate the screenshot.
+    if (isSkiaWeb) {
+      // In CanvasKit and Skwasm, use Layer.toImage to generate the screenshot.
       final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.instance;
       return binding.runAsync<String?>(() async {
         assert(element.renderObject != null);
@@ -84,7 +89,10 @@ class MatchesGoldenFile extends AsyncMatcher {
             return null;
           }
           try {
-            final bool success = await webGoldenComparator.compareBytes(bytes.buffer.asUint8List(), key);
+            final bool success = await webGoldenComparator.compareBytes(
+              bytes.buffer.asUint8List(),
+              key,
+            );
             return success ? null : 'does not match';
           } on TestFailure catch (ex) {
             return ex.message;

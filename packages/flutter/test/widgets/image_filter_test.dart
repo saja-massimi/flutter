@@ -14,10 +14,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Image filter - blur', (WidgetTester tester) async {
+  testWidgets('Image filter - blur', (WidgetTester tester) async {
     await tester.pumpWidget(
       RepaintBoundary(
         child: ImageFiltered(
@@ -26,13 +25,10 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byType(ImageFiltered),
-      matchesGoldenFile('image_filter_blur.png'),
-    );
+    await expectLater(find.byType(ImageFiltered), matchesGoldenFile('image_filter_blur.png'));
   });
 
-  testWidgetsWithLeakTracking('Image filter - blur with offset', (WidgetTester tester) async {
+  testWidgets('Image filter - blur with offset', (WidgetTester tester) async {
     final Key key = GlobalKey();
     await tester.pumpWidget(
       RepaintBoundary(
@@ -46,13 +42,10 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('image_filter_blur_offset.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('image_filter_blur_offset.png'));
   });
 
-  testWidgetsWithLeakTracking('Image filter - dilate', (WidgetTester tester) async {
+  testWidgets('Image filter - dilate', (WidgetTester tester) async {
     await tester.pumpWidget(
       RepaintBoundary(
         child: ImageFiltered(
@@ -61,13 +54,10 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byType(ImageFiltered),
-      matchesGoldenFile('image_filter_dilate.png'),
-    );
+    await expectLater(find.byType(ImageFiltered), matchesGoldenFile('image_filter_dilate.png'));
   }, skip: kIsWeb); // https://github.com/flutter/flutter/issues/101874
 
-  testWidgetsWithLeakTracking('Image filter - erode', (WidgetTester tester) async {
+  testWidgets('Image filter - erode', (WidgetTester tester) async {
     await tester.pumpWidget(
       RepaintBoundary(
         child: ImageFiltered(
@@ -77,19 +67,18 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byType(ImageFiltered),
-      matchesGoldenFile('image_filter_erode.png'),
-    );
+    await expectLater(find.byType(ImageFiltered), matchesGoldenFile('image_filter_erode.png'));
   }, skip: kIsWeb); // https://github.com/flutter/flutter/issues/101874
 
-  testWidgetsWithLeakTracking('Image filter - matrix', (WidgetTester tester) async {
-    final ImageFilter matrix = ImageFilter.matrix(Float64List.fromList(<double>[
-      0.5, 0.0, 0.0, 0.0, //
-      0.0, 0.5, 0.0, 0.0, //
-      0.0, 0.0, 1.0, 0.0, //
-      0.0, 0.0, 0.0, 1.0, //
-    ]));
+  testWidgets('Image filter - matrix', (WidgetTester tester) async {
+    final ImageFilter matrix = ImageFilter.matrix(
+      Float64List.fromList(<double>[
+        0.5, 0.0, 0.0, 0.0, //
+        0.0, 0.5, 0.0, 0.0, //
+        0.0, 0.0, 1.0, 0.0, //
+        0.0, 0.0, 0.0, 1.0, //
+      ]),
+    );
     await tester.pumpWidget(
       RepaintBoundary(
         child: ImageFiltered(
@@ -97,15 +86,12 @@ void main() {
           child: MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(useMaterial3: false, primarySwatch: Colors.blue),
+            debugShowCheckedModeBanner: false, // https://github.com/flutter/flutter/issues/143616
             home: Scaffold(
-              appBar: AppBar(
-                title: const Text('Matrix ImageFilter Test'),
-              ),
-              body: const Center(
-                child:Text('Hooray!'),
-              ),
+              appBar: AppBar(title: const Text('Matrix ImageFilter Test')),
+              body: const Center(child: Text('Hooray!')),
               floatingActionButton: FloatingActionButton(
-                onPressed: () { },
+                onPressed: () {},
                 tooltip: 'Increment',
                 child: const Icon(Icons.add),
               ),
@@ -114,13 +100,10 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byType(ImageFiltered),
-      matchesGoldenFile('image_filter_matrix.png'),
-    );
+    await expectLater(find.byType(ImageFiltered), matchesGoldenFile('image_filter_matrix.png'));
   });
 
-  testWidgetsWithLeakTracking('Image filter - matrix with offset', (WidgetTester tester) async {
+  testWidgets('Image filter - matrix with offset', (WidgetTester tester) async {
     final Matrix4 matrix = Matrix4.rotationZ(pi / 18);
     final ImageFilter matrixFilter = ImageFilter.matrix(matrix.storage);
     final Key key = GlobalKey();
@@ -134,15 +117,12 @@ void main() {
             child: MaterialApp(
               title: 'Flutter Demo',
               theme: ThemeData(useMaterial3: false, primarySwatch: Colors.blue),
+              debugShowCheckedModeBanner: false, // https://github.com/flutter/flutter/issues/143616
               home: Scaffold(
-                appBar: AppBar(
-                  title: const Text('Matrix ImageFilter Test'),
-                ),
-                body: const Center(
-                  child:Text('Hooray!'),
-                ),
+                appBar: AppBar(title: const Text('Matrix ImageFilter Test')),
+                body: const Center(child: Text('Hooray!')),
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () { },
+                  onPressed: () {},
                   tooltip: 'Increment',
                   child: const Icon(Icons.add),
                 ),
@@ -152,13 +132,10 @@ void main() {
         ),
       ),
     );
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('image_filter_matrix_offset.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('image_filter_matrix_offset.png'));
   });
 
-  testWidgetsWithLeakTracking('Image filter - reuses its layer', (WidgetTester tester) async {
+  testWidgets('Image filter - reuses its layer', (WidgetTester tester) async {
     Future<void> pumpWithSigma(double sigma) async {
       await tester.pumpWidget(
         RepaintBoundary(
@@ -179,7 +156,7 @@ void main() {
     expect(renderObject.debugLayer, same(originalLayer));
   });
 
-  testWidgetsWithLeakTracking('Image filter - enabled and disabled', (WidgetTester tester) async {
+  testWidgets('Image filter - enabled and disabled', (WidgetTester tester) async {
     Future<void> pumpWithEnabledState(bool enabled) async {
       await tester.pumpWidget(
         RepaintBoundary(
@@ -194,7 +171,6 @@ void main() {
 
     await pumpWithEnabledState(false);
     expect(tester.layers, isNot(contains(isA<ImageFilterLayer>())));
-
 
     await pumpWithEnabledState(true);
     expect(tester.layers, contains(isA<ImageFilterLayer>()));

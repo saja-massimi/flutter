@@ -30,11 +30,14 @@ class DisposableBuildContext<T extends State> {
   ///
   /// [State.mounted] must be true.
   DisposableBuildContext(T this._state)
-      : assert(_state.mounted, 'A DisposableBuildContext was given a BuildContext for an Element that is not mounted.')  {
+    : assert(
+        _state.mounted,
+        'A DisposableBuildContext was given a BuildContext for an Element that is not mounted.',
+      ) {
     // TODO(polina-c): stop duplicating code across disposables
     // https://github.com/flutter/flutter/issues/137435
     if (kFlutterMemoryAllocationsEnabled) {
-      MemoryAllocations.instance.dispatchObjectCreated(
+      FlutterMemoryAllocations.instance.dispatchObjectCreated(
         library: 'package:flutter/widgets.dart',
         className: '$DisposableBuildContext',
         object: this,
@@ -51,10 +54,7 @@ class DisposableBuildContext<T extends State> {
   /// Otherwise, asserts the [_state] is still mounted and returns its context.
   BuildContext? get context {
     assert(_debugValidate());
-    if (_state == null) {
-      return null;
-    }
-    return _state!.context;
+    return _state?.context;
   }
 
   /// Called from asserts or tests to determine whether this object is in a
@@ -72,7 +72,6 @@ class DisposableBuildContext<T extends State> {
     return true;
   }
 
-
   /// Marks the [BuildContext] as disposed.
   ///
   /// Creators of this object must call [dispose] when their [Element] is
@@ -81,7 +80,7 @@ class DisposableBuildContext<T extends State> {
     // TODO(polina-c): stop duplicating code across disposables
     // https://github.com/flutter/flutter/issues/137435
     if (kFlutterMemoryAllocationsEnabled) {
-      MemoryAllocations.instance.dispatchObjectDisposed(object: this);
+      FlutterMemoryAllocations.instance.dispatchObjectDisposed(object: this);
     }
     _state = null;
   }

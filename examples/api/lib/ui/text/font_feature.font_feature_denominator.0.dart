@@ -2,11 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
 
-/// Flutter code sample for [FontFeature.FontFeature.denominator].
+/// Flutter code sample for [FontFeature.denominator].
 
 void main() => runApp(const ExampleApp());
 
@@ -33,9 +31,7 @@ class ExampleWidget extends StatelessWidget {
       'Fractions: 1/2 2/3 3/4 4/5',
       style: TextStyle(
         fontFamily: 'Piazzolla',
-        fontFeatures: <FontFeature>[
-          FontFeature.denominator(),
-        ],
+        fontFeatures: <FontFeature>[FontFeature.denominator()],
       ),
     );
   }

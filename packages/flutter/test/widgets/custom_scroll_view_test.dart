@@ -4,39 +4,35 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   // Regression test for https://github.com/flutter/flutter/issues/96024
-  testWidgetsWithLeakTracking('CustomScrollView.center update test 1', (WidgetTester tester) async {
+  testWidgets('CustomScrollView.center update test 1', (WidgetTester tester) async {
     final Key centerKey = UniqueKey();
     late StateSetter setState;
     bool hasKey = false;
-    await tester.pumpWidget(Directionality(
-      textDirection: TextDirection.ltr,
-      child: CustomScrollView(
-        center: centerKey,
-        slivers: <Widget>[
-          const SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
-          StatefulBuilder(
-            key: centerKey,
-            builder: (BuildContext context, StateSetter setter) {
-              setState = setter;
-              if (hasKey) {
-                return const SliverToBoxAdapter(
-                  key: Key('b'),
-                  child: SizedBox(height: 100.0),
-                );
-              } else {
-                return const SliverToBoxAdapter(
-                  child: SizedBox(height: 100.0),
-                );
-              }
-            },
-          ),
-        ],
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomScrollView(
+          center: centerKey,
+          slivers: <Widget>[
+            const SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
+            StatefulBuilder(
+              key: centerKey,
+              builder: (BuildContext context, StateSetter setter) {
+                setState = setter;
+                if (hasKey) {
+                  return const SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0));
+                } else {
+                  return const SliverToBoxAdapter(child: SizedBox(height: 100.0));
+                }
+              },
+            ),
+          ],
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
 
     // Change the center key will trigger the old RenderObject remove and a new
@@ -50,7 +46,7 @@ void main() {
     // Pass without throw.
   });
 
-  testWidgetsWithLeakTracking('CustomScrollView.center update test 2', (WidgetTester tester) async {
+  testWidgets('CustomScrollView.center update test 2', (WidgetTester tester) async {
     const List<Widget> slivers1 = <Widget>[
       SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
       SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
@@ -66,10 +62,7 @@ void main() {
     Widget buildFrame(List<Widget> slivers, Key center) {
       return Directionality(
         textDirection: TextDirection.ltr,
-        child: CustomScrollView(
-          center: center,
-          slivers: slivers,
-        ),
+        child: CustomScrollView(center: center, slivers: slivers),
       );
     }
 
@@ -82,39 +75,47 @@ void main() {
     // Pass without throw.
   });
 
-  testWidgetsWithLeakTracking('CustomScrollView.center', (WidgetTester tester) async {
-    await tester.pumpWidget(const Directionality(
-      textDirection: TextDirection.ltr,
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
-          SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
-        ],
-        center: Key('a'),
+  testWidgets('CustomScrollView.center', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
+            SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
+          ],
+          center: Key('a'),
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
     expect(
-      tester.getRect(find.descendant(of: find.byKey(const Key('a')), matching: find.byType(SizedBox))),
+      tester.getRect(
+        find.descendant(of: find.byKey(const Key('a')), matching: find.byType(SizedBox)),
+      ),
       const Rect.fromLTRB(0.0, 0.0, 800.0, 100.0),
     );
     expect(
-      tester.getRect(find.descendant(of: find.byKey(const Key('b')), matching: find.byType(SizedBox))),
+      tester.getRect(
+        find.descendant(of: find.byKey(const Key('b')), matching: find.byType(SizedBox)),
+      ),
       const Rect.fromLTRB(0.0, 100.0, 800.0, 200.0),
     );
   });
 
-  testWidgetsWithLeakTracking('CustomScrollView.center', (WidgetTester tester) async {
-    await tester.pumpWidget(const Directionality(
-      textDirection: TextDirection.ltr,
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
-          SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
-        ],
-        center: Key('b'),
+  testWidgets('CustomScrollView.center', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
+            SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
+          ],
+          center: Key('b'),
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
     expect(
       tester.getRect(
@@ -127,34 +128,30 @@ void main() {
     );
     expect(
       tester.getRect(
-        find.descendant(
-          of: find.byKey(const Key('b')),
-          matching: find.byType(SizedBox),
-        ),
+        find.descendant(of: find.byKey(const Key('b')), matching: find.byType(SizedBox)),
       ),
       const Rect.fromLTRB(0.0, 0.0, 800.0, 100.0),
     );
   });
 
-  testWidgetsWithLeakTracking('CustomScrollView.anchor', (WidgetTester tester) async {
-    await tester.pumpWidget(const Directionality(
-      textDirection: TextDirection.ltr,
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
-          SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
-        ],
-        center: Key('b'),
-        anchor: 1.0,
+  testWidgets('CustomScrollView.anchor', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(key: Key('a'), child: SizedBox(height: 100.0)),
+            SliverToBoxAdapter(key: Key('b'), child: SizedBox(height: 100.0)),
+          ],
+          center: Key('b'),
+          anchor: 1.0,
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
     expect(
       tester.getRect(
-        find.descendant(
-          of: find.byKey(const Key('a')),
-          matching: find.byType(SizedBox),
-        ),
+        find.descendant(of: find.byKey(const Key('a')), matching: find.byType(SizedBox)),
       ),
       const Rect.fromLTRB(0.0, 500.0, 800.0, 600.0),
     );

@@ -5,10 +5,9 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Can size according to aspect ratio', (WidgetTester tester) async {
+  testWidgets('Can size according to aspect ratio', (WidgetTester tester) async {
     final Key outside = UniqueKey();
     final Key inside = UniqueKey();
 
@@ -16,14 +15,7 @@ void main() {
       Center(
         child: SizedBox(
           width: 200.0,
-          child: FittedBox(
-            key: outside,
-            child: SizedBox(
-              key: inside,
-              width: 100.0,
-              height: 50.0,
-            ),
-          ),
+          child: FittedBox(key: outside, child: SizedBox(key: inside, width: 100.0, height: 50.0)),
         ),
       ),
     );
@@ -43,7 +35,7 @@ void main() {
     expect(insidePoint, equals(outsidePoint));
   });
 
-  testWidgetsWithLeakTracking('Can contain child', (WidgetTester tester) async {
+  testWidgets('Can contain child', (WidgetTester tester) async {
     final Key outside = UniqueKey();
     final Key inside = UniqueKey();
 
@@ -52,14 +44,7 @@ void main() {
         child: SizedBox(
           width: 200.0,
           height: 200.0,
-          child: FittedBox(
-            key: outside,
-            child: SizedBox(
-              key: inside,
-              width: 100.0,
-              height: 50.0,
-            ),
-          ),
+          child: FittedBox(key: outside, child: SizedBox(key: inside, width: 100.0, height: 50.0)),
         ),
       ),
     );
@@ -78,7 +63,7 @@ void main() {
     expect(insidePoint, equals(outsidePoint));
   });
 
-  testWidgetsWithLeakTracking('Child can cover', (WidgetTester tester) async {
+  testWidgets('Child can cover', (WidgetTester tester) async {
     final Key outside = UniqueKey();
     final Key inside = UniqueKey();
 
@@ -90,11 +75,7 @@ void main() {
           child: FittedBox(
             key: outside,
             fit: BoxFit.cover,
-            child: SizedBox(
-              key: inside,
-              width: 100.0,
-              height: 50.0,
-            ),
+            child: SizedBox(key: inside, width: 100.0, height: 50.0),
           ),
         ),
       ),
@@ -114,27 +95,21 @@ void main() {
     expect(insidePoint, equals(outsidePoint));
   });
 
-  testWidgetsWithLeakTracking('FittedBox with no child', (WidgetTester tester) async {
+  testWidgets('FittedBox with no child', (WidgetTester tester) async {
     final Key key = UniqueKey();
-    await tester.pumpWidget(
-      Center(
-        child: FittedBox(
-          key: key,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
+    await tester.pumpWidget(Center(child: FittedBox(key: key, fit: BoxFit.cover)));
 
     final RenderBox box = tester.firstRenderObject(find.byKey(key));
     expect(box.size.width, 0.0);
     expect(box.size.height, 0.0);
   });
 
-  testWidgetsWithLeakTracking('Child can be aligned multiple ways in a row', (WidgetTester tester) async {
+  testWidgets('Child can be aligned multiple ways in a row', (WidgetTester tester) async {
     final Key outside = UniqueKey();
     final Key inside = UniqueKey();
 
-    { // align RTL
+    {
+      // align RTL
 
       await tester.pumpWidget(
         Directionality(
@@ -147,11 +122,7 @@ void main() {
                 key: outside,
                 fit: BoxFit.scaleDown,
                 alignment: AlignmentDirectional.bottomEnd,
-                child: SizedBox(
-                  key: inside,
-                  width: 10.0,
-                  height: 10.0,
-                ),
+                child: SizedBox(key: inside, width: 10.0, height: 10.0),
               ),
             ),
           ),
@@ -175,7 +146,8 @@ void main() {
       expect(insideBottomRight, equals(outsideBottomRight));
     }
 
-    { // change direction
+    {
+      // change direction
 
       await tester.pumpWidget(
         Directionality(
@@ -188,11 +160,7 @@ void main() {
                 key: outside,
                 fit: BoxFit.scaleDown,
                 alignment: AlignmentDirectional.bottomEnd,
-                child: SizedBox(
-                  key: inside,
-                  width: 10.0,
-                  height: 10.0,
-                ),
+                child: SizedBox(key: inside, width: 10.0, height: 10.0),
               ),
             ),
           ),
@@ -216,7 +184,8 @@ void main() {
       expect(insideBottomRight, equals(outsideBottomRight));
     }
 
-    { // change alignment
+    {
+      // change alignment
 
       await tester.pumpWidget(
         Directionality(
@@ -229,11 +198,7 @@ void main() {
                 key: outside,
                 fit: BoxFit.scaleDown,
                 alignment: AlignmentDirectional.center,
-                child: SizedBox(
-                  key: inside,
-                  width: 10.0,
-                  height: 10.0,
-                ),
+                child: SizedBox(key: inside, width: 10.0, height: 10.0),
               ),
             ),
           ),
@@ -257,7 +222,8 @@ void main() {
       expect(insideBottomRight, equals(outsideBottomRight));
     }
 
-    { // change size
+    {
+      // change size
 
       await tester.pumpWidget(
         Directionality(
@@ -270,11 +236,7 @@ void main() {
                 key: outside,
                 fit: BoxFit.scaleDown,
                 alignment: AlignmentDirectional.center,
-                child: SizedBox(
-                  key: inside,
-                  width: 30.0,
-                  height: 10.0,
-                ),
+                child: SizedBox(key: inside, width: 30.0, height: 10.0),
               ),
             ),
           ),
@@ -298,7 +260,8 @@ void main() {
       expect(insideBottomRight, equals(outsideBottomRight));
     }
 
-    { // change fit
+    {
+      // change fit
 
       await tester.pumpWidget(
         Directionality(
@@ -311,11 +274,7 @@ void main() {
                 key: outside,
                 fit: BoxFit.fill,
                 alignment: AlignmentDirectional.center,
-                child: SizedBox(
-                  key: inside,
-                  width: 30.0,
-                  height: 10.0,
-                ),
+                child: SizedBox(key: inside, width: 30.0, height: 10.0),
               ),
             ),
           ),
@@ -340,7 +299,7 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('FittedBox layers - contain', (WidgetTester tester) async {
+  testWidgets('FittedBox layers - contain', (WidgetTester tester) async {
     await tester.pumpWidget(
       const Center(
         child: SizedBox(
@@ -350,9 +309,7 @@ void main() {
             child: SizedBox(
               width: 50.0,
               height: 50.0,
-              child: RepaintBoundary(
-                child: Placeholder(),
-              ),
+              child: RepaintBoundary(child: Placeholder()),
             ),
           ),
         ),
@@ -361,7 +318,7 @@ void main() {
     expect(getLayers(), <Type>[TransformLayer, TransformLayer, OffsetLayer]);
   });
 
-  testWidgetsWithLeakTracking('FittedBox layers - cover - horizontal', (WidgetTester tester) async {
+  testWidgets('FittedBox layers - cover - horizontal', (WidgetTester tester) async {
     await tester.pumpWidget(
       const Center(
         child: SizedBox(
@@ -373,9 +330,7 @@ void main() {
             child: SizedBox(
               width: 10.0,
               height: 50.0,
-              child: RepaintBoundary(
-                child: Placeholder(),
-              ),
+              child: RepaintBoundary(child: Placeholder()),
             ),
           ),
         ),
@@ -384,7 +339,7 @@ void main() {
     expect(getLayers(), <Type>[TransformLayer, ClipRectLayer, TransformLayer, OffsetLayer]);
   });
 
-  testWidgetsWithLeakTracking('FittedBox layers - cover - vertical', (WidgetTester tester) async {
+  testWidgets('FittedBox layers - cover - vertical', (WidgetTester tester) async {
     await tester.pumpWidget(
       const Center(
         child: SizedBox(
@@ -396,9 +351,7 @@ void main() {
             child: SizedBox(
               width: 50.0,
               height: 10.0,
-              child: RepaintBoundary(
-                child: Placeholder(),
-              ),
+              child: RepaintBoundary(child: Placeholder()),
             ),
           ),
         ),
@@ -407,7 +360,7 @@ void main() {
     expect(getLayers(), <Type>[TransformLayer, ClipRectLayer, TransformLayer, OffsetLayer]);
   });
 
-  testWidgetsWithLeakTracking('FittedBox layers - none - clip', (WidgetTester tester) async {
+  testWidgets('FittedBox layers - none - clip', (WidgetTester tester) async {
     final List<double> values = <double>[10.0, 50.0, 100.0];
     for (final double a in values) {
       for (final double b in values) {
@@ -424,9 +377,7 @@ void main() {
                     child: SizedBox(
                       width: c,
                       height: d,
-                      child: const RepaintBoundary(
-                        child: Placeholder(),
-                      ),
+                      child: const RepaintBoundary(child: Placeholder()),
                     ),
                   ),
                 ),
@@ -443,7 +394,7 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('Big child into small fitted box - hit testing', (WidgetTester tester) async {
+  testWidgets('Big child into small fitted box - hit testing', (WidgetTester tester) async {
     final GlobalKey key1 = GlobalKey();
     bool pointerDown = false;
     await tester.pumpWidget(
@@ -460,10 +411,7 @@ void main() {
                 onPointerDown: (PointerDownEvent event) {
                   pointerDown = true;
                 },
-                child: Container(
-                  key: key1,
-                  color: const Color(0xFF000000),
-                ),
+                child: Container(key: key1, color: const Color(0xFF000000)),
               ),
             ),
           ),
@@ -475,16 +423,18 @@ void main() {
     expect(pointerDown, isTrue);
   });
 
-  testWidgetsWithLeakTracking('Can set and update clipBehavior', (WidgetTester tester) async {
+  testWidgets('Can set and update clipBehavior', (WidgetTester tester) async {
     await tester.pumpWidget(FittedBox(fit: BoxFit.none, child: Container()));
     final RenderFittedBox renderObject = tester.allRenderObjects.whereType<RenderFittedBox>().first;
     expect(renderObject.clipBehavior, equals(Clip.none));
 
-    await tester.pumpWidget(FittedBox(fit: BoxFit.none, clipBehavior: Clip.antiAlias, child: Container()));
+    await tester.pumpWidget(
+      FittedBox(fit: BoxFit.none, clipBehavior: Clip.antiAlias, child: Container()),
+    );
     expect(renderObject.clipBehavior, equals(Clip.antiAlias));
   });
 
-  testWidgetsWithLeakTracking('BoxFit.scaleDown matches size of child', (WidgetTester tester) async {
+  testWidgets('BoxFit.scaleDown matches size of child', (WidgetTester tester) async {
     final Key outside = UniqueKey();
     final Key inside = UniqueKey();
 
@@ -497,11 +447,7 @@ void main() {
           child: FittedBox(
             key: outside,
             fit: BoxFit.scaleDown,
-            child: SizedBox(
-              key: inside,
-              width: 100.0,
-              height: 50.0,
-            ),
+            child: SizedBox(key: inside, width: 100.0, height: 50.0),
           ),
         ),
       ),
@@ -526,11 +472,7 @@ void main() {
           child: FittedBox(
             key: outside,
             fit: BoxFit.scaleDown,
-            child: SizedBox(
-              key: inside,
-              width: 400.0,
-              height: 200.0,
-            ),
+            child: SizedBox(key: inside, width: 400.0, height: 200.0),
           ),
         ),
       ),
@@ -545,7 +487,9 @@ void main() {
     expect(insidePoint - outsidePoint, equals(Offset.zero));
   });
 
-  testWidgetsWithLeakTracking('Switching to and from BoxFit.scaleDown causes relayout', (WidgetTester tester) async {
+  testWidgets('Switching to and from BoxFit.scaleDown causes relayout', (
+    WidgetTester tester,
+  ) async {
     final Key outside = UniqueKey();
 
     final Widget scaleDownWidget = Center(
@@ -554,10 +498,7 @@ void main() {
         child: FittedBox(
           key: outside,
           fit: BoxFit.scaleDown,
-          child: const SizedBox(
-            width: 100.0,
-            height: 50.0,
-          ),
+          child: const SizedBox(width: 100.0, height: 50.0),
         ),
       ),
     );
@@ -565,13 +506,7 @@ void main() {
     final Widget coverWidget = Center(
       child: SizedBox(
         width: 200.0,
-        child: FittedBox(
-          key: outside,
-          child: const SizedBox(
-            width: 100.0,
-            height: 50.0,
-          ),
-        ),
+        child: FittedBox(key: outside, child: const SizedBox(width: 100.0, height: 50.0)),
       ),
     );
 
@@ -589,21 +524,39 @@ void main() {
     expect(outsideBox.size.height, 50.0);
   });
 
-  testWidgetsWithLeakTracking('FittedBox without child does not throw', (WidgetTester tester) async {
+  testWidgets('FittedBox without child does not throw', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const Center(
-        child: SizedBox(
-          width: 200.0,
-          height: 200.0,
-          child: FittedBox(),
-        ),
-      ),
+      const Center(child: SizedBox(width: 200.0, height: 200.0, child: FittedBox())),
     );
 
     expect(find.byType(FittedBox), findsOneWidget);
 
     // Tapping it also should not throw.
     await tester.tap(find.byType(FittedBox), warnIfMissed: false);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Regression test for https://github.com/flutter/flutter/issues/135082
+  testWidgets('FittedBox with zero size child does not throw', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Center(
+        child: SizedBox(
+          height: 200.0,
+          width: 200.0,
+          child: FittedBox(fit: BoxFit.scaleDown, child: SizedBox.shrink()),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 200.0, maxHeight: 200.0),
+          child: const FittedBox(child: SizedBox.shrink()),
+        ),
+      ),
+    );
     expect(tester.takeException(), isNull);
   });
 }

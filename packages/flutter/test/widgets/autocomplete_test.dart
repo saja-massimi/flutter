@@ -5,13 +5,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class User {
-  const User({
-    required this.email,
-    required this.name,
-  });
+  const User({required this.email, required this.name});
 
   final String email;
   final String name;
@@ -46,7 +42,7 @@ void main() {
     User(name: 'Charlie', email: 'charlie123@gmail.com'),
   ];
 
-  testWidgetsWithLeakTracking('can filter and select a list of string options', (WidgetTester tester) async {
+  testWidgets('can filter and select a list of string options', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -63,7 +59,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -72,7 +73,11 @@ void main() {
                 controller: textEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               lastOnSelected = onSelected;
               return Container(key: optionsKey);
@@ -130,7 +135,7 @@ void main() {
     expect(lastOptions.elementAt(5), 'northern white rhinoceros');
   });
 
-  testWidgetsWithLeakTracking('tapping on an option selects it', (WidgetTester tester) async {
+  testWidgets('tapping on an option selects it', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -146,7 +151,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -155,7 +165,11 @@ void main() {
                 controller: textEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Material(
                 elevation: 4.0,
@@ -169,9 +183,7 @@ void main() {
                       onTap: () {
                         onSelected(option);
                       },
-                      child: ListTile(
-                        title: Text(option),
-                      ),
+                      child: ListTile(title: Text(option)),
                     );
                   },
                 ),
@@ -200,7 +212,7 @@ void main() {
     expect(textEditingController.text, equals(kOptions[2]));
   });
 
-  testWidgetsWithLeakTracking('can filter and select a list of custom User options', (WidgetTester tester) async {
+  testWidgets('can filter and select a list of custom User options', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<User> lastOptions;
@@ -221,7 +233,12 @@ void main() {
             onSelected: (User selected) {
               lastUserSelected = selected;
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -230,7 +247,11 @@ void main() {
                 controller: fieldTextEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<User> onSelected, Iterable<User> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<User> onSelected,
+              Iterable<User> options,
+            ) {
               lastOptions = options;
               lastOnSelected = onSelected;
               return Container(key: optionsKey);
@@ -278,7 +299,9 @@ void main() {
     expect(lastOptions.elementAt(0), kOptionsUsers[1]);
   });
 
-  testWidgetsWithLeakTracking('can specify a custom display string for a list of custom User options', (WidgetTester tester) async {
+  testWidgets('can specify a custom display string for a list of custom User options', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<User> lastOptions;
@@ -294,16 +317,19 @@ void main() {
           body: RawAutocomplete<User>(
             optionsBuilder: (TextEditingValue textEditingValue) {
               return kOptionsUsers.where((User option) {
-                return option
-                    .toString()
-                    .contains(textEditingValue.text.toLowerCase());
+                return option.toString().contains(textEditingValue.text.toLowerCase());
               });
             },
             displayStringForOption: displayStringForOption,
             onSelected: (User selected) {
               lastUserSelected = selected;
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               textEditingController = fieldTextEditingController;
               focusNode = fieldFocusNode;
               return TextField(
@@ -312,7 +338,11 @@ void main() {
                 controller: fieldTextEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<User> onSelected, Iterable<User> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<User> onSelected,
+              Iterable<User> options,
+            ) {
               lastOptions = options;
               lastOnSelected = onSelected;
               return Container(key: optionsKey);
@@ -361,7 +391,7 @@ void main() {
     expect(lastOptions.elementAt(0), kOptionsUsers[1]);
   });
 
-  testWidgetsWithLeakTracking('onFieldSubmitted selects the first option', (WidgetTester tester) async {
+  testWidgets('onFieldSubmitted selects the first option', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -378,7 +408,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               textEditingController = fieldTextEditingController;
               focusNode = fieldFocusNode;
               lastOnFieldSubmitted = onFieldSubmitted;
@@ -388,7 +423,11 @@ void main() {
                 controller: fieldTextEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
@@ -423,17 +462,26 @@ void main() {
   });
 
   group('optionsViewOpenDirection', () {
-    testWidgetsWithLeakTracking('unset (default behavior): open downward', (WidgetTester tester) async {
+    testWidgets('unset (default behavior): open downward', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
               child: RawAutocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) => <String>['a'],
-                fieldViewBuilder: (BuildContext context, TextEditingController controller, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                fieldViewBuilder: (
+                  BuildContext context,
+                  TextEditingController controller,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted,
+                ) {
                   return TextField(controller: controller, focusNode: focusNode);
                 },
-                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                optionsViewBuilder: (
+                  BuildContext context,
+                  AutocompleteOnSelected<String> onSelected,
+                  Iterable<String> options,
+                ) {
                   return const Text('a');
                 },
               ),
@@ -442,22 +490,34 @@ void main() {
         ),
       );
       await tester.showKeyboard(find.byType(TextField));
-      expect(tester.getBottomLeft(find.byType(TextField)),
-        offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))));
+      expect(
+        tester.getBottomLeft(find.byType(TextField)),
+        offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))),
+      );
     });
 
-    testWidgetsWithLeakTracking('down: open downward', (WidgetTester tester) async {
+    testWidgets('down: open downward', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
               child: RawAutocomplete<String>(
-                optionsViewOpenDirection: OptionsViewOpenDirection.down, // ignore: avoid_redundant_argument_values
+                optionsViewOpenDirection:
+                    OptionsViewOpenDirection.down, // ignore: avoid_redundant_argument_values
                 optionsBuilder: (TextEditingValue textEditingValue) => <String>['a'],
-                fieldViewBuilder: (BuildContext context, TextEditingController controller, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                fieldViewBuilder: (
+                  BuildContext context,
+                  TextEditingController controller,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted,
+                ) {
                   return TextField(controller: controller, focusNode: focusNode);
                 },
-                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                optionsViewBuilder: (
+                  BuildContext context,
+                  AutocompleteOnSelected<String> onSelected,
+                  Iterable<String> options,
+                ) {
                   return const Text('a');
                 },
               ),
@@ -466,11 +526,13 @@ void main() {
         ),
       );
       await tester.showKeyboard(find.byType(TextField));
-      expect(tester.getBottomLeft(find.byType(TextField)),
-        offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))));
+      expect(
+        tester.getBottomLeft(find.byType(TextField)),
+        offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))),
+      );
     });
 
-    testWidgetsWithLeakTracking('up: open upward', (WidgetTester tester) async {
+    testWidgets('up: open upward', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -478,10 +540,19 @@ void main() {
               child: RawAutocomplete<String>(
                 optionsViewOpenDirection: OptionsViewOpenDirection.up,
                 optionsBuilder: (TextEditingValue textEditingValue) => <String>['a'],
-                fieldViewBuilder: (BuildContext context, TextEditingController controller, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                fieldViewBuilder: (
+                  BuildContext context,
+                  TextEditingController controller,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted,
+                ) {
                   return TextField(controller: controller, focusNode: focusNode);
                 },
-                optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                optionsViewBuilder: (
+                  BuildContext context,
+                  AutocompleteOnSelected<String> onSelected,
+                  Iterable<String> options,
+                ) {
                   return const Text('a');
                 },
               ),
@@ -490,12 +561,14 @@ void main() {
         ),
       );
       await tester.showKeyboard(find.byType(TextField));
-      expect(tester.getTopLeft(find.byType(TextField)),
-        offsetMoreOrLessEquals(tester.getBottomLeft(find.text('a'))));
+      expect(
+        tester.getTopLeft(find.byType(TextField)),
+        offsetMoreOrLessEquals(tester.getBottomLeft(find.text('a'))),
+      );
     });
 
     group('fieldViewBuilder not passed', () {
-      testWidgetsWithLeakTracking('down', (WidgetTester tester) async {
+      testWidgets('down', (WidgetTester tester) async {
         final GlobalKey autocompleteKey = GlobalKey();
         final TextEditingController controller = TextEditingController();
         addTearDown(controller.dispose);
@@ -512,9 +585,14 @@ void main() {
                     key: autocompleteKey,
                     textEditingController: controller,
                     focusNode: focusNode,
-                    optionsViewOpenDirection: OptionsViewOpenDirection.down, // ignore: avoid_redundant_argument_values
+                    optionsViewOpenDirection:
+                        OptionsViewOpenDirection.down, // ignore: avoid_redundant_argument_values
                     optionsBuilder: (TextEditingValue textEditingValue) => <String>['a'],
-                    optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                    optionsViewBuilder: (
+                      BuildContext context,
+                      AutocompleteOnSelected<String> onSelected,
+                      Iterable<String> options,
+                    ) {
                       return const Text('a');
                     },
                   ),
@@ -524,11 +602,13 @@ void main() {
           ),
         );
         await tester.showKeyboard(find.byType(TextField));
-        expect(tester.getBottomLeft(find.byKey(autocompleteKey)),
-          offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))));
+        expect(
+          tester.getBottomLeft(find.byKey(autocompleteKey)),
+          offsetMoreOrLessEquals(tester.getTopLeft(find.text('a'))),
+        );
       });
 
-      testWidgetsWithLeakTracking('up', (WidgetTester tester) async {
+      testWidgets('up', (WidgetTester tester) async {
         final GlobalKey autocompleteKey = GlobalKey();
         final TextEditingController controller = TextEditingController();
         addTearDown(controller.dispose);
@@ -547,7 +627,11 @@ void main() {
                     focusNode: focusNode,
                     optionsViewOpenDirection: OptionsViewOpenDirection.up,
                     optionsBuilder: (TextEditingValue textEditingValue) => <String>['a'],
-                    optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                    optionsViewBuilder: (
+                      BuildContext context,
+                      AutocompleteOnSelected<String> onSelected,
+                      Iterable<String> options,
+                    ) {
                       return const Text('a');
                     },
                   ),
@@ -558,13 +642,15 @@ void main() {
           ),
         );
         await tester.showKeyboard(find.byType(TextField));
-        expect(tester.getTopLeft(find.byKey(autocompleteKey)),
-          offsetMoreOrLessEquals(tester.getBottomLeft(find.text('a'))));
+        expect(
+          tester.getTopLeft(find.byKey(autocompleteKey)),
+          offsetMoreOrLessEquals(tester.getBottomLeft(find.text('a'))),
+        );
       });
     });
   });
 
-  testWidgetsWithLeakTracking('options follow field when it moves', (WidgetTester tester) async {
+  testWidgets('options follow field when it moves', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late StateSetter setState;
@@ -586,7 +672,12 @@ void main() {
                       return option.contains(textEditingValue.text.toLowerCase());
                     });
                   },
-                  fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+                  fieldViewBuilder: (
+                    BuildContext context,
+                    TextEditingController fieldTextEditingController,
+                    FocusNode fieldFocusNode,
+                    VoidCallback onFieldSubmitted,
+                  ) {
                     focusNode = fieldFocusNode;
                     textEditingController = fieldTextEditingController;
                     return TextFormField(
@@ -595,7 +686,11 @@ void main() {
                       key: fieldKey,
                     );
                   },
-                  optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+                  optionsViewBuilder: (
+                    BuildContext context,
+                    AutocompleteOnSelected<String> onSelected,
+                    Iterable<String> options,
+                  ) {
                     return Container(key: optionsKey);
                   },
                 ),
@@ -638,7 +733,9 @@ void main() {
     expect(optionsOffsetOpen.dy, fieldOffset.dy + fieldSize.height);
   });
 
-  testWidgetsWithLeakTracking('can prevent options from showing by returning an empty iterable', (WidgetTester tester) async {
+  testWidgets('can prevent options from showing by returning an empty iterable', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -657,7 +754,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -666,7 +768,11 @@ void main() {
                 controller: fieldTextEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
@@ -701,7 +807,7 @@ void main() {
     expect(lastOptions.elementAt(1), 'elephant');
   });
 
-  testWidgetsWithLeakTracking('can create a field outside of fieldViewBuilder', (WidgetTester tester) async {
+  testWidgets('can create a field outside of fieldViewBuilder', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     final GlobalKey autocompleteKey = GlobalKey();
@@ -734,7 +840,11 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
@@ -769,7 +879,7 @@ void main() {
     expect(textEditingController.text, lastOptions.elementAt(0));
   });
 
-  testWidgetsWithLeakTracking('initialValue sets initial text field value', (WidgetTester tester) async {
+  testWidgets('initialValue sets initial text field value', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -788,7 +898,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -797,7 +912,11 @@ void main() {
                 controller: textEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               lastOnSelected = onSelected;
               return Container(key: optionsKey);
@@ -829,41 +948,46 @@ void main() {
     expect(textEditingController.text, selection);
   });
 
-  testWidgetsWithLeakTracking('initialValue cannot be defined if TextEditingController is defined', (WidgetTester tester) async {
+  testWidgets('initialValue cannot be defined if TextEditingController is defined', (
+    WidgetTester tester,
+  ) async {
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);
     final TextEditingController textEditingController = TextEditingController();
     addTearDown(textEditingController.dispose);
 
-    expect(
-      () {
-        RawAutocomplete<String>(
-          focusNode: focusNode,
-          // Both [initialValue] and [textEditingController] cannot be
-          // simultaneously defined.
-          initialValue: const TextEditingValue(text: 'lemur'),
-          textEditingController: textEditingController,
-          optionsBuilder: (TextEditingValue textEditingValue) {
-            return kOptions.where((String option) {
-              return option.contains(textEditingValue.text.toLowerCase());
-            });
-          },
-          optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
-            return Container();
-          },
-          fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
-            return TextField(
-              focusNode: focusNode,
-              controller: textEditingController,
-            );
-          },
-        );
-      },
-      throwsAssertionError,
-    );
+    expect(() {
+      RawAutocomplete<String>(
+        focusNode: focusNode,
+        // Both [initialValue] and [textEditingController] cannot be
+        // simultaneously defined.
+        initialValue: const TextEditingValue(text: 'lemur'),
+        textEditingController: textEditingController,
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          return kOptions.where((String option) {
+            return option.contains(textEditingValue.text.toLowerCase());
+          });
+        },
+        optionsViewBuilder: (
+          BuildContext context,
+          AutocompleteOnSelected<String> onSelected,
+          Iterable<String> options,
+        ) {
+          return Container();
+        },
+        fieldViewBuilder: (
+          BuildContext context,
+          TextEditingController fieldTextEditingController,
+          FocusNode fieldFocusNode,
+          VoidCallback onFieldSubmitted,
+        ) {
+          return TextField(focusNode: focusNode, controller: textEditingController);
+        },
+      );
+    }, throwsAssertionError);
   });
 
-  testWidgetsWithLeakTracking('support asynchronous options builder', (WidgetTester tester) async {
+  testWidgets('support asynchronous options builder', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late FocusNode focusNode;
@@ -884,7 +1008,12 @@ void main() {
               }
               return Future<Iterable<String>>.delayed(delay, () => options);
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -893,13 +1022,17 @@ void main() {
                 controller: textEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
           ),
         ),
-      )
+      ),
     );
 
     // Enter text to build the options with delay.
@@ -924,7 +1057,7 @@ void main() {
     expect(lastOptions, <String>['dingo', 'flamingo']);
   });
 
-  testWidgetsWithLeakTracking('can navigate options with the keyboard', (WidgetTester tester) async {
+  testWidgets('can navigate options with the keyboard', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -939,7 +1072,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextFormField(
@@ -951,7 +1089,11 @@ void main() {
                 },
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
@@ -1010,7 +1152,7 @@ void main() {
     expect(textEditingController.text, 'goose');
   });
 
-  testWidgetsWithLeakTracking('can hide and show options with the keyboard', (WidgetTester tester) async {
+  testWidgets('can hide and show options with the keyboard', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late Iterable<String> lastOptions;
@@ -1025,7 +1167,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextFormField(
@@ -1037,7 +1184,11 @@ void main() {
                 },
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOptions = options;
               return Container(key: optionsKey);
             },
@@ -1100,7 +1251,7 @@ void main() {
     expect(find.byKey(optionsKey), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('re-invokes DismissIntent if options not shown', (WidgetTester tester) async {
+  testWidgets('re-invokes DismissIntent if options not shown', (WidgetTester tester) async {
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
     late FocusNode focusNode;
@@ -1120,7 +1271,12 @@ void main() {
                   return option.contains(textEditingValue.text.toLowerCase());
                 });
               },
-              fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+              fieldViewBuilder: (
+                BuildContext context,
+                TextEditingController fieldTextEditingController,
+                FocusNode fieldFocusNode,
+                VoidCallback onFieldSubmitted,
+              ) {
                 focusNode = fieldFocusNode;
                 return TextFormField(
                   key: fieldKey,
@@ -1131,7 +1287,11 @@ void main() {
                   },
                 );
               },
-              optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+              optionsViewBuilder: (
+                BuildContext context,
+                AutocompleteOnSelected<String> onSelected,
+                Iterable<String> options,
+              ) {
                 return Container(key: optionsKey);
               },
             ),
@@ -1159,88 +1319,100 @@ void main() {
     expect(wrappingActionInvoked, true);
   });
 
-  testWidgetsWithLeakTracking('optionsViewBuilders can use AutocompleteHighlightedOption to highlight selected option', (WidgetTester tester) async {
-    final GlobalKey fieldKey = GlobalKey();
-    final GlobalKey optionsKey = GlobalKey();
-    late Iterable<String> lastOptions;
-    late int lastHighlighted;
-    late FocusNode focusNode;
-    late TextEditingController textEditingController;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: RawAutocomplete<String>(
-            optionsBuilder: (TextEditingValue textEditingValue) {
-              return kOptions.where((String option) {
-                return option.contains(textEditingValue.text.toLowerCase());
-              });
-            },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
-              focusNode = fieldFocusNode;
-              textEditingController = fieldTextEditingController;
-              return TextFormField(
-                key: fieldKey,
-                focusNode: focusNode,
-                controller: textEditingController,
-                onFieldSubmitted: (String value) {
-                  onFieldSubmitted();
-                },
-              );
-            },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
-              lastOptions = options;
-              lastHighlighted = AutocompleteHighlightedOption.of(context);
-              return Container(key: optionsKey);
-            },
+  testWidgets(
+    'optionsViewBuilders can use AutocompleteHighlightedOption to highlight selected option',
+    (WidgetTester tester) async {
+      final GlobalKey fieldKey = GlobalKey();
+      final GlobalKey optionsKey = GlobalKey();
+      late Iterable<String> lastOptions;
+      late int lastHighlighted;
+      late FocusNode focusNode;
+      late TextEditingController textEditingController;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: RawAutocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                return kOptions.where((String option) {
+                  return option.contains(textEditingValue.text.toLowerCase());
+                });
+              },
+              fieldViewBuilder: (
+                BuildContext context,
+                TextEditingController fieldTextEditingController,
+                FocusNode fieldFocusNode,
+                VoidCallback onFieldSubmitted,
+              ) {
+                focusNode = fieldFocusNode;
+                textEditingController = fieldTextEditingController;
+                return TextFormField(
+                  key: fieldKey,
+                  focusNode: focusNode,
+                  controller: textEditingController,
+                  onFieldSubmitted: (String value) {
+                    onFieldSubmitted();
+                  },
+                );
+              },
+              optionsViewBuilder: (
+                BuildContext context,
+                AutocompleteOnSelected<String> onSelected,
+                Iterable<String> options,
+              ) {
+                lastOptions = options;
+                lastHighlighted = AutocompleteHighlightedOption.of(context);
+                return Container(key: optionsKey);
+              },
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    // Enter text. The options are filtered by the text.
-    focusNode.requestFocus();
-    await tester.enterText(find.byKey(fieldKey), 'e');
-    await tester.pump();
-    expect(find.byKey(fieldKey), findsOneWidget);
-    expect(find.byKey(optionsKey), findsOneWidget);
-    expect(lastOptions.length, 6);
-    expect(lastOptions.elementAt(0), 'chameleon');
-    expect(lastOptions.elementAt(1), 'elephant');
-    expect(lastOptions.elementAt(2), 'goose');
-    expect(lastOptions.elementAt(3), 'lemur');
-    expect(lastOptions.elementAt(4), 'mouse');
-    expect(lastOptions.elementAt(5), 'northern white rhinoceros');
+      // Enter text. The options are filtered by the text.
+      focusNode.requestFocus();
+      await tester.enterText(find.byKey(fieldKey), 'e');
+      await tester.pump();
+      expect(find.byKey(fieldKey), findsOneWidget);
+      expect(find.byKey(optionsKey), findsOneWidget);
+      expect(lastOptions.length, 6);
+      expect(lastOptions.elementAt(0), 'chameleon');
+      expect(lastOptions.elementAt(1), 'elephant');
+      expect(lastOptions.elementAt(2), 'goose');
+      expect(lastOptions.elementAt(3), 'lemur');
+      expect(lastOptions.elementAt(4), 'mouse');
+      expect(lastOptions.elementAt(5), 'northern white rhinoceros');
 
-    // Move the highlighted option down and check the highlighted index
-    expect(lastHighlighted, 0);
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pump();
-    expect(lastHighlighted, 1);
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pump();
-    expect(lastHighlighted, 2);
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pump();
-    expect(lastHighlighted, 3);
+      // Move the highlighted option down and check the highlighted index
+      expect(lastHighlighted, 0);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(lastHighlighted, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(lastHighlighted, 2);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+      expect(lastHighlighted, 3);
 
-    // And move it back up
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-    await tester.pump();
-    expect(lastHighlighted, 2);
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-    await tester.pump();
-    expect(lastHighlighted, 1);
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-    await tester.pump();
-    expect(lastHighlighted, 0);
+      // And move it back up
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      expect(lastHighlighted, 2);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      expect(lastHighlighted, 1);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      expect(lastHighlighted, 0);
 
-    // Going back up should wrap around
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-    await tester.pump();
-    expect(lastHighlighted, 5);
-  });
+      // Going back up should wrap around
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pump();
+      expect(lastHighlighted, 5);
+    },
+  );
 
-  testWidgetsWithLeakTracking('floating menu goes away on select', (WidgetTester tester) async {
+  testWidgets('floating menu goes away on select', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/99749.
     final GlobalKey fieldKey = GlobalKey();
     final GlobalKey optionsKey = GlobalKey();
@@ -1257,7 +1429,12 @@ void main() {
                 return option.contains(textEditingValue.text.toLowerCase());
               });
             },
-            fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
               focusNode = fieldFocusNode;
               textEditingController = fieldTextEditingController;
               return TextField(
@@ -1266,7 +1443,11 @@ void main() {
                 controller: textEditingController,
               );
             },
-            optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
               lastOnSelected = onSelected;
               return Container(key: optionsKey);
             },
@@ -1288,5 +1469,317 @@ void main() {
     lastOnSelected(kOptions[0]);
     await tester.pump();
     expect(find.byKey(optionsKey), findsNothing);
+  });
+
+  testWidgets('can prevent older optionsBuilder results from replacing the new ones', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey fieldKey = GlobalKey();
+    final GlobalKey optionsKey = GlobalKey();
+    late FocusNode focusNode;
+    late TextEditingController textEditingController;
+    Iterable<String>? lastOptions;
+    Duration? delay;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RawAutocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              final Iterable<String> options = kOptions.where((String option) {
+                return option.contains(textEditingValue.text.toLowerCase());
+              });
+              if (delay == null) {
+                return options;
+              }
+              return Future<Iterable<String>>.delayed(delay, () => options);
+            },
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
+              focusNode = fieldFocusNode;
+              textEditingController = fieldTextEditingController;
+              return TextField(
+                key: fieldKey,
+                focusNode: focusNode,
+                controller: textEditingController,
+              );
+            },
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
+              lastOptions = options;
+              return Container(key: optionsKey);
+            },
+          ),
+        ),
+      ),
+    );
+
+    const Duration longRequestDelay = Duration(milliseconds: 5000);
+    const Duration shortRequestDelay = Duration(milliseconds: 1000);
+    focusNode.requestFocus();
+
+    // Enter the first letter.
+    delay = longRequestDelay;
+    await tester.enterText(find.byKey(fieldKey), 'c');
+    await tester.pump();
+    expect(lastOptions, null);
+
+    // Enter the second letter which resolves faster.
+    delay = shortRequestDelay;
+    await tester.enterText(find.byKey(fieldKey), 'ch');
+    await tester.pump();
+    expect(lastOptions, null);
+
+    // Wait for the short request to resolve.
+    await tester.pump(shortRequestDelay);
+
+    // lastOptions must contain results from the last request.
+    expect(find.byKey(optionsKey), findsOneWidget);
+    expect(lastOptions, <String>['chameleon']);
+
+    // Wait for the last timer to finish.
+    await tester.pump(longRequestDelay - shortRequestDelay);
+    expect(lastOptions, <String>['chameleon']);
+  });
+
+  testWidgets('updates result only from the last call made to optionsBuilder', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey fieldKey = GlobalKey();
+    final GlobalKey optionsKey = GlobalKey();
+    late FocusNode focusNode;
+    late TextEditingController textEditingController;
+    Iterable<String>? lastOptions;
+    Duration? delay;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RawAutocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              final Iterable<String> options = kOptions.where((String option) {
+                return option.contains(textEditingValue.text.toLowerCase());
+              });
+              if (delay == null) {
+                return options;
+              }
+              return Future<Iterable<String>>.delayed(delay, () => options);
+            },
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
+              focusNode = fieldFocusNode;
+              textEditingController = fieldTextEditingController;
+              return TextField(
+                key: fieldKey,
+                focusNode: focusNode,
+                controller: textEditingController,
+              );
+            },
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
+              lastOptions = options;
+              return Container(key: optionsKey);
+            },
+          ),
+        ),
+      ),
+    );
+
+    focusNode.requestFocus();
+    const Duration firstRequestDelay = Duration(milliseconds: 1000);
+    const Duration secondRequestDelay = Duration(milliseconds: 2000);
+    const Duration thirdRequestDelay = Duration(milliseconds: 3000);
+
+    // Enter the first letter.
+    delay = firstRequestDelay;
+    await tester.enterText(find.byKey(fieldKey), 'l');
+    await tester.pump();
+    expect(lastOptions, null);
+
+    // Enter the second letter which resolves slower.
+    delay = secondRequestDelay;
+    await tester.enterText(find.byKey(fieldKey), 'le');
+    await tester.pump();
+    expect(lastOptions, null);
+
+    // Enter the third letter which resolves the slowest.
+    delay = thirdRequestDelay;
+    await tester.enterText(find.byKey(fieldKey), 'lem');
+    await tester.pump();
+    expect(lastOptions, null);
+
+    // lastOptions should get updated only from the last request.
+    await tester.pump(firstRequestDelay);
+    expect(find.byKey(optionsKey), findsNothing);
+    expect(lastOptions, null);
+
+    await tester.pump(secondRequestDelay - firstRequestDelay);
+    expect(find.byKey(optionsKey), findsNothing);
+    expect(lastOptions, null);
+
+    await tester.pump(thirdRequestDelay - secondRequestDelay);
+    expect(find.byKey(optionsKey), findsOneWidget);
+    expect(lastOptions, <String>['lemur']);
+  });
+
+  testWidgets('update options view when field input changes return to the starting keyword', (
+    WidgetTester tester,
+  ) async {
+    final GlobalKey fieldKey = GlobalKey();
+    final GlobalKey optionsKey = GlobalKey();
+    late FocusNode focusNode;
+    late TextEditingController textEditingController;
+    Iterable<String>? lastOptions;
+    const Duration delay = Duration(milliseconds: 100);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RawAutocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              final Iterable<String> options = kOptions.where((String option) {
+                return option.contains(textEditingValue.text.toLowerCase());
+              });
+              return Future<Iterable<String>>.delayed(delay, () => options);
+            },
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
+              focusNode = fieldFocusNode;
+              textEditingController = fieldTextEditingController;
+              return TextField(
+                key: fieldKey,
+                focusNode: focusNode,
+                controller: textEditingController,
+              );
+            },
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
+              lastOptions = options;
+              return Container(key: optionsKey);
+            },
+          ),
+        ),
+      ),
+    );
+
+    // Setup starting point.
+    await tester.enterText(find.byKey(fieldKey), 'ele');
+    await tester.pump(delay);
+    expect(lastOptions, <String>['chameleon', 'elephant']);
+    expect(find.byKey(optionsKey), findsOneWidget);
+
+    // Hide options.
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+    expect(find.byKey(optionsKey), findsNothing);
+
+    // Enter another letter and then immediately erase it.
+    await tester.enterText(find.byKey(fieldKey), 'eleo');
+    await tester.pump();
+    expect(find.byKey(optionsKey), findsNothing);
+
+    await tester.enterText(find.byKey(fieldKey), 'ele');
+    await tester.pump(delay);
+    expect(lastOptions, <String>['chameleon', 'elephant']);
+
+    // Options dropdown should be visible after the last optionsBuilder
+    // call is resolved.
+    expect(find.byKey(optionsKey), findsOneWidget);
+  });
+
+  testWidgets('optionsBuilder does not have to be a pure function', (WidgetTester tester) async {
+    final GlobalKey fieldKey = GlobalKey();
+    final GlobalKey optionsKey = GlobalKey();
+    late FocusNode focusNode;
+    late TextEditingController textEditingController;
+    Iterable<String>? lastOptions;
+    const Duration delay = Duration(milliseconds: 100);
+
+    // This is used to tell optionsBuilder to return something different after
+    // being called with "ele" the second time. I.e. it is not a pure function.
+    int timesOptionsBuilderCalledWithEle = 0;
+    final Iterable<String> altEleOptions = <String>['something new and crazy for ele!'];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RawAutocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) async {
+              if (textEditingValue.text == 'ele') {
+                timesOptionsBuilderCalledWithEle += 1;
+                if (timesOptionsBuilderCalledWithEle > 1) {
+                  return Future<Iterable<String>>.delayed(delay, () => altEleOptions);
+                }
+              }
+              final Iterable<String> options = kOptions.where((String option) {
+                return option.contains(textEditingValue.text.toLowerCase());
+              });
+              return Future<Iterable<String>>.delayed(delay, () => options);
+            },
+            fieldViewBuilder: (
+              BuildContext context,
+              TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode,
+              VoidCallback onFieldSubmitted,
+            ) {
+              focusNode = fieldFocusNode;
+              textEditingController = fieldTextEditingController;
+              return TextField(
+                key: fieldKey,
+                focusNode: focusNode,
+                controller: textEditingController,
+              );
+            },
+            optionsViewBuilder: (
+              BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options,
+            ) {
+              lastOptions = options;
+              return Container(key: optionsKey);
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byKey(fieldKey), 'ele');
+    await tester.pump(delay);
+    expect(lastOptions, <String>['chameleon', 'elephant']);
+    expect(find.byKey(optionsKey), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+    expect(find.byKey(optionsKey), findsNothing);
+
+    await tester.enterText(find.byKey(fieldKey), 'eleo');
+    await tester.pump();
+    expect(find.byKey(optionsKey), findsNothing);
+
+    await tester.enterText(find.byKey(fieldKey), 'ele');
+    await tester.pump(delay);
+    expect(lastOptions, altEleOptions);
+    expect(find.byKey(optionsKey), findsOneWidget);
   });
 }

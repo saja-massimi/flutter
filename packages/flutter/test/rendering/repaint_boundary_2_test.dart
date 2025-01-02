@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('repaint boundary with constraint changes', (WidgetTester tester) async {
+  testWidgets('repaint boundary with constraint changes', (WidgetTester tester) async {
     // Regression test for as https://github.com/flutter/flutter/issues/39151.
     await tester.pumpWidget(const RelayoutBoundariesCrash());
     tester.state<RelayoutBoundariesCrashState>(find.byType(RelayoutBoundariesCrash))._toggleMode();
@@ -44,16 +43,8 @@ class RelayoutBoundariesCrashState extends State<RelayoutBoundariesCrash> {
             final double dimension = !_mode ? 10.0 : 20.0;
             return Column(
               children: <Widget>[
-                SizedBox(
-                  width: dimension,
-                  height: dimension,
-                  child: const Placeholder(),
-                ),
-                SizedBox(
-                  width: dimension,
-                  height: dimension,
-                  child: const Placeholder(),
-                ),
+                SizedBox(width: dimension, height: dimension, child: const Placeholder()),
+                SizedBox(width: dimension, height: dimension, child: const Placeholder()),
               ],
             );
           },

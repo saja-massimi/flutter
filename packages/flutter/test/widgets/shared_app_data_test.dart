@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('SharedAppData basics', (WidgetTester tester) async {
+  testWidgets('SharedAppData basics', (WidgetTester tester) async {
     int columnBuildCount = 0;
     int child1BuildCount = 0;
     int child2BuildCount = 0;
@@ -30,14 +29,26 @@ void main() {
                     Builder(
                       builder: (BuildContext context) {
                         child1BuildCount += 1;
-                        return Text(SharedAppData.getValue<String, String>(context, 'child1Text', () => 'null'));
+                        return Text(
+                          SharedAppData.getValue<String, String>(
+                            context,
+                            'child1Text',
+                            () => 'null',
+                          ),
+                        );
                       },
                     ),
                     Builder(
                       builder: (BuildContext context) {
                         child2BuildCount += 1;
-                        return Text(SharedAppData.getValue<String, String>(context, 'child2Text', () => 'null'));
-                      }
+                        return Text(
+                          SharedAppData.getValue<String, String>(
+                            context,
+                            'child2Text',
+                            () => 'null',
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -117,7 +128,7 @@ void main() {
     expect(find.text('null').evaluate().length, 2);
   });
 
-  testWidgetsWithLeakTracking('WidgetsApp SharedAppData ', (WidgetTester tester) async {
+  testWidgets('WidgetsApp SharedAppData ', (WidgetTester tester) async {
     int parentBuildCount = 0;
     int childBuildCount = 0;
 
@@ -135,7 +146,9 @@ void main() {
               child: Builder(
                 builder: (BuildContext context) {
                   childBuildCount += 1;
-                  return Text(SharedAppData.getValue<String, String>(context, 'childText', () => 'null'));
+                  return Text(
+                    SharedAppData.getValue<String, String>(context, 'childText', () => 'null'),
+                  );
                 },
               ),
             ),
@@ -155,7 +168,7 @@ void main() {
     expect(find.text('child'), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('WidgetsApp SharedAppData Shadowing', (WidgetTester tester) async {
+  testWidgets('WidgetsApp SharedAppData Shadowing', (WidgetTester tester) async {
     int innerTapCount = 0;
     int outerTapCount = 0;
 
@@ -178,7 +191,9 @@ void main() {
                         innerTapCount += 1;
                         SharedAppData.setValue<String, String>(context, 'childText', 'child');
                       },
-                      child: Text(SharedAppData.getValue<String, String>(context, 'childText', () => 'null')),
+                      child: Text(
+                        SharedAppData.getValue<String, String>(context, 'childText', () => 'null'),
+                      ),
                     );
                   },
                 ),

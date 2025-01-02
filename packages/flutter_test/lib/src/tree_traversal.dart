@@ -17,10 +17,7 @@ import 'package:flutter/widgets.dart';
 /// The same applies to any iterable obtained indirectly through this
 /// one, for example the results of calling `where` on this iterable
 /// are also cached.
-Iterable<Element> collectAllElementsFrom(
-  Element rootElement, {
-  required bool skipOffstage,
-}) {
+Iterable<Element> collectAllElementsFrom(Element rootElement, {required bool skipOffstage}) {
   return CachingIterable<Element>(_DepthFirstElementTreeIterator(rootElement, !skipOffstage));
 }
 
@@ -41,9 +38,9 @@ Iterable<Element> collectAllElementsFrom(
 /// are also cached.
 Iterable<SemanticsNode> collectAllSemanticsNodesFrom(
   SemanticsNode root, {
-    DebugSemanticsDumpOrder order = DebugSemanticsDumpOrder.traversalOrder,
-  }) {
-    return CachingIterable<SemanticsNode>(_DepthFirstSemanticsTreeIterator(root, order));
+  DebugSemanticsDumpOrder order = DebugSemanticsDumpOrder.traversalOrder,
+}) {
+  return CachingIterable<SemanticsNode>(_DepthFirstSemanticsTreeIterator(root, order));
 }
 
 /// Provides a recursive, efficient, depth first search of a tree.
@@ -143,7 +140,7 @@ class _DepthFirstElementTreeIterator extends _DepthFirstTreeIterator<Element> {
 /// This will iterate in the same order expected from accessibility services,
 /// so the results can be used to simulate the same traversal the engine will
 /// make. The results are not filtered based on flags or visibility, so they
-/// will need to be further filtered to fully simulate an accessiblity service.
+/// will need to be further filtered to fully simulate an accessibility service.
 class _DepthFirstSemanticsTreeIterator extends _DepthFirstTreeIterator<SemanticsNode> {
   _DepthFirstSemanticsTreeIterator(super.root, this.order);
 

@@ -6,10 +6,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Scrollable scaled up', (WidgetTester tester) async {
+  testWidgets('Scrollable scaled up', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -55,7 +54,7 @@ void main() {
     expect(controller.offset, 42.5); // 85.0 - (85.0 / 2)
   });
 
-  testWidgetsWithLeakTracking('Scrollable scaled down', (WidgetTester tester) async {
+  testWidgets('Scrollable scaled down', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -101,7 +100,7 @@ void main() {
     expect(controller.offset, 0.0); // 340.0 - (170.0 * 2)
   });
 
-  testWidgetsWithLeakTracking('Scrollable rotated 90 degrees', (WidgetTester tester) async {
+  testWidgets('Scrollable rotated 90 degrees', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -143,16 +142,17 @@ void main() {
     expect(controller.offset, 30.0); // 100.0 - 70.0
   });
 
-  testWidgetsWithLeakTracking('Perspective transform on scrollable', (WidgetTester tester) async {
+  testWidgets('Perspective transform on scrollable', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
       MaterialApp(
         home: Transform(
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..rotateX(math.pi / 4),
+          transform:
+              Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateX(math.pi / 4),
           child: Center(
             child: SizedBox(
               width: 200,
@@ -211,10 +211,7 @@ void main() {
 
     // The tracked point (in the coordinate space of the screen) and the finger
     // should have moved the same vertical distance over the screen.
-    expect(
-      pointOnScreenStart.dy - pointOnScreenEnd.dy,
-      within(distance: 0.00001, from: 50.0),
-    );
+    expect(pointOnScreenStart.dy - pointOnScreenEnd.dy, within(distance: 0.00001, from: 50.0));
 
     // While the point traveled the same distance as the finger in the
     // coordinate space of the screen, the scroll view actually moved far more

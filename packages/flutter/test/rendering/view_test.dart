@@ -16,17 +16,26 @@ void main() {
     Size size = const Size(20, 20),
     double devicePixelRatio = 2.0,
   }) {
-    return ViewConfiguration(size: size, devicePixelRatio: devicePixelRatio);
+    final BoxConstraints constraints = BoxConstraints.tight(size);
+    return ViewConfiguration(
+      logicalConstraints: constraints,
+      physicalConstraints: constraints * devicePixelRatio,
+      devicePixelRatio: devicePixelRatio,
+    );
   }
 
   group('RenderView', () {
     test('accounts for device pixel ratio in paintBounds', () {
       layout(RenderAspectRatio(aspectRatio: 1.0));
       pumpFrame();
-      final Size logicalSize = TestRenderingFlutterBinding.instance.renderView.configuration.size;
-      final double devicePixelRatio = TestRenderingFlutterBinding.instance.renderView.configuration.devicePixelRatio;
+      final Size logicalSize = TestRenderingFlutterBinding.instance.renderView.size;
+      final double devicePixelRatio =
+          TestRenderingFlutterBinding.instance.renderView.configuration.devicePixelRatio;
       final Size physicalSize = logicalSize * devicePixelRatio;
-      expect(TestRenderingFlutterBinding.instance.renderView.paintBounds, Offset.zero & physicalSize);
+      expect(
+        TestRenderingFlutterBinding.instance.renderView.paintBounds,
+        Offset.zero & physicalSize,
+      );
     });
 
     test('does not replace the root layer unnecessarily', () {
@@ -71,65 +80,84 @@ void main() {
   });
 
   test('invokes DebugPaintCallback', () {
-    final PaintPattern paintsOrangeRect = paints..rect(
-      color: orange,
-      rect: orangeRect,
-    );
-    final PaintPattern paintsGreenRect = paints..rect(
-      color: green,
-      rect: greenRect,
-    );
-    final PaintPattern paintOrangeAndGreenRect = paints
-      ..rect(
-        color: orange,
-        rect: orangeRect,
-      )
-      ..rect(
-        color: green,
-        rect: greenRect,
-      );
+    final PaintPattern paintsOrangeRect = paints..rect(color: orange, rect: orangeRect);
+    final PaintPattern paintsGreenRect = paints..rect(color: green, rect: greenRect);
+    final PaintPattern paintOrangeAndGreenRect =
+        paints
+          ..rect(color: orange, rect: orangeRect)
+          ..rect(color: green, rect: greenRect);
     void paintCallback(PaintingContext context, Offset offset, RenderView renderView) {
-      context.canvas.drawRect(
-        greenRect,
-        Paint()..color = green,
-      );
+      context.canvas.drawRect(greenRect, Paint()..color = green);
     }
 
     layout(TestRenderObject());
-    expect(
-      TestRenderingFlutterBinding.instance.renderView,
-      paintsOrangeRect,
-    );
-    expect(
-      TestRenderingFlutterBinding.instance.renderView,
-      isNot(paintsGreenRect),
-    );
+    expect(TestRenderingFlutterBinding.instance.renderView, paintsOrangeRect);
+    expect(TestRenderingFlutterBinding.instance.renderView, isNot(paintsGreenRect));
 
     RenderView.debugAddPaintCallback(paintCallback);
-    expect(
-      TestRenderingFlutterBinding.instance.renderView,
-      paintOrangeAndGreenRect,
-    );
+    expect(TestRenderingFlutterBinding.instance.renderView, paintOrangeAndGreenRect);
 
     RenderView.debugRemovePaintCallback(paintCallback);
-    expect(
-      TestRenderingFlutterBinding.instance.renderView,
-      paintsOrangeRect,
-    );
-    expect(
-      TestRenderingFlutterBinding.instance.renderView,
-      isNot(paintsGreenRect),
-    );
+    expect(TestRenderingFlutterBinding.instance.renderView, paintsOrangeRect);
+    expect(TestRenderingFlutterBinding.instance.renderView, isNot(paintsGreenRect));
   });
 
-  test('Config can be set and changed after instantiation without calling prepareInitialFrame first', () {
+  test(
+    'Config can be set and changed after instantiation without calling prepareInitialFrame first',
+    () {
+      final RenderView view = RenderView(
+        view: RendererBinding.instance.platformDispatcher.views.single,
+      );
+      view.configuration = ViewConfiguration(
+        logicalConstraints: BoxConstraints.tight(const Size(100, 200)),
+        devicePixelRatio: 3.0,
+      );
+      view.configuration = ViewConfiguration(
+        logicalConstraints: BoxConstraints.tight(const Size(200, 300)),
+        devicePixelRatio: 2.0,
+      );
+      PipelineOwner().rootNode = view;
+      view.prepareInitialFrame();
+    },
+  );
+
+  test('Constraints are derived from configuration', () {
+    const BoxConstraints constraints = BoxConstraints(
+      minWidth: 1,
+      maxWidth: 2,
+      minHeight: 3,
+      maxHeight: 4,
+    );
+    const double devicePixelRatio = 3.0;
+    final ViewConfiguration config = ViewConfiguration(
+      logicalConstraints: constraints,
+      physicalConstraints: constraints * devicePixelRatio,
+      devicePixelRatio: devicePixelRatio,
+    );
+
+    // Configuration set via setter.
     final RenderView view = RenderView(
       view: RendererBinding.instance.platformDispatcher.views.single,
     );
-    view.configuration = const ViewConfiguration(size: Size(100, 200), devicePixelRatio: 3.0);
-    view.configuration = const ViewConfiguration(size: Size(200, 300), devicePixelRatio: 2.0);
-    PipelineOwner().rootNode = view;
-    view.prepareInitialFrame();
+    expect(
+      () => view.constraints,
+      throwsA(
+        isA<StateError>().having(
+          (StateError e) => e.message,
+          'message',
+          contains('RenderView has not been given a configuration yet'),
+        ),
+      ),
+    );
+    view.configuration = config;
+    expect(view.constraints, constraints);
+
+    // Configuration set in constructor.
+    final RenderView view2 = RenderView(
+      view: RendererBinding.instance.platformDispatcher.views.single,
+      configuration: config,
+    );
+    expect(view2.constraints, constraints);
   });
 }
 
@@ -146,9 +174,6 @@ class TestRenderObject extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    context.canvas.drawRect(
-      orangeRect,
-      Paint()..color = orange,
-    );
+    context.canvas.drawRect(orangeRect, Paint()..color = orange);
   }
 }

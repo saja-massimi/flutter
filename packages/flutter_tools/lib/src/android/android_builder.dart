@@ -13,6 +13,7 @@ AndroidBuilder? get androidBuilder {
 
 abstract class AndroidBuilder {
   const AndroidBuilder();
+
   /// Builds an AAR artifact.
   Future<void> buildAar({
     required FlutterProject project,
@@ -44,8 +45,7 @@ abstract class AndroidBuilder {
   Future<List<String>> getBuildVariants({required FlutterProject project});
 
   /// Outputs app link related project settings into a json file.
-  Future<void> outputsAppLinkSettings(
-    String buildVariant, {
-    required FlutterProject project,
-  });
+  ///
+  /// The return future resolves to the path of the json file.
+  Future<String> outputsAppLinkSettings(String buildVariant, {required FlutterProject project});
 }

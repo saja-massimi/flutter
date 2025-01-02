@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'editable_text.dart';
+library;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -21,16 +24,10 @@ export 'package:flutter/services.dart' show KeyEvent;
 /// For text entry, consider using a [EditableText], which integrates with
 /// on-screen keyboards and input method editors (IMEs).
 ///
-/// The [KeyboardListener] is different from [RawKeyboardListener] in that
-/// [KeyboardListener] uses the newer [HardwareKeyboard] API, which is
-/// preferable.
-///
 /// See also:
 ///
 ///  * [EditableText], which should be used instead of this widget for text
 ///    entry.
-///  * [RawKeyboardListener], a similar widget based on the old [RawKeyboard]
-///    API.
 class KeyboardListener extends StatelessWidget {
   /// Creates a widget that receives keyboard events.
   ///

@@ -5,13 +5,10 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Texture with freeze set to true', (WidgetTester tester) async {
-    await tester.pumpWidget(
-        const Center(child: Texture(textureId: 1, freeze: true)),
-    );
+  testWidgets('Texture with freeze set to true', (WidgetTester tester) async {
+    await tester.pumpWidget(const Center(child: Texture(textureId: 1, freeze: true)));
 
     final Texture texture = tester.firstWidget(find.byType(Texture));
     expect(texture, isNotNull);
@@ -37,10 +34,8 @@ void main() {
     expect(textureLayer.freeze, true);
   });
 
-  testWidgetsWithLeakTracking('Texture with default FilterQuality', (WidgetTester tester) async {
-    await tester.pumpWidget(
-        const Center(child: Texture(textureId: 1)),
-    );
+  testWidgets('Texture with default FilterQuality', (WidgetTester tester) async {
+    await tester.pumpWidget(const Center(child: Texture(textureId: 1)));
 
     final Texture texture = tester.firstWidget(find.byType(Texture));
     expect(texture, isNotNull);
@@ -66,10 +61,9 @@ void main() {
     expect(textureLayer.filterQuality, FilterQuality.low);
   });
 
-
-  testWidgetsWithLeakTracking('Texture with FilterQuality.none', (WidgetTester tester) async {
+  testWidgets('Texture with FilterQuality.none', (WidgetTester tester) async {
     await tester.pumpWidget(
-        const Center(child: Texture(textureId: 1, filterQuality: FilterQuality.none)),
+      const Center(child: Texture(textureId: 1, filterQuality: FilterQuality.none)),
     );
 
     final Texture texture = tester.firstWidget(find.byType(Texture));
@@ -96,10 +90,8 @@ void main() {
     expect(textureLayer.filterQuality, FilterQuality.none);
   });
 
-  testWidgetsWithLeakTracking('Texture with FilterQuality.low', (WidgetTester tester) async {
-    await tester.pumpWidget(
-        const Center(child: Texture(textureId: 1)),
-    );
+  testWidgets('Texture with FilterQuality.low', (WidgetTester tester) async {
+    await tester.pumpWidget(const Center(child: Texture(textureId: 1)));
 
     final Texture texture = tester.firstWidget(find.byType(Texture));
     expect(texture, isNotNull);

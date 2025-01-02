@@ -5,10 +5,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Can dispose without keyboard', (WidgetTester tester) async {
+  testWidgets('Can dispose without keyboard', (WidgetTester tester) async {
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);
     await tester.pumpWidget(RawKeyboardListener(focusNode: focusNode, child: Container()));
@@ -16,18 +15,14 @@ void main() {
     await tester.pumpWidget(Container());
   });
 
-  testWidgetsWithLeakTracking('Fuchsia key event', (WidgetTester tester) async {
+  testWidgets('Fuchsia key event', (WidgetTester tester) async {
     final List<RawKeyEvent> events = <RawKeyEvent>[];
 
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
     await tester.pumpWidget(
-      RawKeyboardListener(
-        focusNode: focusNode,
-        onKey: events.add,
-        child: Container(),
-      ),
+      RawKeyboardListener(focusNode: focusNode, onKey: events.add, child: Container()),
     );
 
     focusNode.requestFocus();
@@ -48,18 +43,14 @@ void main() {
     await tester.pumpWidget(Container());
   }, skip: isBrowser); // [intended] This is a Fuchsia-specific test.
 
-  testWidgetsWithLeakTracking('Web key event', (WidgetTester tester) async {
+  testWidgets('Web key event', (WidgetTester tester) async {
     final List<RawKeyEvent> events = <RawKeyEvent>[];
 
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
     await tester.pumpWidget(
-      RawKeyboardListener(
-        focusNode: focusNode,
-        onKey: events.add,
-        child: Container(),
-      ),
+      RawKeyboardListener(focusNode: focusNode, onKey: events.add, child: Container()),
     );
 
     focusNode.requestFocus();
@@ -79,18 +70,14 @@ void main() {
     await tester.pumpWidget(Container());
   });
 
-  testWidgetsWithLeakTracking('Defunct listeners do not receive events', (WidgetTester tester) async {
+  testWidgets('Defunct listeners do not receive events', (WidgetTester tester) async {
     final List<RawKeyEvent> events = <RawKeyEvent>[];
 
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
     await tester.pumpWidget(
-      RawKeyboardListener(
-        focusNode: focusNode,
-        onKey: events.add,
-        child: Container(),
-      ),
+      RawKeyboardListener(focusNode: focusNode, onKey: events.add, child: Container()),
     );
 
     focusNode.requestFocus();

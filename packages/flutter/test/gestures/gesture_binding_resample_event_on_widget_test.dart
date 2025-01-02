@@ -4,49 +4,22 @@
 
 import 'dart:ui' as ui;
 
-import 'package:clock/clock.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
-
-class TestResampleEventFlutterBinding extends AutomatedTestWidgetsFlutterBinding {
-  @override
-  SamplingClock? get debugSamplingClock => TestSamplingClock(this.clock);
-}
-
-class TestSamplingClock implements SamplingClock {
-  TestSamplingClock(this._clock);
-
-  @override
-  DateTime now() => _clock.now();
-
-  @override
-  Stopwatch stopwatch() => _clock.stopwatch();
-
-  final Clock _clock;
-}
 
 void main() {
-  final TestWidgetsFlutterBinding binding = TestResampleEventFlutterBinding();
-  testWidgetsWithLeakTracking('PointerEvent resampling on a widget', (WidgetTester tester) async {
-    assert(WidgetsBinding.instance == binding);
-    Duration currentTestFrameTime() => Duration(milliseconds: binding.clock.now().millisecondsSinceEpoch);
+  testWidgets('PointerEvent resampling on a widget', (WidgetTester tester) async {
+    Duration currentTestFrameTime() => Duration(
+      milliseconds: TestWidgetsFlutterBinding.instance.clock.now().millisecondsSinceEpoch,
+    );
     void requestFrame() => SchedulerBinding.instance.scheduleFrameCallback((_) {});
     final Duration epoch = currentTestFrameTime();
     final ui.PointerDataPacket packet = ui.PointerDataPacket(
       data: <ui.PointerData>[
-        ui.PointerData(
-          viewId: tester.view.viewId,
-          change: ui.PointerChange.add,
-          timeStamp: epoch,
-        ),
-        ui.PointerData(
-          viewId: tester.view.viewId,
-          change: ui.PointerChange.down,
-          timeStamp: epoch,
-        ),
+        ui.PointerData(viewId: tester.view.viewId, change: ui.PointerChange.add, timeStamp: epoch),
+        ui.PointerData(viewId: tester.view.viewId, change: ui.PointerChange.down, timeStamp: epoch),
         ui.PointerData(
           viewId: tester.view.viewId,
           change: ui.PointerChange.move,
@@ -133,13 +106,11 @@ void main() {
     expect(events[3], isA<PointerUpEvent>());
   });
 
-  testWidgetsWithLeakTracking('Timer should be canceled when resampling stopped', (WidgetTester tester) async {
+  testWidgets('Timer should be canceled when resampling stopped', (WidgetTester tester) async {
     // A timer will be started when event's timeStamp is larger than sampleTime.
     final ui.PointerDataPacket packet = ui.PointerDataPacket(
       data: <ui.PointerData>[
-        ui.PointerData(
-          timeStamp: Duration(microseconds: DateTime.now().microsecondsSinceEpoch),
-        ),
+        ui.PointerData(timeStamp: Duration(microseconds: DateTime.now().microsecondsSinceEpoch)),
       ],
     );
     GestureBinding.instance.resamplingEnabled = true;

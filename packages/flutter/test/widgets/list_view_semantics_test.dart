@@ -4,7 +4,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 import 'semantics_tester.dart';
 
@@ -15,7 +14,7 @@ void main() {
     const int itemCount = 10;
     const double itemHeight = 150.0;
 
-    testWidgetsWithLeakTracking('forward vertical', (WidgetTester tester) async {
+    testWidgets('forward vertical', (WidgetTester tester) async {
       final SemanticsTester semantics = SemanticsTester(tester);
       final ScrollController controller = ScrollController();
       addTearDown(controller.dispose);
@@ -27,26 +26,33 @@ void main() {
             controller: controller,
             itemCount: itemCount,
             itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: itemHeight,
-                child: Text('Tile $index'),
-              );
+              return SizedBox(height: itemHeight, child: Text('Tile $index'));
             },
           ),
         ),
       );
 
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollUp]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollUp, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       // Jump to the end.
       controller.jumpTo(itemCount * itemHeight);
       await tester.pumpAndSettle();
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollDown]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollDown, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       semantics.dispose();
     });
 
-    testWidgetsWithLeakTracking('reverse vertical', (WidgetTester tester) async {
+    testWidgets('reverse vertical', (WidgetTester tester) async {
       final SemanticsTester semantics = SemanticsTester(tester);
       final ScrollController controller = ScrollController();
       addTearDown(controller.dispose);
@@ -59,26 +65,33 @@ void main() {
             controller: controller,
             itemCount: itemCount,
             itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: itemHeight,
-                child: Text('Tile $index'),
-              );
+              return SizedBox(height: itemHeight, child: Text('Tile $index'));
             },
           ),
         ),
       );
 
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollDown]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollDown, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       // Jump to the end.
       controller.jumpTo(itemCount * itemHeight);
       await tester.pumpAndSettle();
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollUp]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollUp, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       semantics.dispose();
     });
 
-    testWidgetsWithLeakTracking('forward horizontal', (WidgetTester tester) async {
+    testWidgets('forward horizontal', (WidgetTester tester) async {
       final SemanticsTester semantics = SemanticsTester(tester);
       final ScrollController controller = ScrollController();
       addTearDown(controller.dispose);
@@ -91,26 +104,33 @@ void main() {
             controller: controller,
             itemCount: itemCount,
             itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: itemHeight,
-                child: Text('Tile $index'),
-              );
+              return SizedBox(height: itemHeight, child: Text('Tile $index'));
             },
           ),
         ),
       );
 
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollLeft]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollLeft, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       // Jump to the end.
       controller.jumpTo(itemCount * itemHeight);
       await tester.pumpAndSettle();
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollRight]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollRight, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       semantics.dispose();
     });
 
-    testWidgetsWithLeakTracking('reverse horizontal', (WidgetTester tester) async {
+    testWidgets('reverse horizontal', (WidgetTester tester) async {
       final SemanticsTester semantics = SemanticsTester(tester);
       final ScrollController controller = ScrollController();
       addTearDown(controller.dispose);
@@ -124,21 +144,28 @@ void main() {
             controller: controller,
             itemCount: itemCount,
             itemBuilder: (BuildContext context, int index) {
-              return SizedBox(
-                height: itemHeight,
-                child: Text('Tile $index'),
-              );
+              return SizedBox(height: itemHeight, child: Text('Tile $index'));
             },
           ),
         ),
       );
 
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollRight]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollRight, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       // Jump to the end.
       controller.jumpTo(itemCount * itemHeight);
       await tester.pumpAndSettle();
-      expect(semantics, includesNodeWith(actions: <SemanticsAction>[SemanticsAction.scrollLeft]));
+      expect(
+        semantics,
+        includesNodeWith(
+          actions: <SemanticsAction>[SemanticsAction.scrollLeft, SemanticsAction.scrollToOffset],
+        ),
+      );
 
       semantics.dispose();
     });

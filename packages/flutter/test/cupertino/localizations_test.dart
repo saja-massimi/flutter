@@ -4,10 +4,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('English translations exist for all CupertinoLocalization properties', (WidgetTester tester) async {
+  testWidgets('English translations exist for all CupertinoLocalization properties', (
+    WidgetTester tester,
+  ) async {
     const CupertinoLocalizations localizations = DefaultCupertinoLocalizations();
 
     expect(localizations.datePickerYear(2018), isNotNull);
@@ -35,29 +36,34 @@ void main() {
     expect(localizations.modalBarrierDismissLabel, isNotNull);
     expect(localizations.searchTextFieldPlaceholderLabel, isNotNull);
     expect(localizations.noSpellCheckReplacementsLabel, isNotNull);
+    expect(localizations.clearButtonLabel, isNotNull);
   });
 
-  testWidgetsWithLeakTracking('CupertinoLocalizations.of throws', (WidgetTester tester) async {
+  testWidgets('CupertinoLocalizations.of throws', (WidgetTester tester) async {
     final GlobalKey noLocalizationsAvailable = GlobalKey();
     final GlobalKey localizationsAvailable = GlobalKey();
 
     await tester.pumpWidget(
       Container(
         key: noLocalizationsAvailable,
-        child: CupertinoApp(
-          home: Container(
-            key: localizationsAvailable,
-          ),
+        child: CupertinoApp(home: Container(key: localizationsAvailable)),
+      ),
+    );
+
+    expect(
+      () => CupertinoLocalizations.of(noLocalizationsAvailable.currentContext!),
+      throwsA(
+        isAssertionError.having(
+          (AssertionError e) => e.message,
+          'message',
+          contains('No CupertinoLocalizations found'),
         ),
       ),
     );
 
-    expect(() => CupertinoLocalizations.of(noLocalizationsAvailable.currentContext!), throwsA(isAssertionError.having(
-      (AssertionError e) => e.message,
-      'message',
-      contains('No CupertinoLocalizations found'),
-    )));
-
-    expect(CupertinoLocalizations.of(localizationsAvailable.currentContext!), isA<CupertinoLocalizations>());
+    expect(
+      CupertinoLocalizations.of(localizationsAvailable.currentContext!),
+      isA<CupertinoLocalizations>(),
+    );
   });
 }

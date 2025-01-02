@@ -14,10 +14,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class LinkedScrollController extends ScrollController {
-  LinkedScrollController({ this.before, this.after });
+  LinkedScrollController({this.before, this.after});
 
   LinkedScrollController? before;
   LinkedScrollController? after;
@@ -36,9 +35,15 @@ class LinkedScrollController extends ScrollController {
 
   @override
   void attach(ScrollPosition position) {
-    assert(position is LinkedScrollPosition, 'A LinkedScrollController must only be used with LinkedScrollPositions.');
+    assert(
+      position is LinkedScrollPosition,
+      'A LinkedScrollController must only be used with LinkedScrollPositions.',
+    );
     final LinkedScrollPosition linkedPosition = position as LinkedScrollPosition;
-    assert(linkedPosition.owner == this, 'A LinkedScrollPosition cannot change controllers once created.');
+    assert(
+      linkedPosition.owner == this,
+      'A LinkedScrollPosition cannot change controllers once created.',
+    );
     super.attach(position);
     _parent?.attach(position);
   }
@@ -58,7 +63,11 @@ class LinkedScrollController extends ScrollController {
   }
 
   @override
-  LinkedScrollPosition createScrollPosition(ScrollPhysics physics, ScrollContext context, ScrollPosition? oldPosition) {
+  LinkedScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition? oldPosition,
+  ) {
     return LinkedScrollPosition(
       this,
       physics: physics,
@@ -92,17 +101,14 @@ class LinkedScrollController extends ScrollController {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    if (before != null && after != null) {
-      description.add('links: ⬌');
-    } else if (before != null) {
-      description.add('links: ⬅');
-    } else if (after != null) {
-      description.add('links: ➡');
-    } else {
-      description.add('links: none');
-    }
+    final String linkSymbol = switch ((before, after)) {
+      (null, null) => 'none',
+      (null, _) => '➡',
+      (_, null) => '⬅',
+      (_, _) => '⬌',
+    };
+    description.add('links: $linkSymbol');
   }
-
 }
 
 class LinkedScrollPosition extends ScrollPositionWithSingleContext {
@@ -172,10 +178,12 @@ class LinkedScrollPosition extends ScrollPositionWithSingleContext {
 
     assert(beforeOverscroll == 0.0 || afterOverscroll == 0.0);
 
-    final double localOverscroll = setPixels(value.clamp(
-      owner.canLinkWithBefore ? minScrollExtent : -double.infinity,
-      owner.canLinkWithAfter ? maxScrollExtent : double.infinity,
-    ));
+    final double localOverscroll = setPixels(
+      value.clamp(
+        owner.canLinkWithBefore ? minScrollExtent : -double.infinity,
+        owner.canLinkWithAfter ? maxScrollExtent : double.infinity,
+      ),
+    );
 
     assert(localOverscroll == 0.0 || (beforeOverscroll == 0.0 && afterOverscroll == 0.0));
   }
@@ -194,12 +202,8 @@ class LinkedScrollPosition extends ScrollPositionWithSingleContext {
   }
 
   void unlink(LinkedScrollActivity activity) {
-    if (_beforeActivities != null) {
-      _beforeActivities!.remove(activity);
-    }
-    if (_afterActivities != null) {
-      _afterActivities!.remove(activity);
-    }
+    _beforeActivities?.remove(activity);
+    _afterActivities?.remove(activity);
   }
 
   @override
@@ -210,9 +214,7 @@ class LinkedScrollPosition extends ScrollPositionWithSingleContext {
 }
 
 class LinkedScrollActivity extends ScrollActivity {
-  LinkedScrollActivity(
-    LinkedScrollPosition super.delegate,
-  );
+  LinkedScrollActivity(LinkedScrollPosition super.delegate);
 
   @override
   LinkedScrollPosition get delegate => super.delegate as LinkedScrollPosition;
@@ -267,7 +269,7 @@ class LinkedScrollActivity extends ScrollActivity {
 }
 
 class Test extends StatefulWidget {
-  const Test({ super.key });
+  const Test({super.key});
   @override
   State<Test> createState() => _TestState();
 }
@@ -382,7 +384,7 @@ class _TestState extends State<Test> {
 }
 
 void main() {
-  testWidgetsWithLeakTracking('LinkedScrollController - 1', (WidgetTester tester) async {
+  testWidgets('LinkedScrollController - 1', (WidgetTester tester) async {
     await tester.pumpWidget(const Test());
     expect(find.text('Hello A'), findsOneWidget);
     expect(find.text('Hello 1'), findsOneWidget);
@@ -460,7 +462,7 @@ void main() {
     expect(find.text('Hello D'), findsNothing);
     expect(find.text('Hello 4'), findsOneWidget);
   });
-  testWidgetsWithLeakTracking('LinkedScrollController - 2', (WidgetTester tester) async {
+  testWidgets('LinkedScrollController - 2', (WidgetTester tester) async {
     await tester.pumpWidget(const Test());
     expect(find.text('Hello A'), findsOneWidget);
     expect(find.text('Hello B'), findsOneWidget);

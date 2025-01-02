@@ -9,7 +9,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
+
+import '../impeller_test_helpers.dart';
 
 Shader createShader(Rect bounds) {
   return const LinearGradient(
@@ -20,14 +21,13 @@ Shader createShader(Rect bounds) {
   ).createShader(bounds);
 }
 
-
 void main() {
-  testWidgetsWithLeakTracking('Can be constructed', (WidgetTester tester) async {
+  testWidgets('Can be constructed', (WidgetTester tester) async {
     const Widget child = SizedBox(width: 100.0, height: 100.0);
     await tester.pumpWidget(const ShaderMask(shaderCallback: createShader, child: child));
   });
 
-  testWidgetsWithLeakTracking('Bounds rect includes offset', (WidgetTester tester) async {
+  testWidgets('Bounds rect includes offset', (WidgetTester tester) async {
     late Rect shaderBounds;
     Shader recordShaderBounds(Rect bounds) {
       shaderBounds = bounds;
@@ -50,8 +50,7 @@ void main() {
     expect(shaderBounds, equals(const Rect.fromLTWH(0.0, 0.0, 400.0, 400.0)));
   });
 
-
-  testWidgetsWithLeakTracking('Bounds rect includes offset visual inspection', (WidgetTester tester) async {
+  testWidgets('Bounds rect includes offset visual inspection', (WidgetTester tester) async {
     final Widget widgetBottomRight = Container(
       width: 400,
       height: 400,
@@ -60,16 +59,13 @@ void main() {
         child: Align(
           alignment: Alignment.bottomRight,
           child: ShaderMask(
-            shaderCallback: (Rect bounds) => const RadialGradient(
-              radius: 0.05,
-              colors:  <Color>[Color(0xFFFF0000),  Color(0xFF00FF00)],
-              tileMode: TileMode.mirror,
-            ).createShader(bounds),
-            child: Container(
-              width: 100,
-              height: 100,
-              color: const Color(0xFFFFFFFF),
-            ),
+            shaderCallback:
+                (Rect bounds) => const RadialGradient(
+                  radius: 0.05,
+                  colors: <Color>[Color(0xFFFF0000), Color(0xFF00FF00)],
+                  tileMode: TileMode.mirror,
+                ).createShader(bounds),
+            child: Container(width: 100, height: 100, color: const Color(0xFFFFFFFF)),
           ),
         ),
       ),
@@ -89,16 +85,13 @@ void main() {
         child: Align(
           alignment: Alignment.topLeft,
           child: ShaderMask(
-            shaderCallback: (Rect bounds) => const RadialGradient(
-              radius: 0.05,
-              colors:  <Color>[Color(0xFFFF0000),  Color(0xFF00FF00)],
-              tileMode: TileMode.mirror,
-            ).createShader(bounds),
-            child: Container(
-              width: 100,
-              height: 100,
-              color: const Color(0xFFFFFFFF),
-            ),
+            shaderCallback:
+                (Rect bounds) => const RadialGradient(
+                  radius: 0.05,
+                  colors: <Color>[Color(0xFFFF0000), Color(0xFF00FF00)],
+                  tileMode: TileMode.mirror,
+                ).createShader(bounds),
+            child: Container(width: 100, height: 100, color: const Color(0xFFFFFFFF)),
           ),
         ),
       ),
@@ -109,5 +102,5 @@ void main() {
       find.byType(RepaintBoundary),
       matchesGoldenFile('shader_mask.bounds.matches_top_left.png'),
     );
-  });
+  }, skip: impellerEnabled); // https://github.com/flutter/flutter/issues/144555
 }

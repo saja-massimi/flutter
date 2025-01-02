@@ -6,43 +6,31 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Shows prefix', (WidgetTester tester) async {
+  testWidgets('Shows prefix', (WidgetTester tester) async {
     const Widget prefix = Text('Enter Value');
 
     await tester.pumpWidget(
       const CupertinoApp(
-        home: Center(
-          child: CupertinoFormRow(
-            prefix: prefix,
-            child: CupertinoTextField(),
-          ),
-        ),
+        home: Center(child: CupertinoFormRow(prefix: prefix, child: CupertinoTextField())),
       ),
     );
 
     expect(prefix, tester.widget(find.byType(Text)));
   });
 
-  testWidgetsWithLeakTracking('Shows child', (WidgetTester tester) async {
+  testWidgets('Shows child', (WidgetTester tester) async {
     const Widget child = CupertinoTextField();
 
     await tester.pumpWidget(
-      const CupertinoApp(
-        home: Center(
-          child: CupertinoFormRow(
-            child: child,
-          ),
-        ),
-      ),
+      const CupertinoApp(home: Center(child: CupertinoFormRow(child: child))),
     );
 
     expect(child, tester.widget(find.byType(CupertinoTextField)));
   });
 
-  testWidgetsWithLeakTracking('RTL puts prefix after child', (WidgetTester tester) async {
+  testWidgets('RTL puts prefix after child', (WidgetTester tester) async {
     const Widget prefix = Text('Enter Value');
     const Widget child = CupertinoTextField();
 
@@ -51,19 +39,20 @@ void main() {
         home: Center(
           child: Directionality(
             textDirection: TextDirection.rtl,
-            child: CupertinoFormRow(
-              prefix: prefix,
-              child: child,
-            ),
+            child: CupertinoFormRow(prefix: prefix, child: child),
           ),
         ),
       ),
     );
 
-    expect(tester.getTopLeft(find.byType(Text)).dx > tester.getTopLeft(find.byType(CupertinoTextField)).dx, true);
+    expect(
+      tester.getTopLeft(find.byType(Text)).dx >
+          tester.getTopLeft(find.byType(CupertinoTextField)).dx,
+      true,
+    );
   });
 
-  testWidgetsWithLeakTracking('LTR puts child after prefix', (WidgetTester tester) async {
+  testWidgets('LTR puts child after prefix', (WidgetTester tester) async {
     const Widget prefix = Text('Enter Value');
     const Widget child = CupertinoTextField();
 
@@ -72,102 +61,86 @@ void main() {
         home: Center(
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: CupertinoFormRow(
-              prefix: prefix,
-              child: child,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    expect(tester.getTopLeft(find.byType(Text)).dx > tester.getTopLeft(find.byType(CupertinoTextField)).dx, false);
-  });
-
-  testWidgetsWithLeakTracking('Shows error widget', (WidgetTester tester) async {
-    const Widget error = Text('Error');
-
-    await tester.pumpWidget(
-      const CupertinoApp(
-        home: Center(
-          child: CupertinoFormRow(
-            error: error,
-            child: CupertinoTextField(),
-          ),
-        ),
-      ),
-    );
-
-    expect(error, tester.widget(find.byType(Text)));
-  });
-
-  testWidgetsWithLeakTracking('Shows helper widget', (WidgetTester tester) async {
-    const Widget helper = Text('Helper');
-
-    await tester.pumpWidget(
-      const CupertinoApp(
-        home: Center(
-          child: CupertinoFormRow(
-            helper: helper,
-            child: CupertinoTextField(),
-          ),
-        ),
-      ),
-    );
-
-    expect(helper, tester.widget(find.byType(Text)));
-  });
-
-  testWidgetsWithLeakTracking('Shows helper text above error text', (WidgetTester tester) async {
-    const Widget helper = Text('Helper');
-    const Widget error = CupertinoActivityIndicator();
-
-    await tester.pumpWidget(
-      const CupertinoApp(
-        home: Center(
-          child: CupertinoFormRow(
-            helper: helper,
-            error: error,
-            child: CupertinoTextField(),
+            child: CupertinoFormRow(prefix: prefix, child: child),
           ),
         ),
       ),
     );
 
     expect(
-      tester.getTopLeft(find.byType(CupertinoActivityIndicator)).dy > tester.getTopLeft(find.byType(Text)).dy,
+      tester.getTopLeft(find.byType(Text)).dx >
+          tester.getTopLeft(find.byType(CupertinoTextField)).dx,
+      false,
+    );
+  });
+
+  testWidgets('Shows error widget', (WidgetTester tester) async {
+    const Widget error = Text('Error');
+
+    await tester.pumpWidget(
+      const CupertinoApp(
+        home: Center(child: CupertinoFormRow(error: error, child: CupertinoTextField())),
+      ),
+    );
+
+    expect(error, tester.widget(find.byType(Text)));
+  });
+
+  testWidgets('Shows helper widget', (WidgetTester tester) async {
+    const Widget helper = Text('Helper');
+
+    await tester.pumpWidget(
+      const CupertinoApp(
+        home: Center(child: CupertinoFormRow(helper: helper, child: CupertinoTextField())),
+      ),
+    );
+
+    expect(helper, tester.widget(find.byType(Text)));
+  });
+
+  testWidgets('Shows helper text above error text', (WidgetTester tester) async {
+    const Widget helper = Text('Helper');
+    const Widget error = CupertinoActivityIndicator();
+
+    await tester.pumpWidget(
+      const CupertinoApp(
+        home: Center(
+          child: CupertinoFormRow(helper: helper, error: error, child: CupertinoTextField()),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getTopLeft(find.byType(CupertinoActivityIndicator)).dy >
+          tester.getTopLeft(find.byType(Text)).dy,
       true,
     );
   });
 
-  testWidgetsWithLeakTracking('Shows helper in label color and error text in red color', (WidgetTester tester) async {
+  testWidgets('Shows helper in label color and error text in red color', (
+    WidgetTester tester,
+  ) async {
     const Widget helper = Text('Helper');
     const Widget error = Text('Error');
 
     await tester.pumpWidget(
       const CupertinoApp(
         home: Center(
-          child: CupertinoFormRow(
-            helper: helper,
-            error: error,
-            child: CupertinoTextField(),
-          ),
+          child: CupertinoFormRow(helper: helper, error: error, child: CupertinoTextField()),
         ),
       ),
     );
 
-    final DefaultTextStyle helperTextStyle =
-        tester.widget(find.byType(DefaultTextStyle).first);
+    final DefaultTextStyle helperTextStyle = tester.widget(find.byType(DefaultTextStyle).first);
 
     expect(helperTextStyle.style.color, CupertinoColors.label);
 
-    final DefaultTextStyle errorTextStyle =
-        tester.widget(find.byType(DefaultTextStyle).last);
+    final DefaultTextStyle errorTextStyle = tester.widget(find.byType(DefaultTextStyle).last);
 
     expect(errorTextStyle.style.color, CupertinoColors.destructiveRed);
   });
 
-  testWidgetsWithLeakTracking('CupertinoFormRow adapts to MaterialApp dark mode', (WidgetTester tester) async {
+  testWidgets('CupertinoFormRow adapts to MaterialApp dark mode', (WidgetTester tester) async {
     const Widget prefix = Text('Prefix');
     const Widget helper = Text('Helper');
 
@@ -175,11 +148,7 @@ void main() {
       return MaterialApp(
         theme: ThemeData(brightness: brightness),
         home: const Center(
-          child: CupertinoFormRow(
-            prefix: prefix,
-            helper: helper,
-            child: CupertinoTextField(),
-          ),
+          child: CupertinoFormRow(prefix: prefix, helper: helper, child: CupertinoTextField()),
         ),
       );
     }

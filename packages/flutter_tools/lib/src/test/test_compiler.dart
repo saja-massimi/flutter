@@ -2,25 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
-
 import 'dart:async';
 
 import 'package:meta/meta.dart';
 
 import '../artifacts.dart';
 import '../base/file_system.dart';
-import '../base/platform.dart';
 import '../build_info.dart';
 import '../bundle.dart';
 import '../compile.dart';
 import '../flutter_plugins.dart';
 import '../globals.dart' as globals;
-import '../linux/native_assets.dart';
-import '../macos/native_assets.dart';
-import '../native_assets.dart';
 import '../project.dart';
-import '../windows/native_assets.dart';
 import 'test_time_recorder.dart';
 
 /// A request to the [TestCompiler] for recompilation.
@@ -50,39 +43,50 @@ class TestCompiler {
   /// If [testTimeRecorder] is passed, times will be recorded in it.
   TestCompiler(
     this.buildInfo,
-    this.flutterProject,
-    { String? precompiledDillPath, this.testTimeRecorder }
-  ) : testFilePath = precompiledDillPath ?? globals.fs.path.join(
-        flutterProject!.directory.path,
-        getBuildDirectory(),
-        'test_cache',
-        getDefaultCachedKernelPath(
-          trackWidgetCreation: buildInfo.trackWidgetCreation,
-          dartDefines: buildInfo.dartDefines,
-          extraFrontEndOptions: buildInfo.extraFrontEndOptions,
-        )),
+    this.flutterProject, {
+    String? precompiledDillPath,
+    this.testTimeRecorder,
+  }) : testFilePath =
+           precompiledDillPath ??
+           globals.fs.path.join(
+             flutterProject!.directory.path,
+             getBuildDirectory(),
+             'test_cache',
+             getDefaultCachedKernelPath(
+               trackWidgetCreation: buildInfo.trackWidgetCreation,
+               dartDefines: buildInfo.dartDefines,
+               extraFrontEndOptions: buildInfo.extraFrontEndOptions,
+             ),
+           ),
        shouldCopyDillFile = precompiledDillPath == null {
     // Compiler maintains and updates single incremental dill file.
     // Incremental compilation requests done for each test copy that file away
     // for independent execution.
-    final Directory outputDillDirectory = globals.fs.systemTempDirectory.createTempSync('flutter_test_compiler.');
+    final Directory outputDillDirectory = globals.fs.systemTempDirectory.createTempSync(
+      'flutter_test_compiler.',
+    );
     outputDill = outputDillDirectory.childFile('output.dill');
-    globals.printTrace('Compiler will use the following file as its incremental dill file: ${outputDill.path}');
+    globals.printTrace(
+      'Compiler will use the following file as its incremental dill file: ${outputDill.path}',
+    );
     globals.printTrace('Listening to compiler controller...');
-    compilerController.stream.listen(_onCompilationRequest, onDone: () {
-      globals.printTrace('Deleting ${outputDillDirectory.path}...');
-      outputDillDirectory.deleteSync(recursive: true);
-    });
+    compilerController.stream.listen(
+      _onCompilationRequest,
+      onDone: () {
+        globals.printTrace('Deleting ${outputDillDirectory.path}...');
+        outputDillDirectory.deleteSync(recursive: true);
+      },
+    );
   }
 
-  final StreamController<CompilationRequest> compilerController = StreamController<CompilationRequest>();
+  final StreamController<CompilationRequest> compilerController =
+      StreamController<CompilationRequest>();
   final List<CompilationRequest> compilationQueue = <CompilationRequest>[];
   final FlutterProject? flutterProject;
   final BuildInfo buildInfo;
   final String testFilePath;
   final bool shouldCopyDillFile;
   final TestTimeRecorder? testTimeRecorder;
-
 
   ResidentCompiler? compiler;
   late File outputDill;
@@ -122,7 +126,7 @@ class TestCompiler {
       trackWidgetCreation: buildInfo.trackWidgetCreation,
       initializeFromDill: testFilePath,
       dartDefines: buildInfo.dartDefines,
-      packagesPath: buildInfo.packagesPath,
+      packagesPath: buildInfo.packageConfigPath,
       frontendServerStarterPath: buildInfo.frontendServerStarterPath,
       extraFrontEndOptions: buildInfo.extraFrontEndOptions,
       platform: globals.platform,
@@ -158,8 +162,9 @@ class TestCompiler {
       final List<Uri> invalidatedRegistrantFiles = <Uri>[];
       if (flutterProject != null) {
         // Update the generated registrant to use the test target's main.
-        final String mainUriString = buildInfo.packageConfig.toPackageUri(request.mainUri)?.toString()
-          ?? request.mainUri.toString();
+        final String mainUriString =
+            buildInfo.packageConfig.toPackageUri(request.mainUri)?.toString() ??
+            request.mainUri.toString();
         await generateMainDartWithPluginRegistrant(
           flutterProject!,
           buildInfo.packageConfig,
@@ -167,51 +172,6 @@ class TestCompiler {
           globals.fs.file(request.mainUri),
         );
         invalidatedRegistrantFiles.add(flutterProject!.dartPluginRegistrant.absolute.uri);
-      }
-
-      Uri? nativeAssetsYaml;
-      if (!buildInfo.buildNativeAssets) {
-        nativeAssetsYaml = null;
-      } else {
-        final Uri projectUri = FlutterProject.current().directory.uri;
-        final NativeAssetsBuildRunner buildRunner = NativeAssetsBuildRunnerImpl(
-          projectUri,
-          buildInfo.packageConfig,
-          globals.fs,
-          globals.logger,
-        );
-        if (globals.platform.isMacOS) {
-          (nativeAssetsYaml, _) = await buildNativeAssetsMacOS(
-            buildMode: buildInfo.mode,
-            projectUri: projectUri,
-            flutterTester: true,
-            fileSystem: globals.fs,
-            buildRunner: buildRunner,
-          );
-        } else if (globals.platform.isLinux) {
-          (nativeAssetsYaml, _) = await buildNativeAssetsLinux(
-            buildMode: buildInfo.mode,
-            projectUri: projectUri,
-            flutterTester: true,
-            fileSystem: globals.fs,
-            buildRunner: buildRunner,
-          );
-        } else if (globals.platform.isWindows) {
-          (nativeAssetsYaml, _) = await buildNativeAssetsWindows(
-            buildMode: buildInfo.mode,
-            projectUri: projectUri,
-            flutterTester: true,
-            fileSystem: globals.fs,
-            buildRunner: buildRunner,
-          );
-        } else {
-          await ensureNoNativeAssetsOrOsIsSupported(
-            projectUri,
-            const LocalPlatform().operatingSystem,
-            globals.fs,
-            buildRunner,
-          );
-        }
       }
 
       final CompilerOutput? compilerOutput = await compiler!.recompile(
@@ -222,7 +182,6 @@ class TestCompiler {
         projectRootPath: flutterProject?.directory.absolute.path,
         checkDartPluginRegistry: true,
         fs: globals.fs,
-        nativeAssetsYaml: nativeAssetsYaml,
       );
       final String? outputPath = compilerOutput?.outputFilename;
 
@@ -239,7 +198,9 @@ class TestCompiler {
           final File outputFile = globals.fs.file(outputPath);
           final File kernelReadyToRun = await outputFile.copy('$path.dill');
           final File testCache = globals.fs.file(testFilePath);
-          if (firstCompile || !testCache.existsSync() || (testCache.lengthSync() < outputFile.lengthSync())) {
+          if (firstCompile ||
+              !testCache.existsSync() ||
+              (testCache.lengthSync() < outputFile.lengthSync())) {
             // The idea is to keep the cache file up-to-date and include as
             // much as possible in an effort to re-use as many packages as
             // possible.

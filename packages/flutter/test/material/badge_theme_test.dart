@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   test('BadgeThemeData copyWith, ==, hashCode basics', () {
@@ -31,19 +30,20 @@ void main() {
     expect(themeData.offset, null);
   });
 
-  testWidgetsWithLeakTracking('Default BadgeThemeData debugFillProperties', (WidgetTester tester) async {
+  testWidgets('Default BadgeThemeData debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
     const BadgeThemeData().debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString())
-      .toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[]);
   });
 
-  testWidgetsWithLeakTracking('BadgeThemeData implements debugFillProperties', (WidgetTester tester) async {
+  testWidgets('BadgeThemeData implements debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
     const BadgeThemeData(
       backgroundColor: Color(0xfffffff0),
@@ -56,24 +56,25 @@ void main() {
       offset: Offset.zero,
     ).debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-        .map((DiagnosticsNode node) => node.toString())
-        .toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[
-      'backgroundColor: Color(0xfffffff0)',
-      'textColor: Color(0xfffffff1)',
+      'backgroundColor: ${const Color(0xfffffff0)}',
+      'textColor: ${const Color(0xfffffff1)}',
       'smallSize: 1.0',
       'largeSize: 2.0',
       'textStyle: TextStyle(inherit: true, size: 4.0)',
       'padding: EdgeInsets.all(5.0)',
       'alignment: AlignmentDirectional(6.0, 7.0)',
-      'offset: Offset(0.0, 0.0)'
+      'offset: Offset(0.0, 0.0)',
     ]);
   });
 
-  testWidgetsWithLeakTracking('Badge uses ThemeData badge theme', (WidgetTester tester) async {
+  testWidgets('Badge uses ThemeData badge theme', (WidgetTester tester) async {
     const Color green = Color(0xff00ff00);
     const Color black = Color(0xff000000);
     const BadgeThemeData badgeTheme = BadgeThemeData(
@@ -89,23 +90,15 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: ThemeData.light(useMaterial3: true).copyWith(
-          badgeTheme: badgeTheme,
-        ),
-        home: const Scaffold(
-          body: Badge(
-            label: Text('1234'),
-            child: Icon(Icons.add),
-          ),
-        ),
+        theme: ThemeData.light(useMaterial3: true).copyWith(badgeTheme: badgeTheme),
+        home: const Scaffold(body: Badge(label: Text('1234'), child: Icon(Icons.add))),
       ),
     );
 
     // text width = 48 = fontSize * 4, text height = fontSize
     expect(tester.getSize(find.text('1234')), const Size(48, 12));
 
-    expect(tester.getTopLeft(find.text('1234')), const Offset(33, 4));
-
+    expect(tester.getTopLeft(find.text('1234')), const Offset(33, 2));
 
     expect(tester.getSize(find.byType(Badge)), const Size(24, 24)); // default Icon size
     expect(tester.getTopLeft(find.byType(Badge)), Offset.zero);
@@ -115,14 +108,17 @@ void main() {
     expect(textStyle.color, black);
 
     final RenderBox box = tester.renderObject(find.byType(Badge));
-    expect(box, paints..rrect(rrect: RRect.fromLTRBR(28, 0, 86, 20, const Radius.circular(10)), color: green));
+    expect(
+      box,
+      paints
+        ..rrect(rrect: RRect.fromLTRBR(28, -2, 86, 18, const Radius.circular(10)), color: green),
+    );
   });
-
 
   // This test is essentially the same as 'Badge uses ThemeData badge theme'. In
   // this case the theme is introduced with the BadgeTheme widget instead of
   // ThemeData.badgeTheme.
-  testWidgetsWithLeakTracking('Badge uses BadgeTheme', (WidgetTester tester) async {
+  testWidgets('Badge uses BadgeTheme', (WidgetTester tester) async {
     const Color green = Color(0xff00ff00);
     const Color black = Color(0xff000000);
     const BadgeThemeData badgeTheme = BadgeThemeData(
@@ -140,24 +136,23 @@ void main() {
       const MaterialApp(
         home: BadgeTheme(
           data: badgeTheme,
-          child: Scaffold(
-            body: Badge(
-              label: Text('1234'),
-              child: Icon(Icons.add),
-            ),
-          ),
+          child: Scaffold(body: Badge(label: Text('1234'), child: Icon(Icons.add))),
         ),
       ),
     );
 
     expect(tester.getSize(find.text('1234')), const Size(48, 12));
-    expect(tester.getTopLeft(find.text('1234')), const Offset(33, 4));
+    expect(tester.getTopLeft(find.text('1234')), const Offset(33, 2));
     expect(tester.getSize(find.byType(Badge)), const Size(24, 24)); // default Icon size
     expect(tester.getTopLeft(find.byType(Badge)), Offset.zero);
     final TextStyle textStyle = tester.renderObject<RenderParagraph>(find.text('1234')).text.style!;
     expect(textStyle.fontSize, 12);
     expect(textStyle.color, black);
     final RenderBox box = tester.renderObject(find.byType(Badge));
-    expect(box, paints..rrect(rrect: RRect.fromLTRBR(28, 0, 86, 20, const Radius.circular(10)), color: green));
+    expect(
+      box,
+      paints
+        ..rrect(rrect: RRect.fromLTRBR(28, -2, 86, 18, const Radius.circular(10)), color: green),
+    );
   });
 }

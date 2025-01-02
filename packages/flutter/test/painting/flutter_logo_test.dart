@@ -9,7 +9,6 @@ library;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   // Here and below, see: https://github.com/dart-lang/sdk/issues/26980
@@ -74,28 +73,20 @@ void main() {
   test('FlutterLogoDecoration toString', () {
     expect(
       start.toString(),
-      equals(
-        'FlutterLogoDecoration(textColor: Color(0xffd4f144), style: stacked)',
-      ),
+      equals('FlutterLogoDecoration(textColor: ${const Color(0xffd4f144)}, style: stacked)'),
     );
     expect(
       FlutterLogoDecoration.lerp(null, end, 0.5).toString(),
       equals(
-        'FlutterLogoDecoration(textColor: Color(0xff81d4fa), style: stacked, transition -1.0:0.5)',
+        'FlutterLogoDecoration(textColor: ${const Color(0xff81d4fa)}, style: stacked, transition -1.0:0.5)',
       ),
     );
   });
 
-  testWidgetsWithLeakTracking('Flutter Logo golden test', (WidgetTester tester) async {
+  testWidgets('Flutter Logo golden test', (WidgetTester tester) async {
     final Key logo = UniqueKey();
-    await tester.pumpWidget(Container(
-      key: logo,
-      decoration: const FlutterLogoDecoration(),
-    ));
+    await tester.pumpWidget(Container(key: logo, decoration: const FlutterLogoDecoration()));
 
-    await expectLater(
-      find.byKey(logo),
-      matchesGoldenFile('flutter_logo.png'),
-    );
+    await expectLater(find.byKey(logo), matchesGoldenFile('flutter_logo.png'));
   });
 }

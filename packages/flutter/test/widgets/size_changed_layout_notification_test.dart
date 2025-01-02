@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('SizeChangedLayoutNotification test', (WidgetTester tester) async {
+  testWidgets('SizeChangedLayoutNotification test', (WidgetTester tester) async {
     bool notified = false;
 
     await tester.pumpWidget(
@@ -16,12 +15,7 @@ void main() {
           onNotification: (LayoutChangedNotification notification) {
             throw Exception('Should not reach this point.');
           },
-          child: const SizeChangedLayoutNotifier(
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
-          ),
+          child: const SizeChangedLayoutNotifier(child: SizedBox(width: 100.0, height: 100.0)),
         ),
       ),
     );
@@ -34,12 +28,7 @@ void main() {
             notified = true;
             return true;
           },
-          child: const SizeChangedLayoutNotifier(
-            child: SizedBox(
-              width: 200.0,
-              height: 100.0,
-            ),
-          ),
+          child: const SizeChangedLayoutNotifier(child: SizedBox(width: 200.0, height: 100.0)),
         ),
       ),
     );

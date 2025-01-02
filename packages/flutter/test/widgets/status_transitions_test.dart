@@ -4,14 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class TestStatusTransitionWidget extends StatusTransitionWidget {
-  const TestStatusTransitionWidget({
-    super.key,
-    required this.builder,
-    required super.animation,
-  });
+  const TestStatusTransitionWidget({super.key, required this.builder, required super.animation});
 
   final WidgetBuilder builder;
 
@@ -20,7 +15,7 @@ class TestStatusTransitionWidget extends StatusTransitionWidget {
 }
 
 void main() {
-  testWidgetsWithLeakTracking('Status transition control test', (WidgetTester tester) async {
+  testWidgets('Status transition control test', (WidgetTester tester) async {
     bool didBuild = false;
     final AnimationController controller = AnimationController(
       duration: const Duration(seconds: 1),
@@ -28,14 +23,16 @@ void main() {
     );
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(TestStatusTransitionWidget(
-      animation: controller,
-      builder: (BuildContext context) {
-        expect(didBuild, isFalse);
-        didBuild = true;
-        return Container();
-      },
-    ));
+    await tester.pumpWidget(
+      TestStatusTransitionWidget(
+        animation: controller,
+        builder: (BuildContext context) {
+          expect(didBuild, isFalse);
+          didBuild = true;
+          return Container();
+        },
+      ),
+    );
 
     expect(didBuild, isTrue);
     didBuild = false;
@@ -66,14 +63,16 @@ void main() {
     );
     addTearDown(anotherController.dispose);
 
-    await tester.pumpWidget(TestStatusTransitionWidget(
-      animation: anotherController,
-      builder: (BuildContext context) {
-        expect(didBuild, isFalse);
-        didBuild = true;
-        return Container();
-      },
-    ));
+    await tester.pumpWidget(
+      TestStatusTransitionWidget(
+        animation: anotherController,
+        builder: (BuildContext context) {
+          expect(didBuild, isFalse);
+          didBuild = true;
+          return Container();
+        },
+      ),
+    );
 
     expect(didBuild, isTrue);
     didBuild = false;

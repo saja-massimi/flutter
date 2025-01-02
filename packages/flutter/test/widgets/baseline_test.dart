@@ -3,17 +3,15 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Baseline - control test', (WidgetTester tester) async {
+  testWidgets('Baseline - control test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const Center(
         child: DefaultTextStyle(
-          style: TextStyle(
-            fontSize: 100.0,
-          ),
+          style: TextStyle(fontSize: 100.0),
           child: Text('X', textDirection: TextDirection.ltr),
         ),
       ),
@@ -21,30 +19,26 @@ void main() {
     expect(tester.renderObject<RenderBox>(find.text('X')).size, const Size(100.0, 100.0));
   });
 
-  testWidgetsWithLeakTracking('Baseline - position test', (WidgetTester tester) async {
+  testWidgets('Baseline - position test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const Center(
         child: Baseline(
           baseline: 175.0,
           baselineType: TextBaseline.alphabetic,
           child: DefaultTextStyle(
-            style: TextStyle(
-              fontFamily: 'FlutterTest',
-              fontSize: 100.0,
-            ),
+            style: TextStyle(fontFamily: 'FlutterTest', fontSize: 100.0),
             child: Text('X', textDirection: TextDirection.ltr),
           ),
         ),
       ),
     );
     expect(tester.renderObject<RenderBox>(find.text('X')).size, const Size(100.0, 100.0));
-    expect(
-      tester.renderObject<RenderBox>(find.byType(Baseline)).size,
-      const Size(100.0, 200),
-    );
+    expect(tester.renderObject<RenderBox>(find.byType(Baseline)).size, const Size(100.0, 200));
   });
 
-  testWidgetsWithLeakTracking('Chip caches baseline', (WidgetTester tester) async {
+  testWidgets('Chip caches baseline', (WidgetTester tester) async {
+    final bool checkIntrinsicSizes = debugCheckIntrinsicSizes;
+    debugCheckIntrinsicSizes = false;
     int calls = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -54,6 +48,7 @@ void main() {
             baselineType: TextBaseline.alphabetic,
             child: Chip(
               label: BaselineDetector(() {
+                assert(!debugCheckIntrinsicSizes);
                 calls += 1;
               }),
             ),
@@ -67,9 +62,12 @@ void main() {
     tester.renderObject<RenderBaselineDetector>(find.byType(BaselineDetector)).dirty();
     await tester.pump();
     expect(calls, 2);
+    debugCheckIntrinsicSizes = checkIntrinsicSizes;
   });
 
-  testWidgetsWithLeakTracking('ListTile caches baseline', (WidgetTester tester) async {
+  testWidgets('ListTile caches baseline', (WidgetTester tester) async {
+    final bool checkIntrinsicSizes = debugCheckIntrinsicSizes;
+    debugCheckIntrinsicSizes = false;
     int calls = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -79,6 +77,7 @@ void main() {
             baselineType: TextBaseline.alphabetic,
             child: ListTile(
               title: BaselineDetector(() {
+                assert(!debugCheckIntrinsicSizes);
                 calls += 1;
               }),
             ),
@@ -92,9 +91,10 @@ void main() {
     tester.renderObject<RenderBaselineDetector>(find.byType(BaselineDetector)).dirty();
     await tester.pump();
     expect(calls, 2);
+    debugCheckIntrinsicSizes = checkIntrinsicSizes;
   });
 
-  testWidgetsWithLeakTracking("LayoutBuilder returns child's baseline", (WidgetTester tester) async {
+  testWidgets("LayoutBuilder returns child's baseline", (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Material(
@@ -116,12 +116,13 @@ void main() {
 }
 
 class BaselineDetector extends LeafRenderObjectWidget {
-  const BaselineDetector(this.callback, { super.key });
+  const BaselineDetector(this.callback, {super.key});
 
   final VoidCallback callback;
 
   @override
-  RenderBaselineDetector createRenderObject(BuildContext context) => RenderBaselineDetector(callback);
+  RenderBaselineDetector createRenderObject(BuildContext context) =>
+      RenderBaselineDetector(callback);
 
   @override
   void updateRenderObject(BuildContext context, RenderBaselineDetector renderObject) {
@@ -165,5 +166,5 @@ class RenderBaselineDetector extends RenderBox {
   }
 
   @override
-  void paint(PaintingContext context, Offset offset) { }
+  void paint(PaintingContext context, Offset offset) {}
 }

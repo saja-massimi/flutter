@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Comparing coordinates', (WidgetTester tester) async {
+  testWidgets('Comparing coordinates', (WidgetTester tester) async {
     final Key keyA = GlobalKey();
     final Key keyB = GlobalKey();
 
@@ -18,20 +17,12 @@ void main() {
           Positioned(
             top: 100.0,
             left: 100.0,
-            child: SizedBox(
-              key: keyA,
-              width: 10.0,
-              height: 10.0,
-            ),
+            child: SizedBox(key: keyA, width: 10.0, height: 10.0),
           ),
           Positioned(
             left: 100.0,
             top: 200.0,
-            child: SizedBox(
-              key: keyB,
-              width: 20.0,
-              height: 10.0,
-            ),
+            child: SizedBox(key: keyB, width: 20.0, height: 10.0),
           ),
         ],
       ),

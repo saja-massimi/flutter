@@ -7,13 +7,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 Future<ui.Image> createTestImage(int width, int height, ui.Color color) async {
-  final ui.Paint paint = ui.Paint()
-    ..style = ui.PaintingStyle.stroke
-    ..strokeWidth = 1.0
-    ..color = color;
+  final ui.Paint paint =
+      ui.Paint()
+        ..style = ui.PaintingStyle.stroke
+        ..strokeWidth = 1.0
+        ..color = color;
   final ui.PictureRecorder recorder = ui.PictureRecorder();
   final ui.Canvas pictureCanvas = ui.Canvas(recorder);
   pictureCanvas.drawCircle(Offset.zero, 20.0, paint);
@@ -29,7 +29,7 @@ void main() {
   const ui.Color transparentRed = ui.Color.fromARGB(128, 255, 0, 0);
 
   group('succeeds', () {
-    testWidgetsWithLeakTracking('when images have the same content', (WidgetTester tester) async {
+    testWidgets('when images have the same content', (WidgetTester tester) async {
       final ui.Image image1 = await createTestImage(100, 100, red);
       addTearDown(image1.dispose);
       final ui.Image referenceImage1 = await createTestImage(100, 100, red);
@@ -52,13 +52,13 @@ void main() {
       await expectLater(image3, matchesReferenceImage(referenceImage3));
     });
 
-    testWidgetsWithLeakTracking('when images are identical', (WidgetTester tester) async {
+    testWidgets('when images are identical', (WidgetTester tester) async {
       final ui.Image image = await createTestImage(100, 100, red);
       addTearDown(image.dispose);
       await expectLater(image, matchesReferenceImage(image));
     });
 
-    testWidgetsWithLeakTracking('when widget looks the same', (WidgetTester tester) async {
+    testWidgets('when widget looks the same', (WidgetTester tester) async {
       addTearDown(tester.view.reset);
       tester.view
         ..physicalSize = const Size(10, 10)
@@ -67,13 +67,12 @@ void main() {
       const ValueKey<String> repaintBoundaryKey = ValueKey<String>('boundary');
 
       await tester.pumpWidget(
-        const RepaintBoundary(
-          key: repaintBoundaryKey,
-          child: ColoredBox(color: red),
-        ),
+        const RepaintBoundary(key: repaintBoundaryKey, child: ColoredBox(color: red)),
       );
 
-      final ui.Image referenceImage = (tester.renderObject(find.byKey(repaintBoundaryKey)) as RenderRepaintBoundary).toImageSync();
+      final ui.Image referenceImage =
+          (tester.renderObject(find.byKey(repaintBoundaryKey)) as RenderRepaintBoundary)
+              .toImageSync();
       addTearDown(referenceImage.dispose);
 
       await expectLater(find.byKey(repaintBoundaryKey), matchesReferenceImage(referenceImage));
@@ -81,7 +80,7 @@ void main() {
   });
 
   group('fails', () {
-    testWidgetsWithLeakTracking('when image sizes do not match', (WidgetTester tester) async {
+    testWidgets('when image sizes do not match', (WidgetTester tester) async {
       final ui.Image red50 = await createTestImage(50, 50, red);
       addTearDown(red50.dispose);
       final ui.Image red100 = await createTestImage(100, 100, red);
@@ -93,7 +92,7 @@ void main() {
       );
     });
 
-    testWidgetsWithLeakTracking('when image pixels do not match', (WidgetTester tester) async {
+    testWidgets('when image pixels do not match', (WidgetTester tester) async {
       final ui.Image red100 = await createTestImage(100, 100, red);
       addTearDown(red100.dispose);
       final ui.Image transparentRed100 = await createTestImage(100, 100, transparentRed);
@@ -113,7 +112,7 @@ void main() {
       );
     });
 
-    testWidgetsWithLeakTracking('when widget does not look the same', (WidgetTester tester) async {
+    testWidgets('when widget does not look the same', (WidgetTester tester) async {
       addTearDown(tester.view.reset);
       tester.view
         ..physicalSize = const Size(10, 10)
@@ -122,26 +121,20 @@ void main() {
       const ValueKey<String> repaintBoundaryKey = ValueKey<String>('boundary');
 
       await tester.pumpWidget(
-        const RepaintBoundary(
-          key: repaintBoundaryKey,
-          child: ColoredBox(color: red),
-        ),
+        const RepaintBoundary(key: repaintBoundaryKey, child: ColoredBox(color: red)),
       );
 
-      final ui.Image referenceImage = (tester.renderObject(find.byKey(repaintBoundaryKey)) as RenderRepaintBoundary).toImageSync();
+      final ui.Image referenceImage =
+          (tester.renderObject(find.byKey(repaintBoundaryKey)) as RenderRepaintBoundary)
+              .toImageSync();
       addTearDown(referenceImage.dispose);
 
       await tester.pumpWidget(
-        const RepaintBoundary(
-          key: repaintBoundaryKey,
-          child: ColoredBox(color: green),
-        ),
+        const RepaintBoundary(key: repaintBoundaryKey, child: ColoredBox(color: green)),
       );
 
       expect(
-        await matchesReferenceImage(referenceImage).matchAsync(
-          find.byKey(repaintBoundaryKey),
-        ),
+        await matchesReferenceImage(referenceImage).matchAsync(find.byKey(repaintBoundaryKey)),
         equals('does not match on 100 pixels'),
       );
     });

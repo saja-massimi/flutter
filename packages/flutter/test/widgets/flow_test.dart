@@ -5,7 +5,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class TestFlowDelegate extends FlowDelegate {
   TestFlowDelegate({required this.startOffset}) : super(repaint: startOffset);
@@ -62,10 +61,9 @@ class DuplicatePainterOpacityFlowDelegate extends OpacityFlowDelegate {
 }
 
 void main() {
-  testWidgetsWithLeakTracking('Flow control test', (WidgetTester tester) async {
-    final AnimationController startOffset = AnimationController.unbounded(
-      vsync: tester,
-    );
+  testWidgets('Flow control test', (WidgetTester tester) async {
+    final AnimationController startOffset = AnimationController.unbounded(vsync: tester);
+    addTearDown(startOffset.dispose);
     final List<int> log = <int>[];
 
     Widget buildBox(int i) {
@@ -116,7 +114,7 @@ void main() {
     expect(log, equals(<int>[0]));
   });
 
-  testWidgetsWithLeakTracking('paintChild gets called twice', (WidgetTester tester) async {
+  testWidgets('paintChild gets called twice', (WidgetTester tester) async {
     await tester.pumpWidget(
       Flow(
         delegate: DuplicatePainterOpacityFlowDelegate(1.0),
@@ -129,23 +127,24 @@ void main() {
     final dynamic exception = tester.takeException();
     expect(exception, isFlutterError);
     final FlutterError error = exception as FlutterError;
-    expect(error.toStringDeep(), equalsIgnoringHashCodes(
-      'FlutterError\n'
-      '   Cannot call paintChild twice for the same child.\n'
-      '   The flow delegate of type DuplicatePainterOpacityFlowDelegate\n'
-      '   attempted to paint child 0 multiple times, which is not\n'
-      '   permitted.\n',
-    ));
+    expect(
+      error.toStringDeep(),
+      equalsIgnoringHashCodes(
+        'FlutterError\n'
+        '   Cannot call paintChild twice for the same child.\n'
+        '   The flow delegate of type DuplicatePainterOpacityFlowDelegate\n'
+        '   attempted to paint child 0 multiple times, which is not\n'
+        '   permitted.\n',
+      ),
+    );
   });
 
-  testWidgetsWithLeakTracking('Flow opacity layer', (WidgetTester tester) async {
+  testWidgets('Flow opacity layer', (WidgetTester tester) async {
     const double opacity = 0.2;
     await tester.pumpWidget(
       Flow(
         delegate: OpacityFlowDelegate(opacity),
-        children: const <Widget>[
-          SizedBox(width: 100.0, height: 100.0),
-        ],
+        children: const <Widget>[SizedBox(width: 100.0, height: 100.0)],
       ),
     );
     ContainerLayer? layer = RendererBinding.instance.renderView.debugLayer;
@@ -158,14 +157,12 @@ void main() {
     expect(layer!.firstChild, isA<TransformLayer>());
   });
 
-  testWidgetsWithLeakTracking('Flow can set and update clipBehavior', (WidgetTester tester) async {
+  testWidgets('Flow can set and update clipBehavior', (WidgetTester tester) async {
     const double opacity = 0.2;
     await tester.pumpWidget(
       Flow(
         delegate: OpacityFlowDelegate(opacity),
-        children: const <Widget>[
-          SizedBox(width: 100.0, height: 100.0),
-        ],
+        children: const <Widget>[SizedBox(width: 100.0, height: 100.0)],
       ),
     );
 
@@ -178,23 +175,19 @@ void main() {
         Flow(
           delegate: OpacityFlowDelegate(opacity),
           clipBehavior: clip,
-          children: const <Widget>[
-            SizedBox(width: 100.0, height: 100.0),
-          ],
+          children: const <Widget>[SizedBox(width: 100.0, height: 100.0)],
         ),
       );
       expect(renderObject.clipBehavior, clip);
     }
   });
 
-  testWidgetsWithLeakTracking('Flow.unwrapped can set and update clipBehavior', (WidgetTester tester) async {
+  testWidgets('Flow.unwrapped can set and update clipBehavior', (WidgetTester tester) async {
     const double opacity = 0.2;
     await tester.pumpWidget(
       Flow.unwrapped(
         delegate: OpacityFlowDelegate(opacity),
-        children: const <Widget>[
-          SizedBox(width: 100.0, height: 100.0),
-        ],
+        children: const <Widget>[SizedBox(width: 100.0, height: 100.0)],
       ),
     );
 
@@ -207,9 +200,7 @@ void main() {
         Flow.unwrapped(
           delegate: OpacityFlowDelegate(opacity),
           clipBehavior: clip,
-          children: const <Widget>[
-            SizedBox(width: 100.0, height: 100.0),
-          ],
+          children: const <Widget>[SizedBox(width: 100.0, height: 100.0)],
         ),
       );
       expect(renderObject.clipBehavior, clip);

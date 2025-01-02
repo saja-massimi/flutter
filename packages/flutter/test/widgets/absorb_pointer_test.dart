@@ -4,24 +4,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 import 'semantics_tester.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('AbsorbPointers do not block siblings', (WidgetTester tester) async {
+  testWidgets('AbsorbPointers do not block siblings', (WidgetTester tester) async {
     bool tapped = false;
     await tester.pumpWidget(
       Column(
         children: <Widget>[
-          Expanded(
-            child: GestureDetector(
-              onTap: () => tapped = true,
-            ),
-          ),
-          const Expanded(
-            child: AbsorbPointer(),
-          ),
+          Expanded(child: GestureDetector(onTap: () => tapped = true)),
+          const Expanded(child: AbsorbPointer()),
         ],
       ),
     );
@@ -30,17 +23,13 @@ void main() {
   });
 
   group('AbsorbPointer semantics', () {
-    testWidgetsWithLeakTracking('does not change semantics when not absorbing', (WidgetTester tester) async {
+    testWidgets('does not change semantics when not absorbing', (WidgetTester tester) async {
       final UniqueKey key = UniqueKey();
       await tester.pumpWidget(
         MaterialApp(
           home: AbsorbPointer(
             absorbing: false,
-            child: ElevatedButton(
-              key: key,
-              onPressed: () { },
-              child: const Text('button'),
-            ),
+            child: ElevatedButton(key: key, onPressed: () {}, child: const Text('button')),
           ),
         ),
       );
@@ -49,6 +38,7 @@ void main() {
         matchesSemantics(
           label: 'button',
           hasTapAction: true,
+          hasFocusAction: true,
           isButton: true,
           isFocusable: true,
           hasEnabledState: true,
@@ -57,18 +47,14 @@ void main() {
       );
     });
 
-    testWidgetsWithLeakTracking('drops semantics when its ignoreSemantics is true', (WidgetTester tester) async {
+    testWidgets('drops semantics when its ignoreSemantics is true', (WidgetTester tester) async {
       final SemanticsTester semantics = SemanticsTester(tester);
       final UniqueKey key = UniqueKey();
       await tester.pumpWidget(
         MaterialApp(
           home: AbsorbPointer(
             ignoringSemantics: true,
-            child: ElevatedButton(
-              key: key,
-              onPressed: () { },
-              child: const Text('button'),
-            ),
+            child: ElevatedButton(key: key, onPressed: () {}, child: const Text('button')),
           ),
         ),
       );
@@ -76,16 +62,12 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgetsWithLeakTracking('ignores user interactions', (WidgetTester tester) async {
+    testWidgets('ignores user interactions', (WidgetTester tester) async {
       final UniqueKey key = UniqueKey();
       await tester.pumpWidget(
         MaterialApp(
           home: AbsorbPointer(
-            child: ElevatedButton(
-              key: key,
-              onPressed: () { },
-              child: const Text('button'),
-            ),
+            child: ElevatedButton(key: key, onPressed: () {}, child: const Text('button')),
           ),
         ),
       );

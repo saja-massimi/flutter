@@ -4,25 +4,24 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Can call setState from didUpdateWidget', (WidgetTester tester) async {
-    await tester.pumpWidget(const Directionality(
-      textDirection: TextDirection.ltr,
-      child: WidgetUnderTest(text: 'hello'),
-    ));
+  testWidgets('Can call setState from didUpdateWidget', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Directionality(textDirection: TextDirection.ltr, child: WidgetUnderTest(text: 'hello')),
+    );
 
     expect(find.text('hello'), findsOneWidget);
     expect(find.text('world'), findsNothing);
-    final _WidgetUnderTestState state = tester.state<_WidgetUnderTestState>(find.byType(WidgetUnderTest));
+    final _WidgetUnderTestState state = tester.state<_WidgetUnderTestState>(
+      find.byType(WidgetUnderTest),
+    );
     expect(state.setStateCalled, 0);
     expect(state.didUpdateWidgetCalled, 0);
 
-    await tester.pumpWidget(const Directionality(
-      textDirection: TextDirection.ltr,
-      child: WidgetUnderTest(text: 'world'),
-    ));
+    await tester.pumpWidget(
+      const Directionality(textDirection: TextDirection.ltr, child: WidgetUnderTest(text: 'world')),
+    );
 
     expect(find.text('world'), findsOneWidget);
     expect(find.text('hello'), findsNothing);

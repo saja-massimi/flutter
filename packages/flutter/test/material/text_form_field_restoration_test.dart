@@ -4,37 +4,28 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 const String text = 'Hello World! How are you? Life is good!';
 const String alternativeText = 'Everything is awesome!!';
 
 void main() {
-  testWidgetsWithLeakTracking('TextField restoration', (WidgetTester tester) async {
+  testWidgets('TextField restoration', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(restorationScopeId: 'app', home: TestWidget()));
+
+    await restoreAndVerify(tester);
+  });
+
+  testWidgets('TextField restoration with external controller', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        restorationScopeId: 'app',
-        home: TestWidget(),
-      ),
+      const MaterialApp(restorationScopeId: 'root', home: TestWidget(useExternal: true)),
     );
 
     await restoreAndVerify(tester);
   });
 
-  testWidgetsWithLeakTracking('TextField restoration with external controller', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        restorationScopeId: 'root',
-        home: TestWidget(
-          useExternal: true,
-        ),
-      ),
-    );
-
-    await restoreAndVerify(tester);
-  });
-
-  testWidgetsWithLeakTracking('State restoration (No Form ancestor) - onUserInteraction error text validation', (WidgetTester tester) async {
+  testWidgets('State restoration (No Form ancestor) - onUserInteraction error text validation', (
+    WidgetTester tester,
+  ) async {
     String? errorText(String? value) => '$value/error';
     late GlobalKey<FormFieldState<String>> formState;
 
@@ -92,79 +83,82 @@ void main() {
     expect(find.text(errorText('bar')!), findsOneWidget);
   });
 
-  testWidgetsWithLeakTracking('State Restoration (No Form ancestor) - validator sets the error text only when validate is called', (WidgetTester tester) async {
-    String? errorText(String? value) => '$value/error';
-    late GlobalKey<FormFieldState<String>> formState;
+  testWidgets(
+    'State Restoration (No Form ancestor) - validator sets the error text only when validate is called',
+    (WidgetTester tester) async {
+      String? errorText(String? value) => '$value/error';
+      late GlobalKey<FormFieldState<String>> formState;
 
-    Widget builder(AutovalidateMode mode) {
-      return MaterialApp(
-        restorationScopeId: 'app',
-        home: MediaQuery(
-          data: const MediaQueryData(),
-          child: Directionality(
-            textDirection: TextDirection.ltr,
-            child: Center(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter state) {
-                  formState = GlobalKey<FormFieldState<String>>();
-                  return Material(
-                    child: TextFormField(
-                      key: formState,
-                      restorationId: 'form_field',
-                      autovalidateMode: mode,
-                      initialValue: 'foo',
-                      validator: errorText,
-                    ),
-                  );
-                },
+      Widget builder(AutovalidateMode mode) {
+        return MaterialApp(
+          restorationScopeId: 'app',
+          home: MediaQuery(
+            data: const MediaQueryData(),
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: Center(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter state) {
+                    formState = GlobalKey<FormFieldState<String>>();
+                    return Material(
+                      child: TextFormField(
+                        key: formState,
+                        restorationId: 'form_field',
+                        autovalidateMode: mode,
+                        initialValue: 'foo',
+                        validator: errorText,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
-    }
+        );
+      }
 
-    // Start off not autovalidating.
-    await tester.pumpWidget(builder(AutovalidateMode.disabled));
-
-    Future<void> checkErrorText(String testValue) async {
-      formState.currentState!.reset();
+      // Start off not autovalidating.
       await tester.pumpWidget(builder(AutovalidateMode.disabled));
-      await tester.enterText(find.byType(TextFormField), testValue);
-      await tester.pump();
 
-      // We have to manually validate if we're not autovalidating.
-      expect(find.text(errorText(testValue)!), findsNothing);
-      formState.currentState!.validate();
-      await tester.pump();
-      expect(find.text(errorText(testValue)!), findsOneWidget);
-      final TestRestorationData data = await tester.getRestorationData();
-      await tester.restartAndRestore();
-      // Error text should be present after restart and restore.
-      expect(find.text(errorText(testValue)!), findsOneWidget);
+      Future<void> checkErrorText(String testValue) async {
+        formState.currentState!.reset();
+        await tester.pumpWidget(builder(AutovalidateMode.disabled));
+        await tester.enterText(find.byType(TextFormField), testValue);
+        await tester.pump();
 
-      formState.currentState!.reset();
-      await tester.pumpAndSettle();
-      expect(find.text(errorText(testValue)!), findsNothing);
+        // We have to manually validate if we're not autovalidating.
+        expect(find.text(errorText(testValue)!), findsNothing);
+        formState.currentState!.validate();
+        await tester.pump();
+        expect(find.text(errorText(testValue)!), findsOneWidget);
+        final TestRestorationData data = await tester.getRestorationData();
+        await tester.restartAndRestore();
+        // Error text should be present after restart and restore.
+        expect(find.text(errorText(testValue)!), findsOneWidget);
 
-      await tester.restoreFrom(data);
-      expect(find.text(errorText(testValue)!), findsOneWidget);
+        formState.currentState!.reset();
+        await tester.pumpAndSettle();
+        expect(find.text(errorText(testValue)!), findsNothing);
 
-      // Try again with autovalidation. Should validate immediately.
-      formState.currentState!.reset();
-      await tester.pumpWidget(builder(AutovalidateMode.always));
-      await tester.enterText(find.byType(TextFormField), testValue);
-      await tester.pump();
+        await tester.restoreFrom(data);
+        expect(find.text(errorText(testValue)!), findsOneWidget);
 
-      expect(find.text(errorText(testValue)!), findsOneWidget);
-      await tester.restartAndRestore();
-      // Error text should be present after restart and restore.
-      expect(find.text(errorText(testValue)!), findsOneWidget);
-    }
+        // Try again with autovalidation. Should validate immediately.
+        formState.currentState!.reset();
+        await tester.pumpWidget(builder(AutovalidateMode.always));
+        await tester.enterText(find.byType(TextFormField), testValue);
+        await tester.pump();
 
-    await checkErrorText('Test');
-    await checkErrorText('');
-  });
+        expect(find.text(errorText(testValue)!), findsOneWidget);
+        await tester.restartAndRestore();
+        // Error text should be present after restart and restore.
+        expect(find.text(errorText(testValue)!), findsOneWidget);
+      }
+
+      await checkErrorText('Test');
+      await checkErrorText('');
+    },
+  );
 }
 
 Future<void> restoreAndVerify(WidgetTester tester) async {

@@ -82,6 +82,7 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
     super.textDirection,
     super.child,
     Clip clipBehavior = Clip.hardEdge,
+    VoidCallback? onEnd,
   }) : _vsync = vsync,
        _clipBehavior = clipBehavior {
     _controller = AnimationController(
@@ -93,10 +94,8 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
         markNeedsLayout();
       }
     });
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: curve,
-    );
+    _animation = CurvedAnimation(parent: _controller, curve: curve);
+    _onEnd = onEnd;
   }
 
   /// When asserts are enabled, returns the animation controller that is used
@@ -203,6 +202,19 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
     _controller.resync(vsync);
   }
 
+  /// Called every time an animation completes.
+  ///
+  /// This can be useful to trigger additional actions (e.g. another animation)
+  /// at the end of the current animation.
+  VoidCallback? get onEnd => _onEnd;
+  VoidCallback? _onEnd;
+  set onEnd(VoidCallback? value) {
+    if (value == _onEnd) {
+      return;
+    }
+    _onEnd = value;
+  }
+
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
@@ -216,11 +228,13 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
         // already, to resume interrupted resizing animation.
         markNeedsLayout();
     }
+    _controller.addStatusListener(_animationStatusListener);
   }
 
   @override
   void detach() {
     _controller.stop();
+    _controller.removeStatusListener(_animationStatusListener);
     super.detach();
   }
 
@@ -257,8 +271,7 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
     size = constraints.constrain(_animatedSize!);
     alignChild();
 
-    if (size.width < _sizeTween.end!.width ||
-        size.height < _sizeTween.end!.height) {
+    if (size.width < _sizeTween.end!.width || size.height < _sizeTween.end!.height) {
       _hasVisualOverflow = true;
     }
   }
@@ -360,6 +373,12 @@ class RenderAnimatedSize extends RenderAligningShiftedBox {
       // Child size stabilized.
       _controller.stop();
       _state = RenderAnimatedSizeState.stable;
+    }
+  }
+
+  void _animationStatusListener(AnimationStatus status) {
+    if (status.isCompleted) {
+      _onEnd?.call();
     }
   }
 

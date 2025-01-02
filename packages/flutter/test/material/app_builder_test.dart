@@ -4,10 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking("builder doesn't get called if app doesn't change", (WidgetTester tester) async {
+  testWidgets("builder doesn't get called if app doesn't change", (WidgetTester tester) async {
     final List<String> log = <String>[];
     final Widget app = MaterialApp(
       home: const Placeholder(),
@@ -18,23 +17,13 @@ void main() {
         return const Placeholder();
       },
     );
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.rtl,
-        child: app,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.rtl, child: app));
     expect(log, <String>['build']);
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: app,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.ltr, child: app));
     expect(log, <String>['build']);
   });
 
-  testWidgetsWithLeakTracking("builder doesn't get called if app doesn't change", (WidgetTester tester) async {
+  testWidgets("builder doesn't get called if app doesn't change", (WidgetTester tester) async {
     final List<String> log = <String>[];
     await tester.pumpWidget(
       MaterialApp(
@@ -46,10 +35,7 @@ void main() {
           },
         ),
         builder: (BuildContext context, Widget? child) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
-          );
+          return Directionality(textDirection: TextDirection.rtl, child: child!);
         },
       ),
     );

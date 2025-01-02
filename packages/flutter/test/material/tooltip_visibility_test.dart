@@ -7,40 +7,41 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 const String tooltipText = 'TIP';
 
 void main() {
-  testWidgetsWithLeakTracking('Tooltip does not build MouseRegion when mouse is detected and in TooltipVisibility with visibility = false', (WidgetTester tester) async {
-    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    addTearDown(() async {
-      return gesture.removePointer();
-    });
-    await gesture.addPointer();
-    await gesture.moveTo(const Offset(1.0, 1.0));
-    await tester.pump();
-    await gesture.moveTo(Offset.zero);
+  testWidgets(
+    'Tooltip does not build MouseRegion when mouse is detected and in TooltipVisibility with visibility = false',
+    (WidgetTester tester) async {
+      final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(() async {
+        return gesture.removePointer();
+      });
+      await gesture.addPointer();
+      await gesture.moveTo(const Offset(1.0, 1.0));
+      await tester.pump();
+      await gesture.moveTo(Offset.zero);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: TooltipVisibility(
-          visible: false,
-          child: Tooltip(
-            message: tooltipText,
-            child: SizedBox(
-              width: 100.0,
-              height: 100.0,
-            ),
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: TooltipVisibility(
+            visible: false,
+            child: Tooltip(message: tooltipText, child: SizedBox(width: 100.0, height: 100.0)),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(find.descendant(of: find.byType(Tooltip), matching: find.byType(MouseRegion)), findsNothing);
-  });
+      expect(
+        find.descendant(of: find.byType(Tooltip), matching: find.byType(MouseRegion)),
+        findsNothing,
+      );
+    },
+  );
 
-  testWidgetsWithLeakTracking('Tooltip does not show when hovered when in TooltipVisibility with visible = false', (WidgetTester tester) async {
+  testWidgets('Tooltip does not show when hovered when in TooltipVisibility with visible = false', (
+    WidgetTester tester,
+  ) async {
     const Duration waitDuration = Duration.zero;
     final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
@@ -59,10 +60,7 @@ void main() {
             child: Tooltip(
               message: tooltipText,
               waitDuration: waitDuration,
-              child: SizedBox(
-                width: 100.0,
-                height: 100.0,
-              ),
+              child: SizedBox(width: 100.0, height: 100.0),
             ),
           ),
         ),
@@ -79,7 +77,9 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip shows when hovered when in TooltipVisibility with visible = true', (WidgetTester tester) async {
+  testWidgets('Tooltip shows when hovered when in TooltipVisibility with visible = true', (
+    WidgetTester tester,
+  ) async {
     const Duration waitDuration = Duration.zero;
     TestGesture? gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
@@ -100,10 +100,7 @@ void main() {
             child: Tooltip(
               message: tooltipText,
               waitDuration: waitDuration,
-              child: SizedBox(
-                width: 100.0,
-                height: 100.0,
-              ),
+              child: SizedBox(width: 100.0, height: 100.0),
             ),
           ),
         ),
@@ -127,23 +124,31 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip does not build GestureDetector when in TooltipVisibility with visibility = false', (WidgetTester tester) async {
-    await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, false);
+  testWidgets(
+    'Tooltip does not build GestureDetector when in TooltipVisibility with visibility = false',
+    (WidgetTester tester) async {
+      await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, false);
 
-    expect(find.byType(GestureDetector), findsNothing);
-  });
+      expect(find.byType(GestureDetector), findsNothing);
+    },
+  );
 
-  testWidgetsWithLeakTracking('Tooltip triggers on tap when trigger mode is tap and in TooltipVisibility with visible = true', (WidgetTester tester) async {
-    await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, true);
+  testWidgets(
+    'Tooltip triggers on tap when trigger mode is tap and in TooltipVisibility with visible = true',
+    (WidgetTester tester) async {
+      await setWidgetForTooltipMode(tester, TooltipTriggerMode.tap, true);
 
-    final Finder tooltip = find.byType(Tooltip);
-    expect(find.text(tooltipText), findsNothing);
+      final Finder tooltip = find.byType(Tooltip);
+      expect(find.text(tooltipText), findsNothing);
 
-    await testGestureTap(tester, tooltip);
-    expect(find.text(tooltipText), findsOneWidget);
-  });
+      await testGestureTap(tester, tooltip);
+      expect(find.text(tooltipText), findsOneWidget);
+    },
+  );
 
-  testWidgetsWithLeakTracking('Tooltip does not trigger manually when in TooltipVisibility with visible = false', (WidgetTester tester) async {
+  testWidgets('Tooltip does not trigger manually when in TooltipVisibility with visible = false', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     await tester.pumpWidget(
       MaterialApp(
@@ -163,7 +168,9 @@ void main() {
     expect(find.text(tooltipText), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Tooltip triggers manually when in TooltipVisibility with visible = true', (WidgetTester tester) async {
+  testWidgets('Tooltip triggers manually when in TooltipVisibility with visible = true', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
     await tester.pumpWidget(
       MaterialApp(
@@ -184,7 +191,11 @@ void main() {
   });
 }
 
-Future<void> setWidgetForTooltipMode(WidgetTester tester, TooltipTriggerMode triggerMode, bool visibility) async {
+Future<void> setWidgetForTooltipMode(
+  WidgetTester tester,
+  TooltipTriggerMode triggerMode,
+  bool visibility,
+) async {
   await tester.pumpWidget(
     MaterialApp(
       home: TooltipVisibility(

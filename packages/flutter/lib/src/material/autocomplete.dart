@@ -105,7 +105,12 @@ class Autocomplete<T extends Object> extends StatelessWidget {
   /// {@macro flutter.widgets.RawAutocomplete.initialValue}
   final TextEditingValue? initialValue;
 
-  static Widget _defaultFieldViewBuilder(BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+  static Widget _defaultFieldViewBuilder(
+    BuildContext context,
+    TextEditingController textEditingController,
+    FocusNode focusNode,
+    VoidCallback onFieldSubmitted,
+  ) {
     return _AutocompleteField(
       focusNode: focusNode,
       textEditingController: textEditingController,
@@ -121,14 +126,17 @@ class Autocomplete<T extends Object> extends StatelessWidget {
       initialValue: initialValue,
       optionsBuilder: optionsBuilder,
       optionsViewOpenDirection: optionsViewOpenDirection,
-      optionsViewBuilder: optionsViewBuilder ?? (BuildContext context, AutocompleteOnSelected<T> onSelected, Iterable<T> options) {
-        return _AutocompleteOptions<T>(
-          displayStringForOption: displayStringForOption,
-          onSelected: onSelected,
-          options: options,
-          maxOptionsHeight: optionsMaxHeight,
-        );
-      },
+      optionsViewBuilder:
+          optionsViewBuilder ??
+          (BuildContext context, AutocompleteOnSelected<T> onSelected, Iterable<T> options) {
+            return _AutocompleteOptions<T>(
+              displayStringForOption: displayStringForOption,
+              onSelected: onSelected,
+              options: options,
+              openDirection: optionsViewOpenDirection,
+              maxOptionsHeight: optionsMaxHeight,
+            );
+          },
       onSelected: onSelected,
     );
   }
@@ -166,6 +174,7 @@ class _AutocompleteOptions<T extends Object> extends StatelessWidget {
     super.key,
     required this.displayStringForOption,
     required this.onSelected,
+    required this.openDirection,
     required this.options,
     required this.maxOptionsHeight,
   });
@@ -173,14 +182,19 @@ class _AutocompleteOptions<T extends Object> extends StatelessWidget {
   final AutocompleteOptionToString<T> displayStringForOption;
 
   final AutocompleteOnSelected<T> onSelected;
+  final OptionsViewOpenDirection openDirection;
 
   final Iterable<T> options;
   final double maxOptionsHeight;
 
   @override
   Widget build(BuildContext context) {
+    final AlignmentDirectional optionsAlignment = switch (openDirection) {
+      OptionsViewOpenDirection.up => AlignmentDirectional.bottomStart,
+      OptionsViewOpenDirection.down => AlignmentDirectional.topStart,
+    };
     return Align(
-      alignment: Alignment.topLeft,
+      alignment: optionsAlignment,
       child: Material(
         elevation: 4.0,
         child: ConstrainedBox(
@@ -208,7 +222,7 @@ class _AutocompleteOptions<T extends Object> extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Text(displayStringForOption(option)),
                     );
-                  }
+                  },
                 ),
               );
             },

@@ -3,15 +3,24 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
+  RenderObject getOverlayColor(WidgetTester tester) {
+    return tester.allRenderObjects.firstWhere(
+      (RenderObject object) => object.runtimeType.toString() == '_RenderInkFeatures',
+    );
+  }
 
   test('SegmentedButtonThemeData copyWith, ==, hashCode basics', () {
     expect(const SegmentedButtonThemeData(), const SegmentedButtonThemeData().copyWith());
-    expect(const SegmentedButtonThemeData().hashCode, const SegmentedButtonThemeData().copyWith().hashCode);
+    expect(
+      const SegmentedButtonThemeData().hashCode,
+      const SegmentedButtonThemeData().copyWith().hashCode,
+    );
 
     const SegmentedButtonThemeData custom = SegmentedButtonThemeData(
       style: ButtonStyle(backgroundColor: MaterialStatePropertyAll<Color>(Colors.green)),
@@ -30,19 +39,20 @@ void main() {
     expect(identical(SegmentedButtonThemeData.lerp(theme, theme, 0.5), theme), true);
   });
 
-  testWidgetsWithLeakTracking('Default SegmentedButtonThemeData debugFillProperties', (WidgetTester tester) async {
+  testWidgets('Default SegmentedButtonThemeData debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
     const SegmentedButtonThemeData().debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString())
-      .toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[]);
   });
 
-  testWidgetsWithLeakTracking('With no other configuration, defaults are used', (WidgetTester tester) async {
+  testWidgets('With no other configuration, defaults are used', (WidgetTester tester) async {
     final ThemeData theme = ThemeData(useMaterial3: true);
     await tester.pumpWidget(
       MaterialApp(
@@ -56,7 +66,7 @@ void main() {
                 ButtonSegment<int>(value: 3, label: Text('3'), enabled: false),
               ],
               selected: const <int>{2},
-              onSelectionChanged: (Set<int> selected) { },
+              onSelectionChanged: (Set<int> selected) {},
             ),
           ),
         ),
@@ -109,7 +119,7 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('ThemeData.segmentedButtonTheme overrides defaults', (WidgetTester tester) async {
+  testWidgets('ThemeData.segmentedButtonTheme overrides defaults', (WidgetTester tester) async {
     final ThemeData theme = ThemeData(
       useMaterial3: true,
       segmentedButtonTheme: SegmentedButtonThemeData(
@@ -149,7 +159,7 @@ void main() {
                 ButtonSegment<int>(value: 3, label: Text('3'), enabled: false),
               ],
               selected: const <int>{2},
-              onSelectionChanged: (Set<int> selected) { },
+              onSelectionChanged: (Set<int> selected) {},
             ),
           ),
         ),
@@ -202,7 +212,7 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('SegmentedButtonTheme overrides ThemeData and defaults', (WidgetTester tester) async {
+  testWidgets('SegmentedButtonTheme overrides ThemeData and defaults', (WidgetTester tester) async {
     final SegmentedButtonThemeData global = SegmentedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
@@ -251,10 +261,7 @@ void main() {
       ),
       selectedIcon: const Icon(Icons.plus_one),
     );
-    final ThemeData theme = ThemeData(
-      useMaterial3: true,
-      segmentedButtonTheme: global,
-    );
+    final ThemeData theme = ThemeData(useMaterial3: true, segmentedButtonTheme: global);
     await tester.pumpWidget(
       MaterialApp(
         theme: theme,
@@ -269,7 +276,7 @@ void main() {
                   ButtonSegment<int>(value: 3, label: Text('3'), enabled: false),
                 ],
                 selected: const <int>{2},
-                onSelectionChanged: (Set<int> selected) { },
+                onSelectionChanged: (Set<int> selected) {},
               ),
             ),
           ),
@@ -281,7 +288,10 @@ void main() {
     {
       final Finder text = find.text('1');
       final Finder parent = find.ancestor(of: text, matching: find.byType(Material)).first;
-      final Finder selectedIcon = find.descendant(of: parent, matching: find.byIcon(Icons.plus_one));
+      final Finder selectedIcon = find.descendant(
+        of: parent,
+        matching: find.byIcon(Icons.plus_one),
+      );
       final Material material = tester.widget<Material>(parent);
       expect(material.animationDuration, const Duration(milliseconds: 200));
       expect(material.borderRadius, null);
@@ -298,7 +308,10 @@ void main() {
     {
       final Finder text = find.text('2');
       final Finder parent = find.ancestor(of: text, matching: find.byType(Material)).first;
-      final Finder selectedIcon = find.descendant(of: parent, matching: find.byIcon(Icons.plus_one));
+      final Finder selectedIcon = find.descendant(
+        of: parent,
+        matching: find.byIcon(Icons.plus_one),
+      );
       final Material material = tester.widget<Material>(parent);
       expect(material.animationDuration, const Duration(milliseconds: 200));
       expect(material.borderRadius, null);
@@ -315,7 +328,10 @@ void main() {
     {
       final Finder text = find.text('3');
       final Finder parent = find.ancestor(of: text, matching: find.byType(Material)).first;
-      final Finder selectedIcon = find.descendant(of: parent, matching: find.byIcon(Icons.plus_one));
+      final Finder selectedIcon = find.descendant(
+        of: parent,
+        matching: find.byIcon(Icons.plus_one),
+      );
       final Material material = tester.widget<Material>(parent);
       expect(material.animationDuration, const Duration(milliseconds: 200));
       expect(material.borderRadius, null);
@@ -329,7 +345,9 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('Widget parameters overrides SegmentedTheme, ThemeData and defaults', (WidgetTester tester) async {
+  testWidgets('Widget parameters overrides SegmentedTheme, ThemeData and defaults', (
+    WidgetTester tester,
+  ) async {
     final SegmentedButtonThemeData global = SegmentedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
@@ -378,10 +396,7 @@ void main() {
       ),
       selectedIcon: const Icon(Icons.plus_one),
     );
-    final ThemeData theme = ThemeData(
-      useMaterial3: true,
-      segmentedButtonTheme: global,
-    );
+    final ThemeData theme = ThemeData(useMaterial3: true, segmentedButtonTheme: global);
     await tester.pumpWidget(
       MaterialApp(
         theme: theme,
@@ -396,7 +411,7 @@ void main() {
                   ButtonSegment<int>(value: 3, label: Text('3'), enabled: false),
                 ],
                 selected: const <int>{2},
-                onSelectionChanged: (Set<int> selected) { },
+                onSelectionChanged: (Set<int> selected) {},
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
                     if (states.contains(MaterialState.disabled)) {
@@ -477,4 +492,88 @@ void main() {
       expect(selectedIcon, findsNothing);
     }
   });
+
+  testWidgets(
+    'SegmentedButtonTheme SegmentedButton.styleFrom overlayColor overrides default overlay color',
+    (WidgetTester tester) async {
+      const Color overlayColor = Color(0xffff0000);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            segmentedButtonTheme: SegmentedButtonThemeData(
+              style: SegmentedButton.styleFrom(overlayColor: overlayColor),
+            ),
+          ),
+          home: Scaffold(
+            body: Center(
+              child: SegmentedButton<int>(
+                segments: const <ButtonSegment<int>>[
+                  ButtonSegment<int>(value: 0, label: Text('Option 1')),
+                  ButtonSegment<int>(value: 1, label: Text('Option 2')),
+                ],
+                onSelectionChanged: (Set<int> selected) {},
+                selected: const <int>{1},
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Hovered selected segment,
+      Offset center = tester.getCenter(find.text('Option 1'));
+      final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer();
+      await gesture.moveTo(center);
+      await tester.pumpAndSettle();
+      expect(getOverlayColor(tester), paints..rect(color: overlayColor.withOpacity(0.08)));
+
+      // Hovered unselected segment,
+      center = tester.getCenter(find.text('Option 2'));
+      await gesture.moveTo(center);
+      await tester.pumpAndSettle();
+      expect(getOverlayColor(tester), paints..rect(color: overlayColor.withOpacity(0.08)));
+
+      // Highlighted unselected segment (pressed).
+      center = tester.getCenter(find.text('Option 1'));
+      await gesture.down(center);
+      await tester.pumpAndSettle();
+      expect(
+        getOverlayColor(tester),
+        paints
+          ..rect(color: overlayColor.withOpacity(0.08))
+          ..rect(color: overlayColor.withOpacity(0.1)),
+      );
+      // Remove pressed and hovered states,
+      await gesture.up();
+      await tester.pumpAndSettle();
+      await gesture.moveTo(const Offset(0, 50));
+      await tester.pumpAndSettle();
+
+      // Highlighted selected segment (pressed)
+      center = tester.getCenter(find.text('Option 2'));
+      await gesture.down(center);
+      await tester.pumpAndSettle();
+      expect(
+        getOverlayColor(tester),
+        paints
+          ..rect(color: overlayColor.withOpacity(0.08))
+          ..rect(color: overlayColor.withOpacity(0.1)),
+      );
+      // Remove pressed and hovered states,
+      await gesture.up();
+      await tester.pumpAndSettle();
+      await gesture.moveTo(const Offset(0, 50));
+      await tester.pumpAndSettle();
+
+      // Focused unselected segment.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(getOverlayColor(tester), paints..rect(color: overlayColor.withOpacity(0.1)));
+
+      // Focused selected segment.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(getOverlayColor(tester), paints..rect(color: overlayColor.withOpacity(0.1)));
+    },
+  );
 }

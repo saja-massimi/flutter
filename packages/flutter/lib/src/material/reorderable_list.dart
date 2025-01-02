@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// @docImport 'package:flutter_test/flutter_test.dart';
+///
+/// @docImport 'card.dart';
+library;
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/gestures.dart';
@@ -97,11 +102,12 @@ class ReorderableListView extends StatefulWidget {
     this.restorationId,
     this.clipBehavior = Clip.hardEdge,
     this.autoScrollerVelocityScalar,
+    this.dragBoundaryProvider,
   }) : assert(
-        (itemExtent == null && prototypeItem == null) ||
-        (itemExtent == null && itemExtentBuilder == null) ||
-        (prototypeItem == null && itemExtentBuilder == null),
-        'You can only pass one of itemExtent, prototypeItem and itemExtentBuilder.',
+         (itemExtent == null && prototypeItem == null) ||
+             (itemExtent == null && itemExtentBuilder == null) ||
+             (prototypeItem == null && itemExtentBuilder == null),
+         'You can only pass one of itemExtent, prototypeItem and itemExtentBuilder.',
        ),
        assert(
          children.every((Widget w) => w.key != null),
@@ -166,11 +172,12 @@ class ReorderableListView extends StatefulWidget {
     this.restorationId,
     this.clipBehavior = Clip.hardEdge,
     this.autoScrollerVelocityScalar,
+    this.dragBoundaryProvider,
   }) : assert(itemCount >= 0),
        assert(
          (itemExtent == null && prototypeItem == null) ||
-         (itemExtent == null && itemExtentBuilder == null) ||
-         (prototypeItem == null && itemExtentBuilder == null),
+             (itemExtent == null && itemExtentBuilder == null) ||
+             (prototypeItem == null && itemExtentBuilder == null),
          'You can only pass one of itemExtent, prototypeItem and itemExtentBuilder.',
        );
 
@@ -214,7 +221,7 @@ class ReorderableListView extends StatefulWidget {
   ///
   ///
   /// ** See code in examples/api/lib/material/reorderable_list/reorderable_list_view.build_default_drag_handles.0.dart **
-  ///{@end-tool}
+  /// {@end-tool}
   final bool buildDefaultDragHandles;
 
   /// {@macro flutter.widgets.reorderable_list.padding}
@@ -287,6 +294,9 @@ class ReorderableListView extends StatefulWidget {
   /// {@macro flutter.widgets.SliverReorderableList.autoScrollerVelocityScalar.default}
   final double? autoScrollerVelocityScalar;
 
+  /// {@macro flutter.widgets.reorderable_list.dragBoundaryProvider}
+  final ReorderDragBoundaryProvider? dragBoundaryProvider;
+
   @override
   State<ReorderableListView> createState() => _ReorderableListViewState();
 }
@@ -296,9 +306,7 @@ class _ReorderableListViewState extends State<ReorderableListView> {
     final Widget item = widget.itemBuilder(context, index);
     assert(() {
       if (item.key == null) {
-        throw FlutterError(
-          'Every item of ReorderableListView must have a key.',
-        );
+        throw FlutterError('Every item of ReorderableListView must have a key.');
       }
       return true;
     }());
@@ -356,18 +364,11 @@ class _ReorderableListViewState extends State<ReorderableListView> {
         case TargetPlatform.iOS:
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
-          return ReorderableDelayedDragStartListener(
-            key: itemGlobalKey,
-            index: index,
-            child: item,
-          );
+          return ReorderableDelayedDragStartListener(key: itemGlobalKey, index: index, child: item);
       }
     }
 
-    return KeyedSubtree(
-      key: itemGlobalKey,
-      child: item,
-    );
+    return KeyedSubtree(key: itemGlobalKey, child: item);
   }
 
   Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
@@ -376,10 +377,7 @@ class _ReorderableListViewState extends State<ReorderableListView> {
       builder: (BuildContext context, Widget? child) {
         final double animValue = Curves.easeInOut.transform(animation.value);
         final double elevation = lerpDouble(0, 6, animValue)!;
-        return Material(
-          elevation: elevation,
-          child: child,
-        );
+        return Material(elevation: elevation, child: child);
       },
       child: child,
     );
@@ -393,38 +391,29 @@ class _ReorderableListViewState extends State<ReorderableListView> {
     // If there is a header or footer we can't just apply the padding to the list,
     // so we break it up into padding for the header, footer and padding for the list.
     final EdgeInsets padding = widget.padding ?? EdgeInsets.zero;
-    late final EdgeInsets headerPadding;
-    late final EdgeInsets footerPadding;
-    late final EdgeInsets listPadding;
-
-    if (widget.header == null && widget.footer == null) {
-      headerPadding = EdgeInsets.zero;
-      footerPadding = EdgeInsets.zero;
-      listPadding = padding;
-    } else if (widget.header != null || widget.footer != null) {
-      switch (widget.scrollDirection) {
-        case Axis.horizontal:
-          if (widget.reverse) {
-            headerPadding = EdgeInsets.fromLTRB(0, padding.top, padding.right, padding.bottom);
-            listPadding = EdgeInsets.fromLTRB(widget.footer != null ? 0 : padding.left, padding.top, widget.header != null ? 0 : padding.right, padding.bottom);
-            footerPadding = EdgeInsets.fromLTRB(padding.left, padding.top, 0, padding.bottom);
-          } else {
-            headerPadding = EdgeInsets.fromLTRB(padding.left, padding.top, 0, padding.bottom);
-            listPadding = EdgeInsets.fromLTRB(widget.header != null ? 0 : padding.left, padding.top, widget.footer != null ? 0 : padding.right, padding.bottom);
-            footerPadding = EdgeInsets.fromLTRB(0, padding.top, padding.right, padding.bottom);
-          }
-        case Axis.vertical:
-          if (widget.reverse) {
-            headerPadding = EdgeInsets.fromLTRB(padding.left, 0, padding.right, padding.bottom);
-            listPadding = EdgeInsets.fromLTRB(padding.left, widget.footer != null ? 0 : padding.top, padding.right, widget.header != null ? 0 : padding.bottom);
-            footerPadding = EdgeInsets.fromLTRB(padding.left, padding.top, padding.right, 0);
-          } else {
-            headerPadding = EdgeInsets.fromLTRB(padding.left, padding.top, padding.right, 0);
-            listPadding = EdgeInsets.fromLTRB(padding.left, widget.header != null ? 0 : padding.top, padding.right, widget.footer != null ? 0 : padding.bottom);
-            footerPadding = EdgeInsets.fromLTRB(padding.left, 0, padding.right, padding.bottom);
-          }
-      }
+    double? start = widget.header == null ? null : 0.0;
+    double? end = widget.footer == null ? null : 0.0;
+    if (widget.reverse) {
+      (start, end) = (end, start);
     }
+
+    final EdgeInsets startPadding, endPadding, listPadding;
+    (startPadding, endPadding, listPadding) = switch (widget.scrollDirection) {
+      Axis.horizontal ||
+      Axis.vertical when (start ?? end) == null => (EdgeInsets.zero, EdgeInsets.zero, padding),
+      Axis.horizontal => (
+        padding.copyWith(left: 0),
+        padding.copyWith(right: 0),
+        padding.copyWith(left: start, right: end),
+      ),
+      Axis.vertical => (
+        padding.copyWith(top: 0),
+        padding.copyWith(bottom: 0),
+        padding.copyWith(top: start, bottom: end),
+      ),
+    };
+    final (EdgeInsets headerPadding, EdgeInsets footerPadding) =
+        widget.reverse ? (startPadding, endPadding) : (endPadding, startPadding);
 
     return CustomScrollView(
       scrollDirection: widget.scrollDirection,
@@ -441,10 +430,7 @@ class _ReorderableListViewState extends State<ReorderableListView> {
       clipBehavior: widget.clipBehavior,
       slivers: <Widget>[
         if (widget.header != null)
-          SliverPadding(
-            padding: headerPadding,
-            sliver: SliverToBoxAdapter(child: widget.header),
-          ),
+          SliverPadding(padding: headerPadding, sliver: SliverToBoxAdapter(child: widget.header)),
         SliverPadding(
           padding: listPadding,
           sliver: SliverReorderableList(
@@ -458,13 +444,11 @@ class _ReorderableListViewState extends State<ReorderableListView> {
             onReorderEnd: widget.onReorderEnd,
             proxyDecorator: widget.proxyDecorator ?? _proxyDecorator,
             autoScrollerVelocityScalar: widget.autoScrollerVelocityScalar,
+            dragBoundaryProvider: widget.dragBoundaryProvider,
           ),
         ),
         if (widget.footer != null)
-          SliverPadding(
-            padding: footerPadding,
-            sliver: SliverToBoxAdapter(child: widget.footer),
-          ),
+          SliverPadding(padding: footerPadding, sliver: SliverToBoxAdapter(child: widget.footer)),
       ],
     );
   }
@@ -487,9 +471,9 @@ class _ReorderableListViewChildGlobalKey extends GlobalObjectKey {
     if (other.runtimeType != runtimeType) {
       return false;
     }
-    return other is _ReorderableListViewChildGlobalKey
-        && other.subKey == subKey
-        && other.state == state;
+    return other is _ReorderableListViewChildGlobalKey &&
+        other.subKey == subKey &&
+        other.state == state;
   }
 
   @override

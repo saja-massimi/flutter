@@ -5,23 +5,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class DependentWidget extends StatelessWidget {
-  const DependentWidget({
-    super.key,
-    required this.color,
-  });
+  const DependentWidget({super.key, required this.color});
 
   final Color color;
 
   @override
   Widget build(BuildContext context) {
     final Color resolved = CupertinoDynamicColor.resolve(color, context);
-    return DecoratedBox(
-      decoration: BoxDecoration(color: resolved),
-      child: const SizedBox.expand(),
-    );
+    return DecoratedBox(decoration: BoxDecoration(color: resolved), child: const SizedBox.expand());
   }
 }
 
@@ -99,7 +92,9 @@ const Color elevationDependentColor1 = CupertinoDynamicColor(
 
 void main() {
   test('== works as expected', () {
-    expect(dynamicColor, const CupertinoDynamicColor(
+    expect(
+      dynamicColor,
+      const CupertinoDynamicColor(
         color: color0,
         darkColor: color1,
         elevatedColor: color2,
@@ -115,36 +110,59 @@ void main() {
 
     expect(notSoDynamicColor1, isNot(contrastDependentColor1));
 
-    expect(vibrancyDependentColor1, isNot(const CupertinoDynamicColor(
-      color: color0,
-      elevatedColor: color0,
-      highContrastColor: color0,
-      highContrastElevatedColor: color0,
-      darkColor: color0,
-      darkHighContrastColor: color0,
-      darkElevatedColor: color0,
-      darkHighContrastElevatedColor: color0,
-    )));
+    expect(
+      vibrancyDependentColor1,
+      isNot(
+        const CupertinoDynamicColor(
+          color: color0,
+          elevatedColor: color0,
+          highContrastColor: color0,
+          highContrastElevatedColor: color0,
+          darkColor: color0,
+          darkHighContrastColor: color0,
+          darkElevatedColor: color0,
+          darkHighContrastElevatedColor: color0,
+        ),
+      ),
+    );
   });
 
   test('CupertinoDynamicColor.toString() works', () {
     expect(
       dynamicColor.toString(),
       contains(
-        'CupertinoDynamicColor(*color = Color(0xff000000)*, '
-        'darkColor = Color(0xff000001), '
-        'highContrastColor = Color(0xff000003), '
-        'darkHighContrastColor = Color(0xff000005), '
-        'elevatedColor = Color(0xff000002), '
-        'darkElevatedColor = Color(0xff000004), '
-        'highContrastElevatedColor = Color(0xff000006), '
-        'darkHighContrastElevatedColor = Color(0xff000007)',
+        'CupertinoDynamicColor(*color = ${const Color(0xff000000)}*, '
+        'darkColor = ${const Color(0xff000001)}, '
+        'highContrastColor = ${const Color(0xff000003)}, '
+        'darkHighContrastColor = ${const Color(0xff000005)}, '
+        'elevatedColor = ${const Color(0xff000002)}, '
+        'darkElevatedColor = ${const Color(0xff000004)}, '
+        'highContrastElevatedColor = ${const Color(0xff000006)}, '
+        'darkHighContrastElevatedColor = ${const Color(0xff000007)}',
       ),
     );
-    expect(notSoDynamicColor1.toString(), contains('CupertinoDynamicColor(*color = Color(0xff000000)*'));
-    expect(vibrancyDependentColor1.toString(), contains('CupertinoDynamicColor(*color = Color(0xff000001)*, darkColor = Color(0xff000000)'));
-    expect(contrastDependentColor1.toString(), contains('CupertinoDynamicColor(*color = Color(0xff000001)*, highContrastColor = Color(0xff000000)'));
-    expect(elevationDependentColor1.toString(), contains('CupertinoDynamicColor(*color = Color(0xff000001)*, elevatedColor = Color(0xff000000)'));
+    expect(
+      notSoDynamicColor1.toString(),
+      contains('CupertinoDynamicColor(*color = ${const Color(0xff000000)}*'),
+    );
+    expect(
+      vibrancyDependentColor1.toString(),
+      contains(
+        'CupertinoDynamicColor(*color = ${const Color(0xff000001)}*, darkColor = ${const Color(0xff000000)}',
+      ),
+    );
+    expect(
+      contrastDependentColor1.toString(),
+      contains(
+        'CupertinoDynamicColor(*color = ${const Color(0xff000001)}*, highContrastColor = ${const Color(0xff000000)}',
+      ),
+    );
+    expect(
+      elevationDependentColor1.toString(),
+      contains(
+        'CupertinoDynamicColor(*color = ${const Color(0xff000001)}*, elevatedColor = ${const Color(0xff000000)}',
+      ),
+    );
 
     expect(
       const CupertinoDynamicColor.withBrightnessAndContrast(
@@ -154,10 +172,10 @@ void main() {
         darkHighContrastColor: color3,
       ).toString(),
       contains(
-        'CupertinoDynamicColor(*color = Color(0xff000000)*, '
-        'darkColor = Color(0xff000001), '
-        'highContrastColor = Color(0xff000002), '
-        'darkHighContrastColor = Color(0xff000003)',
+        'CupertinoDynamicColor(*color = ${const Color(0xff000000)}*, '
+        'darkColor = ${const Color(0xff000001)}, '
+        'highContrastColor = ${const Color(0xff000002)}, '
+        'darkHighContrastColor = ${const Color(0xff000003)}',
       ),
     );
   });
@@ -167,51 +185,56 @@ void main() {
   });
 
   test('withVibrancy constructor creates colors that may depend on vibrancy', () {
-    expect(vibrancyDependentColor1, const CupertinoDynamicColor.withBrightness(
-      color: color1,
-      darkColor: color0,
-    ));
-  });
-
-  test('withVibrancyAndContrast constructor creates colors that may depend on contrast and vibrancy', () {
-    expect(contrastDependentColor1, const CupertinoDynamicColor.withBrightnessAndContrast(
-      color: color1,
-      darkColor: color1,
-      highContrastColor: color0,
-      darkHighContrastColor: color0,
-    ));
-
     expect(
-      const CupertinoDynamicColor(
-        color: color0,
-        darkColor: color1,
-        highContrastColor: color2,
-        darkHighContrastColor: color3,
-        elevatedColor: color0,
-        darkElevatedColor: color1,
-        highContrastElevatedColor: color2,
-        darkHighContrastElevatedColor: color3,
-      ),
-      const CupertinoDynamicColor.withBrightnessAndContrast(
-        color: color0,
-        darkColor: color1,
-        highContrastColor: color2,
-        darkHighContrastColor: color3,
-      ),
+      vibrancyDependentColor1,
+      const CupertinoDynamicColor.withBrightness(color: color1, darkColor: color0),
     );
   });
 
-  testWidgetsWithLeakTracking(
-    'Dynamic colors that are not actually dynamic should not claim dependencies',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(const DependentWidget(color: notSoDynamicColor1));
+  test(
+    'withVibrancyAndContrast constructor creates colors that may depend on contrast and vibrancy',
+    () {
+      expect(
+        contrastDependentColor1,
+        const CupertinoDynamicColor.withBrightnessAndContrast(
+          color: color1,
+          darkColor: color1,
+          highContrastColor: color0,
+          darkHighContrastColor: color0,
+        ),
+      );
 
-      expect(tester.takeException(), null);
-      expect(find.byType(DependentWidget), paints..rect(color: color0));
+      expect(
+        const CupertinoDynamicColor(
+          color: color0,
+          darkColor: color1,
+          highContrastColor: color2,
+          darkHighContrastColor: color3,
+          elevatedColor: color0,
+          darkElevatedColor: color1,
+          highContrastElevatedColor: color2,
+          darkHighContrastElevatedColor: color3,
+        ),
+        const CupertinoDynamicColor.withBrightnessAndContrast(
+          color: color0,
+          darkColor: color1,
+          highContrastColor: color2,
+          darkHighContrastColor: color3,
+        ),
+      );
     },
   );
 
-  testWidgetsWithLeakTracking(
+  testWidgets('Dynamic colors that are not actually dynamic should not claim dependencies', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const DependentWidget(color: notSoDynamicColor1));
+
+    expect(tester.takeException(), null);
+    expect(find.byType(DependentWidget), paints..rect(color: color0));
+  });
+
+  testWidgets(
     'Dynamic colors that are only dependent on vibrancy should not claim unnecessary dependencies, '
     'and its resolved color should change when its dependency changes',
     (WidgetTester tester) async {
@@ -255,7 +278,7 @@ void main() {
     },
   );
 
-  testWidgetsWithLeakTracking(
+  testWidgets(
     'Dynamic colors that are only dependent on accessibility contrast should not claim unnecessary dependencies, '
     'and its resolved color should change when its dependency changes',
     (WidgetTester tester) async {
@@ -284,7 +307,7 @@ void main() {
     },
   );
 
-  testWidgetsWithLeakTracking(
+  testWidgets(
     'Dynamic colors that are only dependent on elevation level should not claim unnecessary dependencies, '
     'and its resolved color should change when its dependency changes',
     (WidgetTester tester) async {
@@ -313,7 +336,7 @@ void main() {
     },
   );
 
-  testWidgetsWithLeakTracking('Dynamic color with all 3 dependencies works', (WidgetTester tester) async {
+  testWidgets('Dynamic color with all 3 dependencies works', (WidgetTester tester) async {
     const Color dynamicRainbowColor1 = CupertinoDynamicColor(
       color: color0,
       darkColor: color1,
@@ -414,14 +437,28 @@ void main() {
     expect(find.byType(DependentWidget), paints..rect(color: color7));
   });
 
-  testWidgetsWithLeakTracking('CupertinoDynamicColor used in a CupertinoTheme', (WidgetTester tester) async {
+  testWidgets('CupertinoDynamicColor toARGB32() is the same as value', (WidgetTester tester) async {
     late CupertinoDynamicColor color;
     await tester.pumpWidget(
       CupertinoApp(
-        theme: const CupertinoThemeData(
-          brightness: Brightness.dark,
-          primaryColor: dynamicColor,
+        theme: const CupertinoThemeData(brightness: Brightness.dark, primaryColor: dynamicColor),
+        home: Builder(
+          builder: (BuildContext context) {
+            color = CupertinoTheme.of(context).primaryColor as CupertinoDynamicColor;
+            return const Placeholder();
+          },
         ),
+      ),
+    );
+
+    expect(color.value, color.toARGB32());
+  });
+
+  testWidgets('CupertinoDynamicColor used in a CupertinoTheme', (WidgetTester tester) async {
+    late CupertinoDynamicColor color;
+    await tester.pumpWidget(
+      CupertinoApp(
+        theme: const CupertinoThemeData(brightness: Brightness.dark, primaryColor: dynamicColor),
         home: Builder(
           builder: (BuildContext context) {
             color = CupertinoTheme.of(context).primaryColor as CupertinoDynamicColor;
@@ -436,10 +473,7 @@ void main() {
     // Changing dependencies works.
     await tester.pumpWidget(
       CupertinoApp(
-        theme: const CupertinoThemeData(
-          brightness: Brightness.light,
-          primaryColor: dynamicColor,
-        ),
+        theme: const CupertinoThemeData(brightness: Brightness.light, primaryColor: dynamicColor),
         home: Builder(
           builder: (BuildContext context) {
             color = CupertinoTheme.of(context).primaryColor as CupertinoDynamicColor;
@@ -497,9 +531,11 @@ void main() {
 
   group('MaterialApp:', () {
     Color? color;
-    setUp(() { color = null; });
+    setUp(() {
+      color = null;
+    });
 
-    testWidgetsWithLeakTracking('dynamic color works in cupertino override theme', (WidgetTester tester) async {
+    testWidgets('dynamic color works in cupertino override theme', (WidgetTester tester) async {
       CupertinoDynamicColor typedColor() => color! as CupertinoDynamicColor;
 
       await tester.pumpWidget(
@@ -556,7 +592,7 @@ void main() {
       expect(typedColor().value, dynamicColor.darkHighContrastElevatedColor.value);
     });
 
-    testWidgetsWithLeakTracking('dynamic color does not work in a material theme', (WidgetTester tester) async {
+    testWidgets('dynamic color does not work in a material theme', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           // This will create a MaterialBasedCupertinoThemeData with primaryColor set to `dynamicColor`.

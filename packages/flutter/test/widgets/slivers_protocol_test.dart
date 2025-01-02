@@ -7,7 +7,6 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void verifyPaintPosition(GlobalKey key, Offset ideal) {
   final RenderObject target = key.currentContext!.findRenderObject()!;
@@ -18,7 +17,7 @@ void verifyPaintPosition(GlobalKey key, Offset ideal) {
 }
 
 void main() {
-  testWidgetsWithLeakTracking('Sliver protocol', (WidgetTester tester) async {
+  testWidgets('Sliver protocol', (WidgetTester tester) async {
     GlobalKey key1, key2, key3, key4, key5;
     await tester.pumpWidget(
       Directionality(
@@ -35,7 +34,10 @@ void main() {
       ),
     );
     final ScrollPosition position = tester.state<ScrollableState>(find.byType(Scrollable)).position;
-    const double max = RenderBigSliver.height * 3.0 + (RenderOverlappingSliver.totalHeight) * 2.0 - 600.0; // 600 is the height of the test viewport
+    const double max =
+        RenderBigSliver.height * 3.0 +
+        (RenderOverlappingSliver.totalHeight) * 2.0 -
+        600.0; // 600 is the height of the test viewport
     assert(max < 10000.0);
     expect(max, 1450.0);
     expect(position.pixels, 0.0);
@@ -56,7 +58,8 @@ void main() {
 
 class RenderBigSliver extends RenderSliver {
   static const double height = 550.0;
-  double get paintExtent => (height - constraints.scrollOffset).clamp(0.0, constraints.remainingPaintExtent);
+  double get paintExtent =>
+      (height - constraints.scrollOffset).clamp(0.0, constraints.remainingPaintExtent);
 
   @override
   void performLayout() {
@@ -69,7 +72,7 @@ class RenderBigSliver extends RenderSliver {
 }
 
 class BigSliver extends LeafRenderObjectWidget {
-  const BigSliver({ super.key });
+  const BigSliver({super.key});
   @override
   RenderBigSliver createRenderObject(BuildContext context) {
     return RenderBigSliver();
@@ -82,12 +85,9 @@ class RenderOverlappingSliver extends RenderSliver {
 
   double get paintExtent {
     return math.min(
-             math.max(
-               fixedHeight,
-               totalHeight - constraints.scrollOffset,
-             ),
-             constraints.remainingPaintExtent,
-           );
+      math.max(fixedHeight, totalHeight - constraints.scrollOffset),
+      constraints.remainingPaintExtent,
+    );
   }
 
   double get layoutExtent {
@@ -106,7 +106,7 @@ class RenderOverlappingSliver extends RenderSliver {
 }
 
 class OverlappingSliver extends LeafRenderObjectWidget {
-  const OverlappingSliver({ super.key });
+  const OverlappingSliver({super.key});
   @override
   RenderOverlappingSliver createRenderObject(BuildContext context) {
     return RenderOverlappingSliver();

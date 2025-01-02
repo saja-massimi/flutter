@@ -7,12 +7,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgetsWithLeakTracking('has correct backdrop filters', (WidgetTester tester) async {
+  testWidgets('has correct backdrop filters', (WidgetTester tester) async {
     await tester.pumpWidget(
       CupertinoApp(
         home: Center(
@@ -47,14 +46,11 @@ void main() {
       // kIsWeb.
       kIsWeb
           ? ImageFilter.blur().runtimeType
-          : ImageFilter.compose(
-              outer: ImageFilter.blur(),
-              inner: ImageFilter.blur(),
-            ).runtimeType,
+          : ImageFilter.compose(outer: ImageFilter.blur(), inner: ImageFilter.blur()).runtimeType,
     );
   });
 
-  testWidgetsWithLeakTracking('has shadow', (WidgetTester tester) async {
+  testWidgets('has shadow', (WidgetTester tester) async {
     await tester.pumpWidget(
       CupertinoApp(
         home: Center(
@@ -78,13 +74,10 @@ void main() {
       ),
     );
 
-    expect(
-      (decoratedBox.decoration as BoxDecoration).boxShadow,
-      isNotNull,
-    );
+    expect((decoratedBox.decoration as BoxDecoration).boxShadow, isNotNull);
   });
 
-  testWidgetsWithLeakTracking('is translucent', (WidgetTester tester) async {
+  testWidgets('is translucent', (WidgetTester tester) async {
     await tester.pumpWidget(
       CupertinoApp(
         home: Center(
@@ -111,13 +104,10 @@ void main() {
         // The second DecoratedBox should be the one with color.
         .elementAt(1);
 
-    expect(
-      (decoratedBox.decoration as BoxDecoration).color!.opacity,
-      lessThan(1.0),
-    );
+    expect((decoratedBox.decoration as BoxDecoration).color!.opacity, lessThan(1.0));
   });
 
-  testWidgetsWithLeakTracking('positions itself at the anchor', (WidgetTester tester) async {
+  testWidgets('positions itself at the anchor', (WidgetTester tester) async {
     // An arbitrary point on the screen to position at.
     const Offset anchor = Offset(30.0, 40.0);
 
@@ -138,8 +128,7 @@ void main() {
     );
 
     expect(
-      tester
-          .getTopLeft(find.byType(CupertinoDesktopTextSelectionToolbarButton)),
+      tester.getTopLeft(find.byType(CupertinoDesktopTextSelectionToolbarButton)),
       // Greater than due to padding internal to the toolbar.
       greaterThan(anchor),
     );

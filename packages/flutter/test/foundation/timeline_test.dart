@@ -18,10 +18,7 @@ void main() {
   test('Does not collect when collection not enabled', () {
     FlutterTimeline.startSync('TEST');
     FlutterTimeline.finishSync();
-    expect(
-      () => FlutterTimeline.debugCollect(),
-      throwsStateError,
-    );
+    expect(() => FlutterTimeline.debugCollect(), throwsStateError);
   });
 
   test('Collects when collection is enabled', () {
@@ -72,7 +69,8 @@ void main() {
     // a bit inconsistent with Stopwatch.
     final int start = FlutterTimeline.now - 1;
     FlutterTimeline.timeSync('TEST', () {
-      final Stopwatch watch = Stopwatch()..start();
+      final Stopwatch watch = Stopwatch()..start(); // flutter_ignore: stopwatch (see analyze.dart)
+      // Ignore context: Used safely for benchmarking.
       while (watch.elapsedMilliseconds < 5) {}
       watch.stop();
     });

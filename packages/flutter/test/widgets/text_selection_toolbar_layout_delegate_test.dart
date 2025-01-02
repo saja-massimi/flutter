@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('positions itself at anchorAbove if it fits', (WidgetTester tester) async {
+  testWidgets('positions itself at anchorAbove if it fits', (WidgetTester tester) async {
     late StateSetter setState;
     const double height = 43.0;
     const double anchorBelowY = 500.0;
@@ -26,11 +25,7 @@ void main() {
                   anchorAbove: Offset(50.0, anchorAboveY),
                   anchorBelow: const Offset(50.0, anchorBelowY),
                 ),
-                child: Container(
-                  width: 200.0,
-                  height: height,
-                  color: const Color(0xffff0000),
-                ),
+                child: Container(width: 200.0, height: height, color: const Color(0xffff0000)),
               );
             },
           ),

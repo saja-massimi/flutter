@@ -5,10 +5,9 @@
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Does not animate if already at target position', (WidgetTester tester) async {
+  testWidgets('Does not animate if already at target position', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
     await tester.pumpWidget(
@@ -16,20 +15,29 @@ void main() {
         textDirection: TextDirection.ltr,
         child: ListView(
           controller: controller,
-          children: List<Widget>.generate(80, (int i) => Text('$i', textDirection: TextDirection.ltr)),
+          children: List<Widget>.generate(
+            80,
+            (int i) => Text('$i', textDirection: TextDirection.ltr),
+          ),
         ),
       ),
     );
 
     expectNoAnimation();
     final double currentPosition = controller.position.pixels;
-    controller.position.animateTo(currentPosition, duration: const Duration(seconds: 10), curve: Curves.linear);
+    controller.position.animateTo(
+      currentPosition,
+      duration: const Duration(seconds: 10),
+      curve: Curves.linear,
+    );
 
     expectNoAnimation();
     expect(controller.position.pixels, currentPosition);
   });
 
-  testWidgetsWithLeakTracking('Does not animate if already at target position within tolerance', (WidgetTester tester) async {
+  testWidgets('Does not animate if already at target position within tolerance', (
+    WidgetTester tester,
+  ) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
     await tester.pumpWidget(
@@ -37,23 +45,31 @@ void main() {
         textDirection: TextDirection.ltr,
         child: ListView(
           controller: controller,
-          children: List<Widget>.generate(80, (int i) => Text('$i', textDirection: TextDirection.ltr)),
+          children: List<Widget>.generate(
+            80,
+            (int i) => Text('$i', textDirection: TextDirection.ltr),
+          ),
         ),
       ),
     );
 
     expectNoAnimation();
 
-    final double halfTolerance = controller.position.physics.toleranceFor(controller.position).distance / 2;
+    final double halfTolerance =
+        controller.position.physics.toleranceFor(controller.position).distance / 2;
     expect(halfTolerance, isNonZero);
     final double targetPosition = controller.position.pixels + halfTolerance;
-    controller.position.animateTo(targetPosition, duration: const Duration(seconds: 10), curve: Curves.linear);
+    controller.position.animateTo(
+      targetPosition,
+      duration: const Duration(seconds: 10),
+      curve: Curves.linear,
+    );
 
     expectNoAnimation();
     expect(controller.position.pixels, targetPosition);
   });
 
-  testWidgetsWithLeakTracking('Animates if going to a position outside of tolerance', (WidgetTester tester) async {
+  testWidgets('Animates if going to a position outside of tolerance', (WidgetTester tester) async {
     final ScrollController controller = ScrollController();
     addTearDown(controller.dispose);
     await tester.pumpWidget(
@@ -61,22 +77,38 @@ void main() {
         textDirection: TextDirection.ltr,
         child: ListView(
           controller: controller,
-          children: List<Widget>.generate(80, (int i) => Text('$i', textDirection: TextDirection.ltr)),
+          children: List<Widget>.generate(
+            80,
+            (int i) => Text('$i', textDirection: TextDirection.ltr),
+          ),
         ),
       ),
     );
 
     expectNoAnimation();
 
-    final double doubleTolerance = controller.position.physics.toleranceFor(controller.position).distance * 2;
+    final double doubleTolerance =
+        controller.position.physics.toleranceFor(controller.position).distance * 2;
     expect(doubleTolerance, isNonZero);
     final double targetPosition = controller.position.pixels + doubleTolerance;
-    controller.position.animateTo(targetPosition, duration: const Duration(seconds: 10), curve: Curves.linear);
+    controller.position.animateTo(
+      targetPosition,
+      duration: const Duration(seconds: 10),
+      curve: Curves.linear,
+    );
 
-    expect(SchedulerBinding.instance.transientCallbackCount, equals(1), reason: 'Expected an animation.');
+    expect(
+      SchedulerBinding.instance.transientCallbackCount,
+      equals(1),
+      reason: 'Expected an animation.',
+    );
   });
 }
 
 void expectNoAnimation() {
-  expect(SchedulerBinding.instance.transientCallbackCount, equals(0), reason: 'Expected no animation.');
+  expect(
+    SchedulerBinding.instance.transientCallbackCount,
+    equals(0),
+    reason: 'Expected no animation.',
+  );
 }

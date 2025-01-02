@@ -5,7 +5,6 @@
 import 'package:flutter/gestures.dart' show kPressTimeout;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 bool confirmCalled = false;
 bool cancelCalled = false;
@@ -77,7 +76,7 @@ void main() {
     cancelCalled = false;
   });
 
-  testWidgetsWithLeakTracking('Tapping should never cause a splash', (WidgetTester tester) async {
+  testWidgets('Tapping should never cause a splash', (WidgetTester tester) async {
     final Key textField1 = UniqueKey();
     final Key textField2 = UniqueKey();
 
@@ -90,18 +89,8 @@ void main() {
               alignment: Alignment.topLeft,
               child: Column(
                 children: <Widget>[
-                  TextField(
-                    key: textField1,
-                    decoration: const InputDecoration(
-                      labelText: 'label',
-                    ),
-                  ),
-                  TextField(
-                    key: textField2,
-                    decoration: const InputDecoration(
-                      labelText: 'label',
-                    ),
-                  ),
+                  TextField(key: textField1, decoration: const InputDecoration(labelText: 'label')),
+                  TextField(key: textField2, decoration: const InputDecoration(labelText: 'label')),
                 ],
               ),
             ),
@@ -136,7 +125,7 @@ void main() {
     expect(cancelCalled, isFalse);
   });
 
-  testWidgetsWithLeakTracking('Splash should never be created or canceled', (WidgetTester tester) async {
+  testWidgets('Splash should never be created or canceled', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Theme(
@@ -144,20 +133,9 @@ void main() {
           child: Material(
             child: ListView(
               children: <Widget>[
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'label1',
-                  ),
-                ),
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'label2',
-                  ),
-                ),
-                Container(
-                  height: 1000.0,
-                  color: const Color(0xFF00FF00),
-                ),
+                const TextField(decoration: InputDecoration(labelText: 'label1')),
+                const TextField(decoration: InputDecoration(labelText: 'label2')),
+                Container(height: 1000.0, color: const Color(0xFF00FF00)),
               ],
             ),
           ),

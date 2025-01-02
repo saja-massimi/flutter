@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Directionality', (WidgetTester tester) async {
+  testWidgets('Directionality', (WidgetTester tester) async {
     final List<TextDirection> log = <TextDirection>[];
     final Widget inner = Builder(
       builder: (BuildContext context) {
@@ -15,56 +14,33 @@ void main() {
         return const Placeholder();
       },
     );
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: inner,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.ltr, child: inner));
     expect(log, <TextDirection>[TextDirection.ltr]);
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: inner,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.ltr, child: inner));
     expect(log, <TextDirection>[TextDirection.ltr]);
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.rtl,
-        child: inner,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.rtl, child: inner));
     expect(log, <TextDirection>[TextDirection.ltr, TextDirection.rtl]);
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.rtl,
-        child: inner,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.rtl, child: inner));
     expect(log, <TextDirection>[TextDirection.ltr, TextDirection.rtl]);
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: inner,
-      ),
-    );
+    await tester.pumpWidget(Directionality(textDirection: TextDirection.ltr, child: inner));
     expect(log, <TextDirection>[TextDirection.ltr, TextDirection.rtl, TextDirection.ltr]);
   });
 
-  testWidgetsWithLeakTracking('Directionality default', (WidgetTester tester) async {
+  testWidgets('Directionality default', (WidgetTester tester) async {
     bool good = false;
-    await tester.pumpWidget(Builder(
-      builder: (BuildContext context) {
-        expect(Directionality.maybeOf(context), isNull);
-        good = true;
-        return const Placeholder();
-      },
-    ));
+    await tester.pumpWidget(
+      Builder(
+        builder: (BuildContext context) {
+          expect(Directionality.maybeOf(context), isNull);
+          good = true;
+          return const Placeholder();
+        },
+      ),
+    );
     expect(good, isTrue);
   });
 
-  testWidgetsWithLeakTracking('Directionality.maybeOf', (WidgetTester tester) async {
+  testWidgets('Directionality.maybeOf', (WidgetTester tester) async {
     final GlobalKey hasDirectionality = GlobalKey();
     final GlobalKey noDirectionality = GlobalKey();
     await tester.pumpWidget(
@@ -72,9 +48,7 @@ void main() {
         key: noDirectionality,
         child: Directionality(
           textDirection: TextDirection.rtl,
-          child: Container(
-            key: hasDirectionality,
-          ),
+          child: Container(key: hasDirectionality),
         ),
       ),
     );
@@ -82,7 +56,7 @@ void main() {
     expect(Directionality.maybeOf(hasDirectionality.currentContext!), TextDirection.rtl);
   });
 
-  testWidgetsWithLeakTracking('Directionality.of', (WidgetTester tester) async {
+  testWidgets('Directionality.of', (WidgetTester tester) async {
     final GlobalKey hasDirectionality = GlobalKey();
     final GlobalKey noDirectionality = GlobalKey();
     await tester.pumpWidget(
@@ -90,17 +64,20 @@ void main() {
         key: noDirectionality,
         child: Directionality(
           textDirection: TextDirection.rtl,
-          child: Container(
-            key: hasDirectionality,
-          ),
+          child: Container(key: hasDirectionality),
         ),
       ),
     );
-    expect(() => Directionality.of(noDirectionality.currentContext!), throwsA(isAssertionError.having(
-      (AssertionError e) => e.message,
-      'message',
-      contains('No Directionality widget found.'),
-    )));
+    expect(
+      () => Directionality.of(noDirectionality.currentContext!),
+      throwsA(
+        isAssertionError.having(
+          (AssertionError e) => e.message,
+          'message',
+          contains('No Directionality widget found.'),
+        ),
+      ),
+    );
     expect(Directionality.of(hasDirectionality.currentContext!), TextDirection.rtl);
   });
 }

@@ -5,10 +5,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('gets local coordinates', (WidgetTester tester) async {
+  testWidgets('gets local coordinates', (WidgetTester tester) async {
     int tapCount = 0;
     int tapCancelCount = 0;
     final List<TapDownDetails> downDetails = <TapDownDetails>[];
@@ -30,12 +29,7 @@ void main() {
           onTapUp: (TapUpDetails details) {
             upDetails.add(details);
           },
-          child: Container(
-            key: redContainer,
-            width: 100,
-            height: 150,
-            color: Colors.red,
-          ),
+          child: Container(key: redContainer, width: 100, height: 150, color: Colors.red),
         ),
       ),
     );
@@ -49,7 +43,9 @@ void main() {
     expect(upDetails.single.globalPosition, const Offset(400, 300));
   });
 
-  testWidgetsWithLeakTracking('kTouchSlop is evaluated in the global coordinate space when scaled up', (WidgetTester tester) async {
+  testWidgets('kTouchSlop is evaluated in the global coordinate space when scaled up', (
+    WidgetTester tester,
+  ) async {
     int tapCount = 0;
     int tapCancelCount = 0;
     final List<TapDownDetails> downDetails = <TapDownDetails>[];
@@ -57,31 +53,26 @@ void main() {
 
     final Key redContainer = UniqueKey();
     await tester.pumpWidget(
-        Center(
-          child: Transform.scale(
-            scale: 2.0,
-            child: GestureDetector(
-                onTap: () {
-                  tapCount++;
-                },
-                onTapCancel: () {
-                  tapCancelCount++;
-                },
-                onTapDown: (TapDownDetails details) {
-                  downDetails.add(details);
-                },
-                onTapUp: (TapUpDetails details) {
-                  upDetails.add(details);
-                },
-                child: Container(
-                  key: redContainer,
-                  width: 100,
-                  height: 150,
-                  color: Colors.red,
-                ),
-            ),
+      Center(
+        child: Transform.scale(
+          scale: 2.0,
+          child: GestureDetector(
+            onTap: () {
+              tapCount++;
+            },
+            onTapCancel: () {
+              tapCancelCount++;
+            },
+            onTapDown: (TapDownDetails details) {
+              downDetails.add(details);
+            },
+            onTapUp: (TapUpDetails details) {
+              upDetails.add(details);
+            },
+            child: Container(key: redContainer, width: 100, height: 150, color: Colors.red),
           ),
         ),
+      ),
     );
 
     // Move just below kTouchSlop should recognize tap.
@@ -112,7 +103,9 @@ void main() {
     expect(upDetails, isEmpty);
   });
 
-  testWidgetsWithLeakTracking('kTouchSlop is evaluated in the global coordinate space when scaled down', (WidgetTester tester) async {
+  testWidgets('kTouchSlop is evaluated in the global coordinate space when scaled down', (
+    WidgetTester tester,
+  ) async {
     int tapCount = 0;
     int tapCancelCount = 0;
     final List<TapDownDetails> downDetails = <TapDownDetails>[];
@@ -120,31 +113,26 @@ void main() {
 
     final Key redContainer = UniqueKey();
     await tester.pumpWidget(
-        Center(
-          child: Transform.scale(
-            scale: 0.5,
-            child: GestureDetector(
-                onTap: () {
-                  tapCount++;
-                },
-                onTapCancel: () {
-                  tapCancelCount++;
-                },
-                onTapDown: (TapDownDetails details) {
-                  downDetails.add(details);
-                },
-                onTapUp: (TapUpDetails details) {
-                  upDetails.add(details);
-                },
-                child: Container(
-                  key: redContainer,
-                  width: 100,
-                  height: 150,
-                  color: Colors.red,
-                ),
-            ),
+      Center(
+        child: Transform.scale(
+          scale: 0.5,
+          child: GestureDetector(
+            onTap: () {
+              tapCount++;
+            },
+            onTapCancel: () {
+              tapCancelCount++;
+            },
+            onTapDown: (TapDownDetails details) {
+              downDetails.add(details);
+            },
+            onTapUp: (TapUpDetails details) {
+              upDetails.add(details);
+            },
+            child: Container(key: redContainer, width: 100, height: 150, color: Colors.red),
           ),
         ),
+      ),
     );
 
     // Move just below kTouchSlop should recognize tap.

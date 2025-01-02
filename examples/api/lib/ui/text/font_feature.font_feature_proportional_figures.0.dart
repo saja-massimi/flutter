@@ -2,11 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
 
-/// Flutter code sample for [FontFeature.FontFeature.proportionalFigures].
+/// Flutter code sample for [FontFeature.proportionalFigures].
 
 void main() => runApp(const ExampleApp());
 
@@ -33,9 +31,7 @@ class ExampleWidget extends StatelessWidget {
       'Call 311-555-2368 now!',
       style: TextStyle(
         fontFamily: 'Kufam',
-        fontFeatures: <FontFeature>[
-          FontFeature.proportionalFigures(),
-        ],
+        fontFeatures: <FontFeature>[FontFeature.proportionalFigures()],
       ),
     );
   }

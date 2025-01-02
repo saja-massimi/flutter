@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class OrderPainter extends CustomPainter {
   const OrderPainter(this.index);
@@ -29,7 +28,7 @@ Widget log(int index) => CustomPaint(painter: OrderPainter(index));
 void main() {
   // NO DIRECTION
 
-  testWidgetsWithLeakTracking('Row with one Flexible child - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with one Flexible child - no textDirection', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -43,16 +42,18 @@ void main() {
     };
 
     // Default is MainAxisAlignment.start so this should fail, asking for a direction.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -60,7 +61,9 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with default main axis parameters - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with default main axis parameters - no textDirection', (
+    WidgetTester tester,
+  ) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -74,16 +77,18 @@ void main() {
     };
 
     // Default is MainAxisAlignment.start so this should fail too.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -91,7 +96,7 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.center - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.center - no textDirection', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -104,16 +109,18 @@ void main() {
     };
 
     // More than one child, so it's not clear what direction to lay out in: should fail.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -121,7 +128,7 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.end - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.end - no textDirection', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -135,17 +142,19 @@ void main() {
     };
 
     // No direction so this should fail, asking for a direction.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -153,7 +162,9 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceBetween - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceBetween - no textDirection', (
+    WidgetTester tester,
+  ) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -167,17 +178,19 @@ void main() {
     };
 
     // More than one child, so it's not clear what direction to lay out in: should fail.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -185,7 +198,9 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceAround - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceAround - no textDirection', (
+    WidgetTester tester,
+  ) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -200,18 +215,20 @@ void main() {
     };
 
     // More than one child, so it's not clear what direction to lay out in: should fail.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-          SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+            SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -219,7 +236,9 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceEvenly - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceEvenly - no textDirection', (
+    WidgetTester tester,
+  ) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -233,17 +252,19 @@ void main() {
     };
 
     // More than one child, so it's not clear what direction to lay out in: should fail.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -251,7 +272,7 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row and MainAxisSize.min - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row and MainAxisSize.min - no textDirection', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('rowKey');
     const Key child0Key = Key('child0');
@@ -264,16 +285,18 @@ void main() {
     };
 
     // Default is MainAxisAlignment.start so this should fail, asking for a direction.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     FlutterError.onError = oldHandler;
     expect(exception, isAssertionError);
@@ -281,35 +304,32 @@ void main() {
     expect(OrderPainter.log, <int>[]);
   });
 
-  testWidgetsWithLeakTracking('Row MainAxisSize.min layout at zero size - no textDirection', (WidgetTester tester) async {
+  testWidgets('Row MainAxisSize.min layout at zero size - no textDirection', (
+    WidgetTester tester,
+  ) async {
     OrderPainter.log.clear();
     const Key childKey = Key('childKey');
 
-    await tester.pumpWidget(const Center(
-      child: SizedBox.shrink(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              key: childKey,
-              width: 100.0,
-              height: 100.0,
-            ),
-          ],
+    await tester.pumpWidget(
+      const Center(
+        child: SizedBox.shrink(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[SizedBox(key: childKey, width: 100.0, height: 100.0)],
+          ),
         ),
       ),
-    ));
+    );
 
     final RenderBox renderBox = tester.renderObject(find.byKey(childKey));
     expect(renderBox.size.width, equals(100.0));
     expect(renderBox.size.height, equals(0.0));
   });
 
-
   // LTR
 
-  testWidgetsWithLeakTracking('Row with one Flexible child - LTR', (WidgetTester tester) async {
+  testWidgets('Row with one Flexible child - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -319,17 +339,19 @@ void main() {
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // Default is MainAxisAlignment.start so children so the children's
     // left edges should be at 0, 100, 700, child2's width should be 600
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -359,7 +381,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with default main axis parameters - LTR', (WidgetTester tester) async {
+  testWidgets('Row with default main axis parameters - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -369,17 +391,19 @@ void main() {
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // Default is MainAxisAlignment.start so children so the children's
     // left edges should be at 0, 100, 200
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -409,7 +433,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.center - LTR', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.center - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -417,17 +441,19 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's left edges should be at 300, 400
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.center,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.center,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -451,7 +477,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.end - LTR', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.end - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -460,18 +486,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's left edges should be at 500, 600, 700.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.ltr,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.ltr,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -501,7 +529,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceBetween - LTR', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceBetween - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -510,18 +538,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's left edges should be at 0, 350, 700
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -551,7 +581,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceAround - LTR', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceAround - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -561,19 +591,21 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's left edges should be at 50, 250, 450, 650
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-          SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+            SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -609,7 +641,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3, 4]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceEvenly - LTR', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceEvenly - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -618,18 +650,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 200x100 children's left edges should be at 50, 300, 550
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -659,7 +693,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row and MainAxisSize.min - LTR', (WidgetTester tester) async {
+  testWidgets('Row and MainAxisSize.min - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('rowKey');
     const Key child0Key = Key('child0');
@@ -667,17 +701,19 @@ void main() {
 
     // Row with MainAxisSize.min without flexible children shrink wraps.
     // Row's width should be 250, children should be at 0, 100.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisSize: MainAxisSize.min,
-        textDirection: TextDirection.ltr,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisSize: MainAxisSize.min,
+          textDirection: TextDirection.ltr,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -701,36 +737,31 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2]);
   });
 
-  testWidgetsWithLeakTracking('Row MainAxisSize.min layout at zero size - LTR', (WidgetTester tester) async {
+  testWidgets('Row MainAxisSize.min layout at zero size - LTR', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key childKey = Key('childKey');
 
-    await tester.pumpWidget(const Center(
-      child: SizedBox.shrink(
-        child: Row(
-          textDirection: TextDirection.ltr,
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              key: childKey,
-              width: 100.0,
-              height: 100.0,
-            ),
-          ],
+    await tester.pumpWidget(
+      const Center(
+        child: SizedBox.shrink(
+          child: Row(
+            textDirection: TextDirection.ltr,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[SizedBox(key: childKey, width: 100.0, height: 100.0)],
+          ),
         ),
       ),
-    ));
+    );
 
     final RenderBox renderBox = tester.renderObject(find.byKey(childKey));
     expect(renderBox.size.width, equals(100.0));
     expect(renderBox.size.height, equals(0.0));
   });
 
-
   // RTL
 
-  testWidgetsWithLeakTracking('Row with one Flexible child - RTL', (WidgetTester tester) async {
+  testWidgets('Row with one Flexible child - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -740,17 +771,19 @@ void main() {
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // Default is MainAxisAlignment.start so children so the children's
     // right edges should be at 0, 100, 700 from the right, child2's width should be 600
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            Expanded(child: SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2))),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -780,7 +813,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with default main axis parameters - RTL', (WidgetTester tester) async {
+  testWidgets('Row with default main axis parameters - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -790,17 +823,19 @@ void main() {
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // Default is MainAxisAlignment.start so children so the children's
     // right edges should be at 0, 100, 200 from the right
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -830,7 +865,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.center - RTL', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.center - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -838,17 +873,19 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's right edges should be at 300, 400 from the right
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.center,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.center,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -872,7 +909,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.end - RTL', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.end - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -881,18 +918,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's right edges should be at 500, 600, 700 from the right.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        textDirection: TextDirection.rtl,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -922,7 +961,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceBetween - RTL', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceBetween - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -931,18 +970,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's right edges should be at 0, 350, 700 from the right
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -972,7 +1013,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceAround - RTL', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceAround - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -982,19 +1023,21 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 100x100 children's right edges should be at 50, 250, 450, 650 from the right
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
-          SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 100.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 100.0, height: 100.0, child: log(3)),
+            SizedBox(key: child3Key, width: 100.0, height: 100.0, child: log(4)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -1030,7 +1073,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3, 4]);
   });
 
-  testWidgetsWithLeakTracking('Row with MainAxisAlignment.spaceEvenly - RTL', (WidgetTester tester) async {
+  testWidgets('Row with MainAxisAlignment.spaceEvenly - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('row');
     const Key child0Key = Key('child0');
@@ -1039,18 +1082,20 @@ void main() {
 
     // Default is MainAxisSize.max so the Row should be as wide as the test: 800.
     // The 200x100 children's right edges should be at 50, 300, 550 from the right
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
-          SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 200.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 200.0, height: 100.0, child: log(2)),
+            SizedBox(key: child2Key, width: 200.0, height: 100.0, child: log(3)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -1080,7 +1125,7 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2, 3]);
   });
 
-  testWidgetsWithLeakTracking('Row and MainAxisSize.min - RTL', (WidgetTester tester) async {
+  testWidgets('Row and MainAxisSize.min - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key rowKey = Key('rowKey');
     const Key child0Key = Key('child0');
@@ -1088,17 +1133,19 @@ void main() {
 
     // Row with MainAxisSize.min without flexible children shrink wraps.
     // Row's width should be 250, children should be at 0, 100 from right.
-    await tester.pumpWidget(Center(
-      child: Row(
-        key: rowKey,
-        mainAxisSize: MainAxisSize.min,
-        textDirection: TextDirection.rtl,
-        children: <Widget>[
-          SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
-          SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
-        ],
+    await tester.pumpWidget(
+      Center(
+        child: Row(
+          key: rowKey,
+          mainAxisSize: MainAxisSize.min,
+          textDirection: TextDirection.rtl,
+          children: <Widget>[
+            SizedBox(key: child0Key, width: 100.0, height: 100.0, child: log(1)),
+            SizedBox(key: child1Key, width: 150.0, height: 100.0, child: log(2)),
+          ],
+        ),
       ),
-    ));
+    );
 
     RenderBox renderBox;
     BoxParentData boxParentData;
@@ -1122,29 +1169,62 @@ void main() {
     expect(OrderPainter.log, <int>[1, 2]);
   });
 
-  testWidgetsWithLeakTracking('Row MainAxisSize.min layout at zero size - RTL', (WidgetTester tester) async {
+  testWidgets('Row MainAxisSize.min layout at zero size - RTL', (WidgetTester tester) async {
     OrderPainter.log.clear();
     const Key childKey = Key('childKey');
 
-    await tester.pumpWidget(const Center(
-      child: SizedBox.shrink(
-        child: Row(
-          textDirection: TextDirection.rtl,
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              key: childKey,
-              width: 100.0,
-              height: 100.0,
-            ),
-          ],
+    await tester.pumpWidget(
+      const Center(
+        child: SizedBox.shrink(
+          child: Row(
+            textDirection: TextDirection.rtl,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[SizedBox(key: childKey, width: 100.0, height: 100.0)],
+          ),
         ),
       ),
-    ));
+    );
 
     final RenderBox renderBox = tester.renderObject(find.byKey(childKey));
     expect(renderBox.size.width, equals(100.0));
     expect(renderBox.size.height, equals(0.0));
+  });
+
+  testWidgets('Default Row.spacing value', (WidgetTester tester) async {
+    await tester.pumpWidget(const Directionality(textDirection: TextDirection.ltr, child: Row()));
+
+    expect(tester.widget<Row>(find.byType(Row)).spacing, 0.0);
+  });
+
+  testWidgets('Can update Row.spacing value', (WidgetTester tester) async {
+    Widget buildRow({required double spacing}) {
+      return Center(
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Row(
+            spacing: spacing,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(height: 100.0, width: 100.0, color: const Color(0xFFFF0000)),
+              Container(height: 100.0, width: 100.0, color: const Color(0xFF0000FF)),
+              Container(height: 100.0, width: 100.0, color: const Color(0xff00FF00)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(buildRow(spacing: 8.0));
+
+    expect(tester.widget<Row>(find.byType(Row)).spacing, equals(8.0));
+    expect(tester.getSize(find.byType(Row)).width, equals(316.0));
+    expect(tester.getSize(find.byType(Row)).height, equals(100.0));
+
+    await tester.pumpWidget(buildRow(spacing: 18.0));
+
+    expect(tester.widget<Row>(find.byType(Row)).spacing, equals(18.0));
+    expect(tester.getSize(find.byType(Row)).width, equals(336.0));
+    expect(tester.getSize(find.byType(Row)).height, equals(100.0));
   });
 }

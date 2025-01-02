@@ -10,10 +10,9 @@ library;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
-  testWidgetsWithLeakTracking('Activity indicator animate property works', (WidgetTester tester) async {
+  testWidgets('Activity indicator animate property works', (WidgetTester tester) async {
     await tester.pumpWidget(buildCupertinoActivityIndicator());
     expect(SchedulerBinding.instance.transientCallbackCount, equals(1));
 
@@ -29,7 +28,7 @@ void main() {
     expect(SchedulerBinding.instance.transientCallbackCount, equals(1));
   });
 
-  testWidgetsWithLeakTracking('Activity indicator dark mode', (WidgetTester tester) async {
+  testWidgets('Activity indicator dark mode', (WidgetTester tester) async {
     final Key key = UniqueKey();
     await tester.pumpWidget(
       Center(
@@ -39,20 +38,14 @@ void main() {
             key: key,
             child: const ColoredBox(
               color: CupertinoColors.white,
-              child: CupertinoActivityIndicator(
-                animating: false,
-                radius: 35,
-              ),
+              child: CupertinoActivityIndicator(animating: false, radius: 35),
             ),
           ),
         ),
       ),
     );
 
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('activityIndicator.paused.light.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('activityIndicator.paused.light.png'));
 
     await tester.pumpWidget(
       Center(
@@ -62,23 +55,17 @@ void main() {
             key: key,
             child: const ColoredBox(
               color: CupertinoColors.black,
-              child: CupertinoActivityIndicator(
-                animating: false,
-                radius: 35,
-              ),
+              child: CupertinoActivityIndicator(animating: false, radius: 35),
             ),
           ),
         ),
       ),
     );
 
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('activityIndicator.paused.dark.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('activityIndicator.paused.dark.png'));
   });
 
-  testWidgetsWithLeakTracking('Activity indicator 0% in progress', (WidgetTester tester) async {
+  testWidgets('Activity indicator 0% in progress', (WidgetTester tester) async {
     final Key key = UniqueKey();
     await tester.pumpWidget(
       Center(
@@ -86,21 +73,16 @@ void main() {
           key: key,
           child: const ColoredBox(
             color: CupertinoColors.white,
-            child: CupertinoActivityIndicator.partiallyRevealed(
-              progress: 0,
-            ),
+            child: CupertinoActivityIndicator.partiallyRevealed(progress: 0),
           ),
         ),
       ),
     );
 
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('activityIndicator.inprogress.0.0.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('activityIndicator.inprogress.0.0.png'));
   });
 
-  testWidgetsWithLeakTracking('Activity indicator 30% in progress', (WidgetTester tester) async {
+  testWidgets('Activity indicator 30% in progress', (WidgetTester tester) async {
     final Key key = UniqueKey();
     await tester.pumpWidget(
       Center(
@@ -108,21 +90,16 @@ void main() {
           key: key,
           child: const ColoredBox(
             color: CupertinoColors.white,
-            child: CupertinoActivityIndicator.partiallyRevealed(
-              progress: 0.5,
-            ),
+            child: CupertinoActivityIndicator.partiallyRevealed(progress: 0.5),
           ),
         ),
       ),
     );
 
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('activityIndicator.inprogress.0.3.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('activityIndicator.inprogress.0.3.png'));
   });
 
-  testWidgetsWithLeakTracking('Activity indicator 100% in progress', (WidgetTester tester) async {
+  testWidgets('Activity indicator 100% in progress', (WidgetTester tester) async {
     final Key key = UniqueKey();
     await tester.pumpWidget(
       Center(
@@ -136,17 +113,12 @@ void main() {
       ),
     );
 
-    await expectLater(
-      find.byKey(key),
-      matchesGoldenFile('activityIndicator.inprogress.1.0.png'),
-    );
+    await expectLater(find.byKey(key), matchesGoldenFile('activityIndicator.inprogress.1.0.png'));
   });
 
   // Regression test for https://github.com/flutter/flutter/issues/41345.
-  testWidgetsWithLeakTracking('has the correct corner radius', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const CupertinoActivityIndicator(animating: false, radius: 100),
-    );
+  testWidgets('has the correct corner radius', (WidgetTester tester) async {
+    await tester.pumpWidget(const CupertinoActivityIndicator(animating: false, radius: 100));
 
     // An earlier implementation for the activity indicator started drawing
     // the ticks at 9 o'clock, however, in order to support partially revealed
@@ -154,12 +126,11 @@ void main() {
     // first tick was changed to be at 12 o'clock.
     expect(
       find.byType(CupertinoActivityIndicator),
-      paints
-        ..rrect(rrect: const RRect.fromLTRBXY(-10, -100 / 3, 10, -100, 10, 10)),
+      paints..rrect(rrect: const RRect.fromLTRBXY(-10, -100 / 3, 10, -100, 10, 10)),
     );
   });
 
-  testWidgetsWithLeakTracking('Can specify color', (WidgetTester tester) async {
+  testWidgets('Can specify color', (WidgetTester tester) async {
     final Key key = UniqueKey();
     await tester.pumpWidget(
       Center(
@@ -179,9 +150,10 @@ void main() {
 
     expect(
       find.byType(CupertinoActivityIndicator),
-      paints
-        ..rrect(rrect: const RRect.fromLTRBXY(-10, -100 / 3, 10, -100, 10, 10),
-                color: const Color(0x935d3fd3)),
+      paints..rrect(
+        rrect: const RRect.fromLTRBXY(-10, -100 / 3, 10, -100, 10, 10),
+        color: const Color(0x935d3fd3),
+      ),
     );
   });
 }
@@ -189,8 +161,6 @@ void main() {
 Widget buildCupertinoActivityIndicator([bool? animating]) {
   return MediaQuery(
     data: const MediaQueryData(),
-    child: CupertinoActivityIndicator(
-      animating: animating ?? true,
-    ),
+    child: CupertinoActivityIndicator(animating: animating ?? true),
   );
 }

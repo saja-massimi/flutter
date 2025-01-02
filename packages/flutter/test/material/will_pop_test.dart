@@ -4,12 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 bool willPopValue = false;
 
 class SamplePage extends StatefulWidget {
-  const SamplePage({ super.key });
+  const SamplePage({super.key});
   @override
   SamplePageState createState() => SamplePageState();
 }
@@ -35,16 +34,14 @@ class SamplePageState extends State<SamplePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sample Page')),
-    );
+    return Scaffold(appBar: AppBar(title: const Text('Sample Page')));
   }
 }
 
 int willPopCount = 0;
 
 class SampleForm extends StatelessWidget {
-  const SampleForm({ super.key, required this.callback });
+  const SampleForm({super.key, required this.callback});
 
   final WillPopCallback callback;
 
@@ -67,20 +64,13 @@ class SampleForm extends StatelessWidget {
 
 // Expose the protected hasScopedWillPopCallback getter
 class _TestPageRoute<T> extends MaterialPageRoute<T> {
-  _TestPageRoute({
-    super.settings,
-    required super.builder,
-  }) : super(maintainState: true);
+  _TestPageRoute({super.settings, required super.builder}) : super(maintainState: true);
 
   bool get hasCallback => super.hasScopedWillPopCallback;
 }
 
 class _TestPage extends Page<dynamic> {
-  _TestPage({
-    required this.builder,
-    required LocalKey key,
-  })  : _key = GlobalKey(),
-        super(key: key);
+  _TestPage({required this.builder, required LocalKey key}) : _key = GlobalKey(), super(key: key);
 
   final WidgetBuilder builder;
   final GlobalKey<dynamic> _key;
@@ -88,16 +78,19 @@ class _TestPage extends Page<dynamic> {
   @override
   Route<dynamic> createRoute(BuildContext context) {
     return _TestPageRoute<dynamic>(
-        settings: this,
-        builder: (BuildContext context) {
-          // keep state during move to another location in tree
-          return KeyedSubtree(key: _key, child: builder.call(context));
-        });
+      settings: this,
+      builder: (BuildContext context) {
+        // keep state during move to another location in tree
+        return KeyedSubtree(key: _key, child: builder.call(context));
+      },
+    );
   }
 }
 
 void main() {
-  testWidgetsWithLeakTracking('ModalRoute scopedWillPopupCallback can inhibit back button', (WidgetTester tester) async {
+  testWidgets('ModalRoute scopedWillPopupCallback can inhibit back button', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -152,7 +145,7 @@ void main() {
     expect(find.text('Sample Page'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('willPop will only pop if the callback returns true', (WidgetTester tester) async {
+  testWidgets('willPop will only pop if the callback returns true', (WidgetTester tester) async {
     Widget buildFrame() {
       return MaterialApp(
         home: Scaffold(
@@ -163,13 +156,13 @@ void main() {
                 child: TextButton(
                   child: const Text('X'),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute<void>(
-                      builder: (BuildContext context) {
-                        return SampleForm(
-                          callback: () => Future<bool>.value(willPopValue),
-                        );
-                      },
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) {
+                          return SampleForm(callback: () => Future<bool>.value(willPopValue));
+                        },
+                      ),
+                    );
                   },
                 ),
               );
@@ -191,7 +184,7 @@ void main() {
     expect(find.text('Sample Form'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Form.willPop can inhibit back button', (WidgetTester tester) async {
+  testWidgets('Form.willPop can inhibit back button', (WidgetTester tester) async {
     Widget buildFrame() {
       return MaterialApp(
         home: Scaffold(
@@ -202,13 +195,13 @@ void main() {
                 child: TextButton(
                   child: const Text('X'),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute<void>(
-                      builder: (BuildContext context) {
-                        return SampleForm(
-                          callback: () => Future<bool>.value(willPopValue),
-                        );
-                      },
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) {
+                          return SampleForm(callback: () => Future<bool>.value(willPopValue));
+                        },
+                      ),
+                    );
                   },
                 ),
               );
@@ -245,20 +238,24 @@ void main() {
     expect(willPopCount, 1);
   });
 
-  testWidgetsWithLeakTracking('Form.willPop callbacks do not accumulate', (WidgetTester tester) async {
+  testWidgets('Form.willPop callbacks do not accumulate', (WidgetTester tester) async {
     Future<bool> showYesNoAlert(BuildContext context) async {
       return (await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            actions: <Widget> [
+            actions: <Widget>[
               TextButton(
                 child: const Text('YES'),
-                onPressed: () { Navigator.of(context).pop(true); },
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
               ),
               TextButton(
                 child: const Text('NO'),
-                onPressed: () { Navigator.of(context).pop(false); },
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
               ),
             ],
           );
@@ -276,13 +273,13 @@ void main() {
                 child: TextButton(
                   child: const Text('X'),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute<void>(
-                      builder: (BuildContext context) {
-                        return SampleForm(
-                          callback: () => showYesNoAlert(context),
-                        );
-                      },
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) {
+                          return SampleForm(callback: () => showYesNoAlert(context));
+                        },
+                      ),
+                    );
                   },
                 ),
               );
@@ -337,7 +334,7 @@ void main() {
     expect(find.text('Sample Form'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Route.scopedWillPop callbacks do not accumulate', (WidgetTester tester) async {
+  testWidgets('Route.scopedWillPop callbacks do not accumulate', (WidgetTester tester) async {
     late StateSetter contentsSetState; // call this to rebuild the route's SampleForm contents
     bool contentsEmpty = false; // when true, don't include the SampleForm in the route
 
@@ -346,7 +343,9 @@ void main() {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             contentsSetState = setState;
-            return contentsEmpty ? Container() : SampleForm(key: UniqueKey(), callback: () async => false);
+            return contentsEmpty
+                ? Container()
+                : SampleForm(key: UniqueKey(), callback: () async => false);
           },
         );
       },
@@ -382,22 +381,24 @@ void main() {
     expect(route.hasCallback, isTrue);
 
     // Rebuild the route's SampleForm child an additional 3x for good measure.
-    contentsSetState(() { });
+    contentsSetState(() {});
     await tester.pump();
-    contentsSetState(() { });
+    contentsSetState(() {});
     await tester.pump();
-    contentsSetState(() { });
+    contentsSetState(() {});
     await tester.pump();
 
     // Now build the route's contents without the sample form.
     contentsEmpty = true;
-    contentsSetState(() { });
+    contentsSetState(() {});
     await tester.pump();
 
     expect(route.hasCallback, isFalse);
   });
 
-  testWidgetsWithLeakTracking('should handle new route if page moved from one navigator to another', (WidgetTester tester) async {
+  testWidgets('should handle new route if page moved from one navigator to another', (
+    WidgetTester tester,
+  ) async {
     // Regression test for https://github.com/flutter/flutter/issues/89133
     late StateSetter contentsSetState;
     bool moveToAnotherNavigator = false;
@@ -406,10 +407,7 @@ void main() {
       _TestPage(
         key: UniqueKey(),
         builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () async => true,
-            child: const Text('anchor'),
-          );
+          return WillPopScope(onWillPop: () async => true, child: const Text('anchor'));
         },
       ),
     ];
@@ -442,13 +440,15 @@ void main() {
 
     await tester.pumpWidget(buildFrame());
     await tester.pump();
-    final _TestPageRoute<dynamic> route1 = ModalRoute.of(tester.element(find.text('anchor')))! as _TestPageRoute<dynamic>;
+    final _TestPageRoute<dynamic> route1 =
+        ModalRoute.of(tester.element(find.text('anchor')))! as _TestPageRoute<dynamic>;
     expect(route1.hasCallback, isTrue);
     moveToAnotherNavigator = true;
     contentsSetState(() {});
 
     await tester.pump();
-    final _TestPageRoute<dynamic> route2 = ModalRoute.of(tester.element(find.text('anchor')))! as _TestPageRoute<dynamic>;
+    final _TestPageRoute<dynamic> route2 =
+        ModalRoute.of(tester.element(find.text('anchor')))! as _TestPageRoute<dynamic>;
 
     expect(route1.hasCallback, isFalse);
     expect(route2.hasCallback, isTrue);

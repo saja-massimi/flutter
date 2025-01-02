@@ -9,22 +9,19 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   tearDown(() {
     debugDisableShadows = true;
   });
 
-  testWidgetsWithLeakTracking('Shadows on BoxDecoration', (WidgetTester tester) async {
+  testWidgets('Shadows on BoxDecoration', (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: RepaintBoundary(
           child: Container(
             margin: const EdgeInsets.all(50.0),
-            decoration: BoxDecoration(
-              boxShadow: kElevationToShadow[9],
-            ),
+            decoration: BoxDecoration(boxShadow: kElevationToShadow[9]),
             height: 100.0,
             width: 100.0,
           ),
@@ -52,7 +49,9 @@ void main() {
           child: Container(
             margin: const EdgeInsets.all(150.0),
             decoration: ShapeDecoration(
-              shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              shape: const BeveledRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              ),
               shadows: kElevationToShadow[elevation],
             ),
             height: 100.0,
@@ -61,8 +60,9 @@ void main() {
         ),
       );
     }
+
     for (final int elevation in kElevationToShadow.keys) {
-      testWidgetsWithLeakTracking('elevation $elevation', (WidgetTester tester) async {
+      testWidgets('elevation $elevation', (WidgetTester tester) async {
         debugDisableShadows = false;
         await tester.pumpWidget(build(elevation));
         await expectLater(
@@ -74,7 +74,7 @@ void main() {
     }
   });
 
-  testWidgetsWithLeakTracking('Shadows with PhysicalLayer', (WidgetTester tester) async {
+  testWidgets('Shadows with PhysicalLayer', (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: RepaintBoundary(
@@ -84,10 +84,7 @@ void main() {
             child: PhysicalModel(
               elevation: 9.0,
               color: Colors.blue[900]!,
-              child: const SizedBox(
-                height: 100.0,
-                width: 100.0,
-              ),
+              child: const SizedBox(height: 100.0, width: 100.0),
             ),
           ),
         ),
@@ -122,10 +119,7 @@ void main() {
                 ),
               ),
               elevation: elevation,
-              child: const SizedBox(
-                height: 100.0,
-                width: 100.0,
-              ),
+              child: const SizedBox(height: 100.0, width: 100.0),
             ),
           ),
         ),
@@ -133,7 +127,7 @@ void main() {
     }
 
     for (final int elevation in kElevationToShadow.keys) {
-      testWidgetsWithLeakTracking('elevation $elevation', (WidgetTester tester) async {
+      testWidgets('elevation $elevation', (WidgetTester tester) async {
         debugDisableShadows = false;
         await tester.pumpWidget(build(elevation.toDouble()));
         await expectLater(

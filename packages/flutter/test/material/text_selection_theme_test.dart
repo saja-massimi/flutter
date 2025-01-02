@@ -5,12 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   test('TextSelectionThemeData copyWith, ==, hashCode basics', () {
     expect(const TextSelectionThemeData(), const TextSelectionThemeData().copyWith());
-    expect(const TextSelectionThemeData().hashCode, const TextSelectionThemeData().copyWith().hashCode);
+    expect(
+      const TextSelectionThemeData().hashCode,
+      const TextSelectionThemeData().copyWith().hashCode,
+    );
   });
 
   test('TextSelectionThemeData lerp special cases', () {
@@ -26,19 +28,20 @@ void main() {
     expect(theme.selectionHandleColor, null);
   });
 
-  testWidgetsWithLeakTracking('Default TextSelectionThemeData debugFillProperties', (WidgetTester tester) async {
+  testWidgets('Default TextSelectionThemeData debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
     const TextSelectionThemeData().debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-        .map((DiagnosticsNode node) => node.toString())
-        .toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[]);
   });
 
-  testWidgetsWithLeakTracking('TextSelectionThemeData implements debugFillProperties', (WidgetTester tester) async {
+  testWidgets('TextSelectionThemeData implements debugFillProperties', (WidgetTester tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
     const TextSelectionThemeData(
       cursorColor: Color(0xffeeffaa),
@@ -46,19 +49,22 @@ void main() {
       selectionHandleColor: Color(0xaabbccdd),
     ).debugFillProperties(builder);
 
-    final List<String> description = builder.properties
-        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-        .map((DiagnosticsNode node) => node.toString())
-        .toList();
+    final List<String> description =
+        builder.properties
+            .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+            .map((DiagnosticsNode node) => node.toString())
+            .toList();
 
     expect(description, <String>[
-      'cursorColor: Color(0xffeeffaa)',
-      'selectionColor: Color(0x88888888)',
-      'selectionHandleColor: Color(0xaabbccdd)',
+      'cursorColor: ${const Color(0xffeeffaa)}',
+      'selectionColor: ${const Color(0x88888888)}',
+      'selectionHandleColor: ${const Color(0xaabbccdd)}',
     ]);
   });
 
-  testWidgetsWithLeakTracking('Material2 - Empty textSelectionTheme will use defaults', (WidgetTester tester) async {
+  testWidgets('Material2 - Empty textSelectionTheme will use defaults', (
+    WidgetTester tester,
+  ) async {
     final ThemeData theme = ThemeData(useMaterial3: false);
     const Color defaultCursorColor = Color(0xff2196f3);
     const Color defaultSelectionColor = Color(0x662196f3);
@@ -70,12 +76,7 @@ void main() {
     });
     // Test TextField's cursor & selection color.
     await tester.pumpWidget(
-      MaterialApp(
-        theme: theme,
-        home: const Material(
-          child: TextField(autofocus: true),
-        ),
-      ),
+      MaterialApp(theme: theme, home: const Material(child: TextField(autofocus: true))),
     );
     await tester.pump();
     await tester.pumpAndSettle();
@@ -107,7 +108,9 @@ void main() {
     expect(handle, paints..path(color: defaultSelectionHandleColor));
   });
 
-  testWidgetsWithLeakTracking('Material3 - Empty textSelectionTheme will use defaults', (WidgetTester tester) async {
+  testWidgets('Material3 - Empty textSelectionTheme will use defaults', (
+    WidgetTester tester,
+  ) async {
     final ThemeData theme = ThemeData(useMaterial3: true);
     final Color defaultCursorColor = theme.colorScheme.primary;
     final Color defaultSelectionColor = theme.colorScheme.primary.withOpacity(0.40);
@@ -119,12 +122,7 @@ void main() {
     });
     // Test TextField's cursor & selection color.
     await tester.pumpWidget(
-      MaterialApp(
-        theme: theme,
-        home: const Material(
-          child: TextField(autofocus: true),
-        ),
-      ),
+      MaterialApp(theme: theme, home: const Material(child: TextField(autofocus: true))),
     );
     await tester.pump();
     await tester.pumpAndSettle();
@@ -156,15 +154,13 @@ void main() {
     expect(handle, paints..path(color: defaultSelectionHandleColor));
   });
 
-  testWidgetsWithLeakTracking('ThemeData.textSelectionTheme will be used if provided', (WidgetTester tester) async {
+  testWidgets('ThemeData.textSelectionTheme will be used if provided', (WidgetTester tester) async {
     const TextSelectionThemeData textSelectionTheme = TextSelectionThemeData(
       cursorColor: Color(0xffaabbcc),
       selectionColor: Color(0x88888888),
       selectionHandleColor: Color(0x00ccbbaa),
     );
-    final ThemeData theme = ThemeData.fallback().copyWith(
-      textSelectionTheme: textSelectionTheme,
-    );
+    final ThemeData theme = ThemeData.fallback().copyWith(textSelectionTheme: textSelectionTheme);
 
     EditableText.debugDeterministicCursor = true;
     addTearDown(() {
@@ -173,12 +169,7 @@ void main() {
 
     // Test TextField's cursor & selection color.
     await tester.pumpWidget(
-      MaterialApp(
-        theme: theme,
-        home: const Material(
-          child: TextField(autofocus: true),
-        ),
-      ),
+      MaterialApp(theme: theme, home: const Material(child: TextField(autofocus: true))),
     );
     await tester.pump();
 
@@ -209,7 +200,9 @@ void main() {
     expect(handle, paints..path(color: textSelectionTheme.selectionHandleColor));
   });
 
-  testWidgetsWithLeakTracking('TextSelectionTheme widget will override ThemeData.textSelectionTheme', (WidgetTester tester) async {
+  testWidgets('TextSelectionTheme widget will override ThemeData.textSelectionTheme', (
+    WidgetTester tester,
+  ) async {
     const TextSelectionThemeData defaultTextSelectionTheme = TextSelectionThemeData(
       cursorColor: Color(0xffaabbcc),
       selectionColor: Color(0x88888888),
@@ -271,7 +264,7 @@ void main() {
     expect(handle, paints..path(color: widgetTextSelectionTheme.selectionHandleColor));
   });
 
-  testWidgetsWithLeakTracking('TextField parameters will override theme settings', (WidgetTester tester) async {
+  testWidgets('TextField parameters will override theme settings', (WidgetTester tester) async {
     const TextSelectionThemeData defaultTextSelectionTheme = TextSelectionThemeData(
       cursorColor: Color(0xffaabbcc),
       selectionHandleColor: Color(0x00ccbbaa),
@@ -320,7 +313,7 @@ void main() {
     expect(renderSelectable.cursorColor, cursorColor.withAlpha(0));
   });
 
-  testWidgetsWithLeakTracking('TextSelectionThem overrides DefaultSelectionStyle', (WidgetTester tester) async {
+  testWidgets('TextSelectionThem overrides DefaultSelectionStyle', (WidgetTester tester) async {
     const Color themeSelectionColor = Color(0xffaabbcc);
     const Color themeCursorColor = Color(0x00ccbbaa);
     const Color defaultSelectionColor = Color(0xffaa1111);
@@ -340,15 +333,15 @@ void main() {
                 selectionColor: themeSelectionColor,
                 cursorColor: themeCursorColor,
               ),
-              child: Placeholder(
-                key: themeStyle,
-              ),
+              child: Placeholder(key: themeStyle),
             ),
-          )
+          ),
         ),
       ),
     );
-    final BuildContext defaultSelectionStyleContext = tester.element(find.byKey(defaultSelectionStyle));
+    final BuildContext defaultSelectionStyleContext = tester.element(
+      find.byKey(defaultSelectionStyle),
+    );
     DefaultSelectionStyle style = DefaultSelectionStyle.of(defaultSelectionStyleContext);
     expect(style.selectionColor, defaultSelectionColor);
     expect(style.cursorColor, defaultCursorColor);

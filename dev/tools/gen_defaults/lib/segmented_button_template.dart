@@ -5,7 +5,11 @@
 import 'template.dart';
 
 class SegmentedButtonTemplate extends TokenTemplate {
-  const SegmentedButtonTemplate(this.tokenGroup, super.blockName, super.fileName, super.tokens, {
+  const SegmentedButtonTemplate(
+    this.tokenGroup,
+    super.blockName,
+    super.fileName,
+    super.tokens, {
     super.colorSchemePrefix = '_colors.',
   });
 
@@ -119,6 +123,26 @@ class _${blockName}DefaultsM3 extends SegmentedButtonThemeData {
   }
   @override
   Widget? get selectedIcon => const Icon(Icons.check);
+
+  static WidgetStateProperty<Color?> resolveStateColor(
+    Color? unselectedColor,
+    Color? selectedColor,
+    Color? overlayColor,
+  ) {
+    final Color? selected = overlayColor ?? selectedColor;
+    final Color? unselected = overlayColor ?? unselectedColor;
+    return WidgetStateProperty<Color?>.fromMap(
+      <WidgetStatesConstraint, Color?>{
+        WidgetState.selected & WidgetState.pressed: selected?.withOpacity(0.1),
+        WidgetState.selected & WidgetState.hovered: selected?.withOpacity(0.08),
+        WidgetState.selected & WidgetState.focused: selected?.withOpacity(0.1),
+        WidgetState.pressed: unselected?.withOpacity(0.1),
+        WidgetState.hovered: unselected?.withOpacity(0.08),
+        WidgetState.focused: unselected?.withOpacity(0.1),
+        WidgetState.any: Colors.transparent,
+      },
+    );
+  }
 }
 ''';
 }

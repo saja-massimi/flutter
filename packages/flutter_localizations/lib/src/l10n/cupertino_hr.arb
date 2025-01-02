@@ -31,5 +31,6 @@
   "menuDismissLabel": "Odbacivanje izbornika",
   "lookUpButtonLabel": "Pogled prema gore",
   "searchWebButtonLabel": "Pretraži web",
-  "shareButtonLabel": "Dijeli..."
+  "shareButtonLabel": "Dijeli...",
+  "clearButtonLabel": "Izbriši"
 }

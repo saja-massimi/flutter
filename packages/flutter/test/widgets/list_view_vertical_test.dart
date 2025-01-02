@@ -4,7 +4,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 const List<int> items = <int>[0, 1, 2, 3, 4, 5];
 
@@ -13,15 +12,16 @@ Widget buildFrame() {
     textDirection: TextDirection.ltr,
     child: ListView(
       itemExtent: 290.0,
-      children: items.map<Widget>((int item) {
-        return Text('$item');
-      }).toList(),
+      children:
+          items.map<Widget>((int item) {
+            return Text('$item');
+          }).toList(),
     ),
   );
 }
 
 void main() {
-  testWidgetsWithLeakTracking('Drag vertically', (WidgetTester tester) async {
+  testWidgets('Drag vertically', (WidgetTester tester) async {
     await tester.pumpWidget(buildFrame());
 
     await tester.pump();
@@ -64,16 +64,17 @@ void main() {
     expect(find.text('5'), findsNothing);
   });
 
-  testWidgetsWithLeakTracking('Drag vertically', (WidgetTester tester) async {
+  testWidgets('Drag vertically', (WidgetTester tester) async {
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: ListView(
           itemExtent: 290.0,
           padding: const EdgeInsets.only(top: 250.0),
-          children: items.map<Widget>((int item) {
-            return Text('$item');
-          }).toList(),
+          children:
+              items.map<Widget>((int item) {
+                return Text('$item');
+              }).toList(),
         ),
       ),
     );

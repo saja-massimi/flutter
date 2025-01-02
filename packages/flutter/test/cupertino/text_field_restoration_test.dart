@@ -5,31 +5,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 const String text = 'Hello World! How are you? Life is good!';
 const String alternativeText = 'Everything is awesome!!';
 
 void main() {
-  testWidgetsWithLeakTracking('CupertinoTextField restoration', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const CupertinoApp(
-        restorationScopeId: 'app',
-        home: TestWidget(),
-      ),
-    );
+  testWidgets('CupertinoTextField restoration', (WidgetTester tester) async {
+    await tester.pumpWidget(const CupertinoApp(restorationScopeId: 'app', home: TestWidget()));
 
     await restoreAndVerify(tester);
   });
 
-  testWidgetsWithLeakTracking('CupertinoTextField restoration with external controller', (WidgetTester tester) async {
+  testWidgets('CupertinoTextField restoration with external controller', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const CupertinoApp(
-        restorationScopeId: 'app',
-        home: TestWidget(
-          useExternal: true,
-        ),
-      ),
+      const CupertinoApp(restorationScopeId: 'app', home: TestWidget(useExternal: true)),
     );
 
     await restoreAndVerify(tester);

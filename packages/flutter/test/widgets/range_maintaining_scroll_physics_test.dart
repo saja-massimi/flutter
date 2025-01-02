@@ -6,10 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 class ExpandingBox extends StatefulWidget {
-  const ExpandingBox({ super.key, required this.collapsedSize, required this.expandedSize });
+  const ExpandingBox({super.key, required this.collapsedSize, required this.expandedSize});
 
   final double collapsedSize;
   final double expandedSize;
@@ -18,7 +17,8 @@ class ExpandingBox extends StatefulWidget {
   State<ExpandingBox> createState() => _ExpandingBoxState();
 }
 
-class _ExpandingBoxState extends State<ExpandingBox> with AutomaticKeepAliveClientMixin<ExpandingBox> {
+class _ExpandingBoxState extends State<ExpandingBox>
+    with AutomaticKeepAliveClientMixin<ExpandingBox> {
   late double _height;
 
   @override
@@ -41,10 +41,7 @@ class _ExpandingBoxState extends State<ExpandingBox> with AutomaticKeepAliveClie
       color: Colors.green,
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: TextButton(
-          onPressed: toggleSize,
-          child: const Text('Collapse'),
-        ),
+        child: TextButton(onPressed: toggleSize, child: const Text('Collapse')),
       ),
     );
   }
@@ -54,15 +51,19 @@ class _ExpandingBoxState extends State<ExpandingBox> with AutomaticKeepAliveClie
 }
 
 void main() {
-  testWidgetsWithLeakTracking('shrink listview', (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: ListView.builder(
-        itemBuilder: (BuildContext context, int index) => index == 0
-              ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
-              : Container(height: 300, color: Colors.red),
-        itemCount: 2,
+  testWidgets('shrink listview', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ListView.builder(
+          itemBuilder:
+              (BuildContext context, int index) =>
+                  index == 0
+                      ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
+                      : Container(height: 300, color: Colors.red),
+          itemCount: 2,
+        ),
       ),
-    ));
+    );
 
     final ScrollPosition position = tester.state<ScrollableState>(find.byType(Scrollable)).position;
     expect(position.activity, isInstanceOf<IdleScrollActivity>());
@@ -99,15 +100,19 @@ void main() {
     expect(position.pixels, 100.0);
   });
 
-  testWidgetsWithLeakTracking('shrink listview while dragging', (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: ListView.builder(
-        itemBuilder: (BuildContext context, int index) => index == 0
-              ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
-              : Container(height: 300, color: Colors.red),
-        itemCount: 2,
+  testWidgets('shrink listview while dragging', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ListView.builder(
+          itemBuilder:
+              (BuildContext context, int index) =>
+                  index == 0
+                      ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
+                      : Container(height: 300, color: Colors.red),
+          itemCount: 2,
+        ),
       ),
-    ));
+    );
 
     final ScrollPosition position = tester.state<ScrollableState>(find.byType(Scrollable)).position;
     expect(position.activity, isInstanceOf<IdleScrollActivity>());
@@ -139,7 +144,9 @@ void main() {
     expect(position.pixels, lessThanOrEqualTo(900.0));
     expect(position.activity, isInstanceOf<DragScrollActivity>());
 
-    final _ExpandingBoxState expandingBoxState = tester.state<_ExpandingBoxState>(find.byType(ExpandingBox));
+    final _ExpandingBoxState expandingBoxState = tester.state<_ExpandingBoxState>(
+      find.byType(ExpandingBox),
+    );
     expandingBoxState.toggleSize();
     expect(await tester.pumpAndSettle(), 2); // Nothing to animate, only one semantics update
     expect(position.activity, isInstanceOf<DragScrollActivity>());
@@ -158,21 +165,29 @@ void main() {
     expect(position.pixels, 50.0);
   });
 
-  testWidgetsWithLeakTracking('shrink listview while ballistic', (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: GestureDetector(
-        onTap: () { assert(false); },
-        child: ListView.builder(
-          physics: const RangeMaintainingScrollPhysics(parent: BouncingScrollPhysics()),
-          itemBuilder: (BuildContext context, int index) => index == 0
-                ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
-                : Container(height: 300, color: Colors.red),
-          itemCount: 2,
+  testWidgets('shrink listview while ballistic', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GestureDetector(
+          onTap: () {
+            assert(false);
+          },
+          child: ListView.builder(
+            physics: const RangeMaintainingScrollPhysics(parent: BouncingScrollPhysics()),
+            itemBuilder:
+                (BuildContext context, int index) =>
+                    index == 0
+                        ? const ExpandingBox(collapsedSize: 400, expandedSize: 1200)
+                        : Container(height: 300, color: Colors.red),
+            itemCount: 2,
+          ),
         ),
       ),
-    ));
+    );
 
-    final _ExpandingBoxState expandingBoxState = tester.state<_ExpandingBoxState>(find.byType(ExpandingBox));
+    final _ExpandingBoxState expandingBoxState = tester.state<_ExpandingBoxState>(
+      find.byType(ExpandingBox),
+    );
     expandingBoxState.toggleSize();
 
     final ScrollPosition position = tester.state<ScrollableState>(find.byType(Scrollable)).position;
@@ -221,8 +236,10 @@ void main() {
     expect(position.pixels, 0.0);
   });
 
-  testWidgetsWithLeakTracking('expanding page views', (WidgetTester tester) async {
-    await tester.pumpWidget(const Padding(padding: EdgeInsets.only(right: 200.0), child: TabBarDemo()));
+  testWidgets('expanding page views', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const Padding(padding: EdgeInsets.only(right: 200.0), child: TabBarDemo()),
+    );
     await tester.tap(find.text('bike'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
@@ -232,7 +249,7 @@ void main() {
     expect(bike2.center, bike1.shift(const Offset(100.0, 0.0)).center);
   });
 
-  testWidgetsWithLeakTracking('changing the size of the viewport when overscrolled', (WidgetTester tester) async {
+  testWidgets('changing the size of the viewport when overscrolled', (WidgetTester tester) async {
     Widget build(double height) {
       return Directionality(
         textDirection: TextDirection.rtl,
@@ -251,6 +268,7 @@ void main() {
         ),
       );
     }
+
     await tester.pumpWidget(build(200.0));
     // to verify that changing the size of the viewport while you are overdragged does not change the
     // scroll position, we must ensure that:
@@ -258,7 +276,12 @@ void main() {
     // - scroll extents have changed
     // - position does not change at the same time
     // - old position is out of old range AND new range
-    await tester.drag(find.byType(Placeholder), const Offset(0.0, 100.0), touchSlopY: 0.0, warnIfMissed: false); // it'll hit the scrollable
+    await tester.drag(
+      find.byType(Placeholder),
+      const Offset(0.0, 100.0),
+      touchSlopY: 0.0,
+      warnIfMissed: false,
+    ); // it'll hit the scrollable
     await tester.pump();
     final Rect oldPosition = tester.getRect(find.byType(Placeholder));
     await tester.pumpWidget(build(220.0));
@@ -266,7 +289,7 @@ void main() {
     expect(oldPosition, newPosition);
   });
 
-  testWidgetsWithLeakTracking('inserting and removing an item when overscrolled', (WidgetTester tester) async {
+  testWidgets('inserting and removing an item when overscrolled', (WidgetTester tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/62890
 
     const double itemExtent = 100.0;
@@ -284,8 +307,7 @@ void main() {
               child: ListView(
                 children: <Widget>[
                   SizedBox(height: itemExtent, child: Placeholder(key: key)),
-                  if (twoItems)
-                    const SizedBox(height: itemExtent, child: Placeholder()),
+                  if (twoItems) const SizedBox(height: itemExtent, child: Placeholder()),
                 ],
               ),
             ),
@@ -354,11 +376,7 @@ class TabBarDemo extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             bottom: const TabBar(
-              tabs: <Widget>[
-                Tab(text: 'car'),
-                Tab(text: 'transit'),
-                Tab(text: 'bike'),
-              ],
+              tabs: <Widget>[Tab(text: 'car'), Tab(text: 'transit'), Tab(text: 'bike')],
             ),
             title: const Text('Tabs Demo'),
           ),

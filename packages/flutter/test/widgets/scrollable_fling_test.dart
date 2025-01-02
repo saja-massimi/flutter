@@ -5,34 +5,31 @@
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
-const TextStyle testFont = TextStyle(
-  color: Color(0xFF00FF00),
-);
+const TextStyle testFont = TextStyle(color: Color(0xFF00FF00));
 
 Future<void> pumpTest(WidgetTester tester, TargetPlatform platform) async {
   await tester.pumpWidget(Container());
-  await tester.pumpWidget(MaterialApp(
-    theme: ThemeData(
-      platform: platform,
-    ),
-    home: ColoredBox(
-      color: const Color(0xFF111111),
-      child: ListView.builder(
-        dragStartBehavior: DragStartBehavior.down,
-        itemBuilder: (BuildContext context, int index) {
-          return Text('$index', style: testFont);
-        },
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(platform: platform),
+      home: ColoredBox(
+        color: const Color(0xFF111111),
+        child: ListView.builder(
+          dragStartBehavior: DragStartBehavior.down,
+          itemBuilder: (BuildContext context, int index) {
+            return Text('$index', style: testFont);
+          },
+        ),
       ),
     ),
-  ));
+  );
 }
 
 const double dragOffset = 213.82;
 
 void main() {
-  testWidgetsWithLeakTracking('Flings on different platforms', (WidgetTester tester) async {
+  testWidgets('Flings on different platforms', (WidgetTester tester) async {
     double getCurrentOffset() {
       return tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels;
     }
@@ -97,17 +94,22 @@ void main() {
     expect(linuxResult, equals(androidResult));
   });
 
-  testWidgetsWithLeakTracking('fling and tap to stop', (WidgetTester tester) async {
+  testWidgets('fling and tap to stop', (WidgetTester tester) async {
     final List<String> log = <String>[];
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: ListView(
           dragStartBehavior: DragStartBehavior.down,
-          children: List<Widget>.generate(250, (int i) => GestureDetector(
-            onTap: () { log.add('tap $i'); },
-            child: Text('$i', style: testFont),
-          )),
+          children: List<Widget>.generate(
+            250,
+            (int i) => GestureDetector(
+              onTap: () {
+                log.add('tap $i');
+              },
+              child: Text('$i', style: testFont),
+            ),
+          ),
         ),
       ),
     );
@@ -127,17 +129,22 @@ void main() {
     expect(log, equals(<String>['tap 21', 'tap 35']));
   });
 
-  testWidgetsWithLeakTracking('fling and wait and tap', (WidgetTester tester) async {
+  testWidgets('fling and wait and tap', (WidgetTester tester) async {
     final List<String> log = <String>[];
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: ListView(
           dragStartBehavior: DragStartBehavior.down,
-          children: List<Widget>.generate(250, (int i) => GestureDetector(
-            onTap: () { log.add('tap $i'); },
-            child: Text('$i', style: testFont),
-          )),
+          children: List<Widget>.generate(
+            250,
+            (int i) => GestureDetector(
+              onTap: () {
+                log.add('tap $i');
+              },
+              child: Text('$i', style: testFont),
+            ),
+          ),
         ),
       ),
     );
@@ -149,7 +156,9 @@ void main() {
     await tester.fling(find.byType(Scrollable), const Offset(0.0, -200.0), 1000.0);
     await tester.pump(const Duration(milliseconds: 50));
     expect(log, equals(<String>['tap 21']));
-    await tester.pump(const Duration(seconds: 50)); // long wait, so the fling will have ended at the end of it
+    await tester.pump(
+      const Duration(seconds: 50),
+    ); // long wait, so the fling will have ended at the end of it
     expect(log, equals(<String>['tap 21']));
     await tester.tap(find.byType(Scrollable));
     await tester.pump(const Duration(milliseconds: 50));
